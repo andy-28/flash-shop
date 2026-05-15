@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9A5EBDC-F08D-4A81-9F5F-1DEEA56435B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.Domain", "src\FlashShop.Domain\FlashShop.Domain.csproj", "{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.Application", "src\FlashShop.Application\FlashShop.Application.csproj", "{00A84A63-45D6-48A2-8099-5BC110B7090E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.Infrastructure", "src\FlashShop.Infrastructure\FlashShop.Infrastructure.csproj", "{88BDC743-980B-492E-A12A-CF23A10AA2B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.Api", "src\FlashShop.Api\FlashShop.Api.csproj", "{EEDF056A-C237-43B9-92FF-D35676765881}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DE7157F0-6973-4CD8-B0E9-750A1622015D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.UnitTests", "tests\FlashShop.UnitTests\FlashShop.UnitTests.csproj", "{C622EE67-8A2F-4D75-9FEE-922140CE6C6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashShop.IntegrationTests", "tests\FlashShop.IntegrationTests\FlashShop.IntegrationTests.csproj", "{616CC9AF-927A-4856-9FD5-8BC5F00A5B75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00A84A63-45D6-48A2-8099-5BC110B7090E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00A84A63-45D6-48A2-8099-5BC110B7090E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00A84A63-45D6-48A2-8099-5BC110B7090E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00A84A63-45D6-48A2-8099-5BC110B7090E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88BDC743-980B-492E-A12A-CF23A10AA2B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BDC743-980B-492E-A12A-CF23A10AA2B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88BDC743-980B-492E-A12A-CF23A10AA2B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88BDC743-980B-492E-A12A-CF23A10AA2B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEDF056A-C237-43B9-92FF-D35676765881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEDF056A-C237-43B9-92FF-D35676765881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEDF056A-C237-43B9-92FF-D35676765881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEDF056A-C237-43B9-92FF-D35676765881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C622EE67-8A2F-4D75-9FEE-922140CE6C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C622EE67-8A2F-4D75-9FEE-922140CE6C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C622EE67-8A2F-4D75-9FEE-922140CE6C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C622EE67-8A2F-4D75-9FEE-922140CE6C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{616CC9AF-927A-4856-9FD5-8BC5F00A5B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{616CC9AF-927A-4856-9FD5-8BC5F00A5B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{616CC9AF-927A-4856-9FD5-8BC5F00A5B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{616CC9AF-927A-4856-9FD5-8BC5F00A5B75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D4D41FB4-AEA8-4CD7-A8E8-EA77B243B37A} = {B9A5EBDC-F08D-4A81-9F5F-1DEEA56435B9}
+		{00A84A63-45D6-48A2-8099-5BC110B7090E} = {B9A5EBDC-F08D-4A81-9F5F-1DEEA56435B9}
+		{88BDC743-980B-492E-A12A-CF23A10AA2B7} = {B9A5EBDC-F08D-4A81-9F5F-1DEEA56435B9}
+		{EEDF056A-C237-43B9-92FF-D35676765881} = {B9A5EBDC-F08D-4A81-9F5F-1DEEA56435B9}
+		{C622EE67-8A2F-4D75-9FEE-922140CE6C6B} = {DE7157F0-6973-4CD8-B0E9-750A1622015D}
+		{616CC9AF-927A-4856-9FD5-8BC5F00A5B75} = {DE7157F0-6973-4CD8-B0E9-750A1622015D}
+	EndGlobalSection
+EndGlobal
