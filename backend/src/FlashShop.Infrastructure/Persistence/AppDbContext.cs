@@ -18,6 +18,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<Shipment> Shipments => Set<Shipment>();
     public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ContentBlock> ContentBlocks => Set<ContentBlock>();
+    public DbSet<ContentBlockMedia> ContentBlockMedia => Set<ContentBlockMedia>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
