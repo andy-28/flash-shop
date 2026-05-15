@@ -8,7 +8,7 @@ public sealed class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
 {
     public void Configure(EntityTypeBuilder<Inventory> builder)
     {
-        builder.ToTable("inventories");
+        builder.ToTable("inventory");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasColumnName("id");
         builder.Property(x => x.VariantId).HasColumnName("variant_id");
