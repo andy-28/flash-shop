@@ -11,6 +11,10 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<FlashShop.Api.Filters.ValidationFilter>();
@@ -65,6 +69,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("DefaultCors");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

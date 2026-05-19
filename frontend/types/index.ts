@@ -5,6 +5,9 @@ export interface Product {
   name: string;
   description: string;
   category: string;
+  status: string;
+  minPrice?: number;
+  availableStock?: number;
   variants: ProductVariant[];
 }
 
@@ -13,6 +16,24 @@ export interface ProductVariant {
   sku: string;
   specName: string;
   price: number;
+  availableStock: number;
+}
+
+export interface CreateProductPayload {
+  name: string;
+  description: string;
+  category: string;
+  variants: Array<{
+    sku: string;
+    specName: string;
+    price: number;
+    totalStock: number;
+  }>;
+}
+
+export interface UpdateInventoryPayload {
+  variantId: string;
+  totalStock: number;
   availableStock: number;
 }
 

@@ -39,7 +39,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ProductRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<OrderRepository>();
         services.AddSingleton<IMessageQueue, InMemoryMessageQueue>();
 

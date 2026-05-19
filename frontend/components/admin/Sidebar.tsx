@@ -12,8 +12,8 @@ const items = [
 
 export function Sidebar() {
   return (
-    <aside className="border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center border-b border-slate-200 px-5">
+    <aside className="border-r border-white/10 bg-zinc-950">
+      <div className="flex h-16 items-center border-b border-white/10 px-5">
         <Link href="/admin/dashboard" className="font-semibold">
           FlashShop CMS
         </Link>
@@ -24,7 +24,7 @@ export function Sidebar() {
 
           return (
             <Link
-              className="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+              className="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-zinc-400 hover:bg-white/10 hover:text-white"
               href={item.href}
               key={item.href}
             >
