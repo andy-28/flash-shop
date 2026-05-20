@@ -38,11 +38,37 @@ export interface UpdateInventoryPayload {
 }
 
 export interface CartItem {
+  cartItemId: string;
   variantId: string;
+  productId: string;
   productName: string;
   specName: string;
+  imageUrl: string | null;
   quantity: number;
   unitPrice: number;
+  availableStock: number;
+  subtotal: number;
+  isAvailable: boolean;
+}
+
+export interface Cart {
+  id: string | null;
+  items: CartItem[];
+  totalAmount: number;
+  itemCount: number;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  expiresAt: string;
+  user: AuthUser;
 }
 
 export interface Order {

@@ -2,12 +2,14 @@ using FlashShop.Application.Inventory.Commands;
 using FlashShop.Application.Products.Commands;
 using FlashShop.Application.Products.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlashShop.Api.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/products")]
+[Authorize(Roles = "Admin")]
 public sealed class AdminProductController(IMediator mediator, IWebHostEnvironment environment) : ControllerBase
 {
     [HttpGet]

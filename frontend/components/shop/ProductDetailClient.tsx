@@ -4,11 +4,19 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, Package } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getProduct } from "@/lib/api/products";
+import { useAuthStore } from "@/stores/authStore";
+import { useCartStore } from "@/stores/cartStore";
 
 export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [added, setAdded] = useState(false);
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const isCartLoading = useCartStore((state) => state.isLoading);
   const { data: product, isError, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => getProduct(id),
@@ -28,6 +36,21 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
 
   if (isError || !product) {
     return <main className="mx-auto max-w-6xl px-4 py-10 text-rose-300">Product could not be loaded.</main>;
+  }
+
+  async function handleAddToCart() {
+    if (!selectedVariant) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
+    await addToCart(selectedVariant.id, 1);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
   }
 
   return (
@@ -87,8 +110,12 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
           </div>
         </div>
 
-        <Button className="h-10 w-full rounded-md" disabled={!selectedVariant || selectedVariant.availableStock <= 0}>
-          Add to cart
+        <Button
+          className="h-10 w-full rounded-md"
+          disabled={!selectedVariant || selectedVariant.availableStock <= 0 || isCartLoading}
+          onClick={handleAddToCart}
+        >
+          {selectedVariant && selectedVariant.availableStock <= 0 ? "售罄" : added ? "已加入 ✓" : "加入購物車"}
         </Button>
       </section>
     </main>

@@ -1,8 +1,10 @@
 using System.Text;
 using FlashShop.Api.Hubs;
 using FlashShop.Api.Middleware;
+using FlashShop.Api.Services;
 using FlashShop.Application.Auth.Commands;
 using FlashShop.Application.Common.Behaviors;
+using FlashShop.Application.Common.Interfaces;
 using FlashShop.Infrastructure;
 using FluentValidation;
 using MediatR;
@@ -37,6 +39,9 @@ builder.Services.AddMediatR(configuration =>
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterCommand).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
 
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "this-is-a-dev-secret-key-at-least-32-chars!!";
@@ -74,6 +79,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<DashboardHub>("/hubs/dashboard");
+
+await DevAdminSeeder.SeedAsync(app);
 
 app.Run();
 
