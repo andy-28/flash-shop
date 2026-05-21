@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using FlashShop.Api.Hubs;
 using FlashShop.Api.Middleware;
 using FlashShop.Api.Services;
@@ -20,14 +21,18 @@ builder.Logging.AddDebug();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<FlashShop.Api.Filters.ValidationFilter>();
-});
+})
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultCors", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost")
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

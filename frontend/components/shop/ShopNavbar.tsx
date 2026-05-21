@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, ReceiptText, ShoppingBag, ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 import { useAuthStore } from "@/stores/authStore";
@@ -34,6 +34,15 @@ export function ShopNavbar() {
               <ShoppingBag className="size-4" />
               Products
             </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/orders"
+                className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+              >
+                <ReceiptText className="size-4" />
+                Orders
+              </Link>
+            ) : null}
             <button
               type="button"
               className="relative inline-flex size-9 items-center justify-center rounded-md text-zinc-300 hover:bg-white/10 hover:text-white"

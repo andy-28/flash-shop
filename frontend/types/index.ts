@@ -75,7 +75,31 @@ export interface Order {
   id: string;
   orderNo: string;
   status: OrderStatus;
+  totalAmount: number;
+  discountAmount: number;
+  shippingFee: number;
   finalAmount: number;
   createdAt: string;
+  paidAt: string | null;
   expiredAt: string;
+  itemCount: number;
+  userName?: string | null;
+  userEmail?: string | null;
+  items: OrderItem[];
+  payment?: Payment | null;
+}
+
+export interface OrderItem {
+  productName: string;
+  specName: string;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+}
+
+export interface Payment {
+  method: string;
+  status: "Pending" | "Success" | "Failed" | "Refunded";
+  paidAt: string | null;
+  transactionId: string | null;
 }

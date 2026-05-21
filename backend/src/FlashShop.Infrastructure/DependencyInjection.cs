@@ -44,7 +44,7 @@ public static class DependencyInjection
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
-        services.AddScoped<OrderRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddSingleton<IMessageQueue, InMemoryMessageQueue>();
 
         return services;
