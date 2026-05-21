@@ -1,23 +1,82 @@
+using FlashShop.Application.Common.Interfaces;
+using FlashShop.Application.Orders.Commands;
+using FlashShop.Application.Orders.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlashShop.Api.Controllers;
 
 [ApiController]
 [Route("api/orders")]
-public sealed class OrderController : ControllerBase
+[Authorize]
+public sealed class OrderController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetOrders() => Ok("TODO");
+    public async Task<IActionResult> GetOrders(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var orders = await mediator.Send(new GetOrderListQuery
+        {
+            UserId = GetUserId(),
+            Page = page,
+            PageSize = pageSize
+        }, cancellationToken);
+
+        return Ok(orders);
+    }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetOrder(Guid id) => Ok("TODO");
+    public async Task<IActionResult> GetOrder(Guid id, CancellationToken cancellationToken)
+    {
+        var order = await mediator.Send(new GetOrderDetailQuery
+        {
+            OrderId = id,
+            UserId = GetUserId()
+        }, cancellationToken);
+
+        return Ok(order);
+    }
 
     [HttpPost]
-    public IActionResult CreateOrder() => Ok("TODO");
+    public async Task<IActionResult> CreateOrder(CancellationToken cancellationToken)
+    {
+        var order = await mediator.Send(new CreateOrderCommand
+        {
+            UserId = GetUserId()
+        }, cancellationToken);
+
+        return Ok(order);
+    }
+
+    [HttpPost("{id:guid}/pay")]
+    public async Task<IActionResult> ProcessPayment(Guid id, CancellationToken cancellationToken)
+    {
+        var order = await mediator.Send(new ProcessPaymentCommand
+        {
+            OrderId = id,
+            UserId = GetUserId()
+        }, cancellationToken);
+
+        return Ok(order);
+    }
 
     [HttpPost("{id:guid}/cancel")]
-    public IActionResult CancelOrder(Guid id) => Ok("TODO");
+    public async Task<IActionResult> CancelOrder(Guid id, CancellationToken cancellationToken)
+    {
+        var order = await mediator.Send(new CancelOrderCommand
+        {
+            OrderId = id,
+            UserId = GetUserId()
+        }, cancellationToken);
 
-    [HttpPost("{id:guid}/payment")]
-    public IActionResult ProcessPayment(Guid id) => Ok("TODO");
+        return Ok(order);
+    }
+
+    private Guid GetUserId()
+    {
+        return currentUserService.UserId ?? throw new UnauthorizedAccessException();
+    }
 }
