@@ -8,22 +8,37 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const fetchMe = useAuthStore((state) => state.fetchMe);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
-  const isAdmin = isAuthenticated && user?.role === "Admin";
+  const isAdmin = user?.role === "Admin";
 
   useEffect(() => {
     if (!hasHydrated) {
       return;
     }
 
-    if (!isAdmin) {
+    if (!accessToken) {
       router.push("/login");
+      return;
     }
-  }, [hasHydrated, isAdmin, router]);
 
-  if (!hasHydrated || !isAdmin) {
+    if (!user) {
+      void fetchMe().catch(() => {
+        logout();
+        router.push("/login");
+      });
+      return;
+    }
+
+    if (!isAdmin) {
+      router.push("/login?reason=admin");
+    }
+  }, [accessToken, fetchMe, hasHydrated, isAdmin, logout, router, user]);
+
+  if (!hasHydrated || !accessToken || !user || !isAdmin) {
     return (
       <main className="grid min-h-screen place-items-center bg-black text-sm text-zinc-400">
         Checking admin access...
