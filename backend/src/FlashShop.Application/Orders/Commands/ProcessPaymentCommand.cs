@@ -17,6 +17,7 @@ public sealed class ProcessPaymentCommand : IRequest<OrderDto>
 public sealed class ProcessPaymentCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
+    IInventoryLogRepository inventoryLogRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<ProcessPaymentCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
@@ -62,7 +63,7 @@ public sealed class ProcessPaymentCommandHandler(
             inventory.FrozenStock -= item.Quantity;
             inventory.SoldCount += item.Quantity;
             inventory.Version += 1;
-            inventory.Logs.Add(new InventoryLog
+            await inventoryLogRepository.AddAsync(new InventoryLog
             {
                 Id = Guid.NewGuid(),
                 InventoryId = inventory.Id,
@@ -71,7 +72,7 @@ public sealed class ProcessPaymentCommandHandler(
                 Reason = $"Order {order.OrderNo} paid",
                 OrderId = order.Id,
                 CreatedAt = now
-            });
+            }, cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

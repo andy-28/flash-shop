@@ -103,3 +103,38 @@ export interface Payment {
   paidAt: string | null;
   transactionId: string | null;
 }
+
+export interface ContentBlockMedia {
+  id: string;
+  mediaType: string;
+  mediaUrl: string;
+  position: number;
+}
+
+export interface ContentBlock {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  imageUrl: string;
+  linkUrl: string | null;
+  linkType: "Internal" | "External" | "Product" | "None" | string;
+  placement: string;
+  position: number;
+  isActive: boolean;
+  startAt: string | null;
+  endAt: string | null;
+  createdAt: string;
+  media: ContentBlockMedia[];
+}
+
+export interface ContentBlockPayload {
+  title: string;
+  subtitle?: string | null;
+  imageUrl: string;
+  linkUrl?: string | null;
+  linkType: string;
+  placement: string;
+  isActive: boolean;
+  startAt?: string | null;
+  endAt?: string | null;
+}

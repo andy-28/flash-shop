@@ -5,7 +5,7 @@ const items = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/dashboard#contents", label: "Contents", icon: FileText },
+  { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/dashboard#analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/dashboard#settings", label: "Settings", icon: Settings },
 ];

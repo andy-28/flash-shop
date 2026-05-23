@@ -28,6 +28,7 @@ function formatRemaining(seconds: number) {
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +37,10 @@ export default function OrderDetailPage() {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -48,7 +53,7 @@ export default function OrderDetailPage() {
         setError(axiosError.response?.data?.message ?? "Unable to load order.");
       })
       .finally(() => setIsLoading(false));
-  }, [isAuthenticated, params.id, router]);
+  }, [hasHydrated, isAuthenticated, params.id, router]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);

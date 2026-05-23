@@ -16,6 +16,7 @@ public sealed class CancelOrderCommand : IRequest<OrderDto>
 public sealed class CancelOrderCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
+    IInventoryLogRepository inventoryLogRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<CancelOrderCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(CancelOrderCommand request, CancellationToken cancellationToken)
@@ -53,7 +54,7 @@ public sealed class CancelOrderCommandHandler(
             inventory.FrozenStock -= item.Quantity;
             inventory.AvailableStock += item.Quantity;
             inventory.Version += 1;
-            inventory.Logs.Add(new InventoryLog
+            await inventoryLogRepository.AddAsync(new InventoryLog
             {
                 Id = Guid.NewGuid(),
                 InventoryId = inventory.Id,
@@ -62,7 +63,7 @@ public sealed class CancelOrderCommandHandler(
                 Reason = $"Order {order.OrderNo} cancelled by user",
                 OrderId = order.Id,
                 CreatedAt = now
-            });
+            }, cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -8,16 +8,18 @@ import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
 
 export function ShopNavbar() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const itemCount = useCartStore((state) => state.itemCount);
   const openCart = useCartStore((state) => state.openCart);
   const fetchCart = useCartStore((state) => state.fetchCart);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (hasHydrated && isAuthenticated && accessToken) {
       void fetchCart();
     }
-  }, [fetchCart, isAuthenticated]);
+  }, [accessToken, fetchCart, hasHydrated, isAuthenticated]);
 
   return (
     <>

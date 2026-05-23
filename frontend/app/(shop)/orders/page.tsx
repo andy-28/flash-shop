@@ -20,11 +20,16 @@ const statusClass: Record<OrderStatus, string> = {
 
 export default function OrdersPage() {
   const router = useRouter();
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -34,7 +39,7 @@ export default function OrdersPage() {
       .then(setOrders)
       .catch((error) => console.error("Failed to load orders", error))
       .finally(() => setIsLoading(false));
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
   return (
     <div className="min-h-screen bg-black text-white">
