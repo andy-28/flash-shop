@@ -11,6 +11,7 @@ export function ShopNavbar() {
   const accessToken = useAuthStore((state) => state.accessToken);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const itemCount = useCartStore((state) => state.itemCount);
   const openCart = useCartStore((state) => state.openCart);
   const fetchCart = useCartStore((state) => state.fetchCart);
@@ -58,13 +59,15 @@ export function ShopNavbar() {
                 </span>
               ) : null}
             </button>
-            <Link
-              href="/admin/products"
-              className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
-            >
-              <LayoutDashboard className="size-4" />
-              Admin
-            </Link>
+            {user?.role === "Admin" ? (
+              <Link
+                href="/admin/content"
+                className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+              >
+                <LayoutDashboard className="size-4" />
+                Admin
+              </Link>
+            ) : null}
           </div>
         </nav>
       </header>
