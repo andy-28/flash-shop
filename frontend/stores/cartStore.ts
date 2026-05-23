@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import axios from "axios";
 import { addCartItem, getCart, removeCartItem, updateCartItem } from "@/lib/api/cart";
 import type { CartItem } from "@/types";
 
@@ -31,6 +32,11 @@ export const useCartStore = create<CartState>((set) => ({
       const cart = await getCart();
       set({ items: cart.items, totalAmount: cart.totalAmount, itemCount: cart.itemCount });
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        set({ items: [], totalAmount: 0, itemCount: 0 });
+        return;
+      }
+
       console.error("Failed to fetch cart", error);
     } finally {
       set({ isLoading: false });

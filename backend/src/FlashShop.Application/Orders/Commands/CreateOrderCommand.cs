@@ -15,6 +15,7 @@ public sealed class CreateOrderCommand : IRequest<OrderDto>
 public sealed class CreateOrderCommandHandler(
     ICartRepository cartRepository,
     IOrderRepository orderRepository,
+    IInventoryLogRepository inventoryLogRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<CreateOrderCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -78,7 +79,7 @@ public sealed class CreateOrderCommandHandler(
             inventory.AvailableStock -= cartItem.Quantity;
             inventory.FrozenStock += cartItem.Quantity;
             inventory.Version += 1;
-            inventory.Logs.Add(new InventoryLog
+            await inventoryLogRepository.AddAsync(new InventoryLog
             {
                 Id = Guid.NewGuid(),
                 InventoryId = inventory.Id,
@@ -87,7 +88,7 @@ public sealed class CreateOrderCommandHandler(
                 Reason = $"Order {orderNo} created",
                 OrderId = order.Id,
                 CreatedAt = now
-            });
+            }, cancellationToken);
         }
 
         order.TotalAmount = order.Items.Sum(x => x.Subtotal);

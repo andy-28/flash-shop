@@ -55,7 +55,7 @@ public sealed class AddToCartCommandHandler(
 
         if (item is null)
         {
-            cart.Items.Add(new CartItem
+            await cartRepository.AddItemAsync(new CartItem
             {
                 Id = Guid.NewGuid(),
                 CartId = cart.Id,
@@ -63,7 +63,7 @@ public sealed class AddToCartCommandHandler(
                 Quantity = request.Quantity,
                 AddedAt = DateTime.UtcNow,
                 Variant = variant
-            });
+            }, cancellationToken);
         }
         else
         {

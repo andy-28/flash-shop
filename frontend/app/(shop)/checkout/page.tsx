@@ -11,19 +11,24 @@ import { useCartStore } from "@/stores/cartStore";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { clearCart, fetchCart, items, totalAmount } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
 
     void fetchCart();
-  }, [fetchCart, isAuthenticated, router]);
+  }, [fetchCart, hasHydrated, isAuthenticated, router]);
 
   const submitOrder = async () => {
     setIsSubmitting(true);

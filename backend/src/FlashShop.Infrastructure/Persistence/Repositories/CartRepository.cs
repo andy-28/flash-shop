@@ -34,6 +34,11 @@ public sealed class CartRepository(AppDbContext dbContext) : ICartRepository
         return dbContext.Carts.AddAsync(cart, cancellationToken).AsTask();
     }
 
+    public Task AddItemAsync(CartItem cartItem, CancellationToken cancellationToken = default)
+    {
+        return dbContext.CartItems.AddAsync(cartItem, cancellationToken).AsTask();
+    }
+
     public void RemoveItem(CartItem cartItem)
     {
         dbContext.CartItems.Remove(cartItem);

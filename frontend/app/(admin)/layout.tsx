@@ -1,7 +1,36 @@
-import { Sidebar } from "@/components/admin/Sidebar";
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Sidebar } from "@/components/admin/Sidebar";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const router = useRouter();
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = isAuthenticated && user?.role === "Admin";
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
+    if (!isAdmin) {
+      router.push("/login");
+    }
+  }, [hasHydrated, isAdmin, router]);
+
+  if (!hasHydrated || !isAdmin) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-black text-sm text-zinc-400">
+        Checking admin access...
+      </main>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white md:grid md:grid-cols-[248px_1fr]">
       <Sidebar />
