@@ -4,19 +4,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
+import { OrderStatusBadge } from "@/components/shop/OrderStatusBadge";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { cancelOrder, getOrder, payOrder } from "@/lib/api/orders";
 import { useAuthStore } from "@/stores/authStore";
-import type { Order, OrderStatus } from "@/types";
-
-const statusClass: Record<OrderStatus, string> = {
-  Pending: "bg-[#F59E0B]/15 text-[#F59E0B]",
-  Paid: "bg-[#22C55E]/15 text-[#22C55E]",
-  Shipping: "bg-[#3B82F6]/15 text-[#3B82F6]",
-  Delivered: "bg-purple-500/15 text-purple-300",
-  Cancelled: "bg-[#EF4444]/15 text-[#EF4444]",
-  Expired: "bg-zinc-500/15 text-zinc-400",
-};
+import type { Order } from "@/types";
 
 function formatRemaining(seconds: number) {
   const safeSeconds = Math.max(seconds, 0);
@@ -100,9 +92,7 @@ export default function OrderDetailPage() {
                 <p className="text-xs uppercase tracking-[0.22em] text-[#A0A0A0]">Order detail</p>
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <h1 className="text-3xl font-semibold">{order.orderNo}</h1>
-                  <span className={`w-fit rounded-full px-2.5 py-1 text-xs font-medium ${statusClass[order.status]}`}>
-                    {order.status}
-                  </span>
+                  <OrderStatusBadge status={order.status} />
                 </div>
                 <p className="mt-2 text-sm text-[#A0A0A0]">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
@@ -179,6 +169,11 @@ export default function OrderDetailPage() {
                     Cancel order
                   </button>
                 </div>
+              ) : null}
+              {order.status === "Expired" ? (
+                <p className="mt-5 rounded-md border border-zinc-700 bg-zinc-900 p-3 text-sm text-zinc-300">
+                  訂單已過期，凍結庫存已自動釋放。
+                </p>
               ) : null}
             </aside>
           </div>

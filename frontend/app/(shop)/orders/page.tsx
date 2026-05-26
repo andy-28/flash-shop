@@ -4,19 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PackageSearch } from "lucide-react";
+import { OrderStatusBadge } from "@/components/shop/OrderStatusBadge";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { getOrders } from "@/lib/api/orders";
 import { useAuthStore } from "@/stores/authStore";
-import type { Order, OrderStatus } from "@/types";
-
-const statusClass: Record<OrderStatus, string> = {
-  Pending: "bg-[#F59E0B]/15 text-[#F59E0B]",
-  Paid: "bg-[#22C55E]/15 text-[#22C55E]",
-  Shipping: "bg-[#3B82F6]/15 text-[#3B82F6]",
-  Delivered: "bg-purple-500/15 text-purple-300",
-  Cancelled: "bg-[#EF4444]/15 text-[#EF4444]",
-  Expired: "bg-zinc-500/15 text-zinc-400",
-};
+import type { Order } from "@/types";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -71,9 +63,7 @@ export default function OrdersPage() {
                 <p className="font-medium">{order.orderNo}</p>
                 <p className="mt-1 text-sm text-[#A0A0A0]">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
-              <span className={`h-fit w-fit rounded-full px-2.5 py-1 text-xs font-medium ${statusClass[order.status]}`}>
-                {order.status}
-              </span>
+              <OrderStatusBadge status={order.status} />
               <p className="text-sm text-[#A0A0A0]">{order.itemCount} items</p>
               <p className="font-semibold md:text-right">NT$ {order.finalAmount.toLocaleString()}</p>
             </Link>

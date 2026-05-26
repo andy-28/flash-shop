@@ -16,6 +16,7 @@ public sealed class CreateOrderCommandHandler(
     ICartRepository cartRepository,
     IOrderRepository orderRepository,
     IInventoryLogRepository inventoryLogRepository,
+    IOrderSettings orderSettings,
     IUnitOfWork unitOfWork) : IRequestHandler<CreateOrderCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -52,7 +53,7 @@ public sealed class CreateOrderCommandHandler(
             OrderNo = orderNo,
             Status = OrderStatus.Pending,
             CreatedAt = now,
-            ExpiredAt = now.AddMinutes(30),
+            ExpiredAt = now.AddMinutes(orderSettings.PaymentTimeoutMinutes),
             ShippingFee = 0,
             DiscountAmount = 0
         };

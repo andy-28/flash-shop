@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using FlashShop.Api.BackgroundJobs;
 using FlashShop.Api.Hubs;
 using FlashShop.Api.Middleware;
 using FlashShop.Api.Services;
@@ -48,6 +49,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
+builder.Services.AddHostedService<OrderTimeoutJob>();
 
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "this-is-a-dev-secret-key-at-least-32-chars!!";
 builder.Services

@@ -4,6 +4,7 @@ using FlashShop.Infrastructure.Messaging;
 using FlashShop.Infrastructure.Persistence;
 using FlashShop.Infrastructure.Persistence.Repositories;
 using FlashShop.Infrastructure.Security;
+using FlashShop.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddSingleton<IOrderSettings, OrderSettings>();
         services.AddSingleton<IMessageQueue, InMemoryMessageQueue>();
 
         return services;
