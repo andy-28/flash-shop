@@ -9,6 +9,7 @@ public sealed class OrderDto
     public OrderStatus Status { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal DiscountAmount { get; set; }
+    public string? CouponCode { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal FinalAmount { get; set; }
     public DateTime CreatedAt { get; set; }

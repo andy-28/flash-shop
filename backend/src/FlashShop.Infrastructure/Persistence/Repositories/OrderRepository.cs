@@ -80,6 +80,7 @@ public sealed class OrderRepository(AppDbContext dbContext) : IOrderRepository
     {
         return query
             .Include(x => x.User)
+            .Include(x => x.Coupon)
             .Include(x => x.Items)
             .Include(x => x.Payment)
             .Include(x => x.Shipment);

@@ -1,5 +1,6 @@
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
+using FlashShop.Application.Coupons;
 using FlashShop.Application.Orders.DTOs;
 using FlashShop.Domain.Entities;
 using FlashShop.Domain.Enums;
@@ -10,11 +11,13 @@ namespace FlashShop.Application.Orders.Commands;
 public sealed class CreateOrderCommand : IRequest<OrderDto>
 {
     public Guid UserId { get; set; }
+    public string? CouponCode { get; set; }
 }
 
 public sealed class CreateOrderCommandHandler(
     ICartRepository cartRepository,
     IOrderRepository orderRepository,
+    ICouponRepository couponRepository,
     IInventoryLogRepository inventoryLogRepository,
     IOrderSettings orderSettings,
     IUnitOfWork unitOfWork) : IRequestHandler<CreateOrderCommand, OrderDto>
@@ -93,6 +96,21 @@ public sealed class CreateOrderCommandHandler(
         }
 
         order.TotalAmount = order.Items.Sum(x => x.Subtotal);
+        Coupon? coupon = null;
+        if (!string.IsNullOrWhiteSpace(request.CouponCode))
+        {
+            coupon = await couponRepository.GetByCodeAsync(request.CouponCode, cancellationToken);
+            var hasUsed = coupon is not null && await couponRepository.HasUsageAsync(coupon.Id, request.UserId, cancellationToken);
+            var result = CouponCalculator.Validate(coupon, hasUsed, order.TotalAmount, now);
+            if (!result.IsValid)
+            {
+                throw new BusinessException(result.ErrorMessage ?? "Coupon is invalid.");
+            }
+
+            order.CouponId = coupon!.Id;
+            order.DiscountAmount = result.DiscountAmount;
+        }
+
         order.FinalAmount = order.TotalAmount - order.DiscountAmount + order.ShippingFee;
         order.Payment = new Payment
         {
@@ -105,6 +123,24 @@ public sealed class CreateOrderCommandHandler(
         };
 
         await orderRepository.AddAsync(order, cancellationToken);
+        if (coupon is not null)
+        {
+            coupon.UsedCount += 1;
+            if (coupon.UsedCount > coupon.UsageLimit)
+            {
+                throw new BusinessException("優惠券已被領完");
+            }
+
+            await couponRepository.AddUsageAsync(new CouponUsage
+            {
+                Id = Guid.NewGuid(),
+                CouponId = coupon.Id,
+                UserId = request.UserId,
+                OrderId = order.Id,
+                UsedAt = now
+            }, cancellationToken);
+        }
+
         foreach (var cartItem in cart.Items.ToArray())
         {
             cartRepository.RemoveItem(cartItem);

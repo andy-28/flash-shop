@@ -2,12 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, ShoppingBag } from "lucide-react";
+import { Check, Loader2, ShoppingBag, Tag, X } from "lucide-react";
 import { AxiosError } from "axios";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
+import { validateCoupon } from "@/lib/api/coupons";
 import { createOrder } from "@/lib/api/orders";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
+import type { ApplyCouponResult } from "@/types";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -15,7 +17,11 @@ export default function CheckoutPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { clearCart, fetchCart, items, totalAmount } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponResult, setCouponResult] = useState<ApplyCouponResult | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!hasHydrated) {
@@ -30,11 +36,48 @@ export default function CheckoutPage() {
     void fetchCart();
   }, [fetchCart, hasHydrated, isAuthenticated, router]);
 
+  const appliedDiscount = couponResult?.isValid ? couponResult.discountAmount : 0;
+  const finalAmount = Math.max(totalAmount - appliedDiscount, 0);
+
+  const applyCoupon = async () => {
+    const trimmedCode = couponCode.trim();
+    if (!trimmedCode) {
+      setCouponResult(null);
+      setCouponError("Enter a coupon code.");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError(null);
+    setCouponResult(null);
+    try {
+      const result = await validateCoupon(trimmedCode, totalAmount);
+      if (result.isValid) {
+        setCouponResult(result);
+        setCouponCode(result.code ?? trimmedCode);
+        return;
+      }
+
+      setCouponError(result.errorMessage ?? "Coupon is not valid.");
+    } catch (exception) {
+      const axiosError = exception as AxiosError<{ message?: string }>;
+      setCouponError(axiosError.response?.data?.message ?? "Unable to validate coupon.");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponCode("");
+    setCouponResult(null);
+    setCouponError(null);
+  };
+
   const submitOrder = async () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const order = await createOrder();
+      const order = await createOrder(couponResult?.isValid ? couponResult.code ?? couponCode.trim() : undefined);
       clearCart();
       router.push(`/orders/${order.id}`);
     } catch (exception) {
@@ -86,14 +129,75 @@ export default function CheckoutPage() {
               <span className="text-[#A0A0A0]">Shipping</span>
               <span>Free</span>
             </div>
+          </div>
+
+          <div className="mt-5 rounded-md border border-[#2A2A2A] bg-black/30 p-3">
+            <label htmlFor="coupon-code" className="text-sm font-medium">
+              Coupon
+            </label>
+            <div className="mt-3 flex gap-2">
+              <div className="relative flex-1">
+                <Tag className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#666666]" />
+                <input
+                  id="coupon-code"
+                  value={couponCode}
+                  onChange={(event) => {
+                    setCouponCode(event.target.value);
+                    setCouponResult(null);
+                    setCouponError(null);
+                  }}
+                  className={`h-10 w-full rounded-md border bg-[#0A0A0A] pl-9 pr-3 text-sm outline-none transition ${
+                    couponResult?.isValid
+                      ? "border-[#22C55E]"
+                      : couponError
+                        ? "border-[#EF4444]"
+                        : "border-[#2A2A2A] focus:border-[#404040]"
+                  }`}
+                  placeholder="SAVE100"
+                  disabled={Boolean(couponResult?.isValid)}
+                />
+              </div>
+              {couponResult?.isValid ? (
+                <button
+                  type="button"
+                  className="inline-flex size-10 items-center justify-center rounded-md border border-[#2A2A2A] text-[#A0A0A0] hover:bg-white/10 hover:text-white"
+                  onClick={removeCoupon}
+                  aria-label="Remove coupon"
+                >
+                  <X className="size-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 text-sm font-medium text-black disabled:opacity-40"
+                  disabled={isApplyingCoupon || totalAmount <= 0}
+                  onClick={applyCoupon}
+                >
+                  {isApplyingCoupon ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                  Apply
+                </button>
+              )}
+            </div>
+            {couponResult?.isValid ? (
+              <p className="mt-2 inline-flex items-center gap-2 text-sm text-[#22C55E]">
+                <Check className="size-4" />
+                {couponResult.code} applied. Discount NT$ {couponResult.discountAmount.toLocaleString()}.
+              </p>
+            ) : null}
+            {couponError ? <p className="mt-2 text-sm text-[#EF4444]">{couponError}</p> : null}
+          </div>
+
+          <div className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-[#A0A0A0]">Discount</span>
-              <span>NT$ 0</span>
+              <span className={appliedDiscount > 0 ? "text-[#22C55E]" : undefined}>
+                {appliedDiscount > 0 ? "-" : ""}NT$ {appliedDiscount.toLocaleString()}
+              </span>
             </div>
           </div>
           <div className="mt-5 flex justify-between border-t border-[#2A2A2A] pt-5 text-lg font-semibold">
             <span>Total</span>
-            <span>NT$ {totalAmount.toLocaleString()}</span>
+            <span>NT$ {finalAmount.toLocaleString()}</span>
           </div>
           {error ? <p className="mt-3 text-sm text-[#EF4444]">{error}</p> : null}
           <button

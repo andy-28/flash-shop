@@ -1,8 +1,8 @@
 import { apiClient } from "@/lib/api/client";
 import type { Order, OrderStatus } from "@/types";
 
-export async function createOrder(): Promise<Order> {
-  const response = await apiClient.post<Order>("/orders");
+export async function createOrder(couponCode?: string): Promise<Order> {
+  const response = await apiClient.post<Order>("/orders", couponCode ? { couponCode } : {});
   return response.data;
 }
 

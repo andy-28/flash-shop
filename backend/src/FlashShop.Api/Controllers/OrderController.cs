@@ -41,11 +41,12 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateOrder(CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest? request, CancellationToken cancellationToken)
     {
         var order = await mediator.Send(new CreateOrderCommand
         {
-            UserId = GetUserId()
+            UserId = GetUserId(),
+            CouponCode = request?.CouponCode
         }, cancellationToken);
 
         return Ok(order);
@@ -79,4 +80,9 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
     {
         return currentUserService.UserId ?? throw new UnauthorizedAccessException();
     }
+}
+
+public sealed class CreateOrderRequest
+{
+    public string? CouponCode { get; set; }
 }

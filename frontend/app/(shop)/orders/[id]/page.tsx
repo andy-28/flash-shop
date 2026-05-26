@@ -121,8 +121,16 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#A0A0A0]">Discount</span>
-                  <span>NT$ {order.discountAmount.toLocaleString()}</span>
+                  <span className={order.discountAmount > 0 ? "text-[#22C55E]" : undefined}>
+                    {order.discountAmount > 0 ? "-" : ""}NT$ {order.discountAmount.toLocaleString()}
+                  </span>
                 </div>
+                {order.couponCode ? (
+                  <div className="flex justify-between">
+                    <span className="text-[#A0A0A0]">Coupon</span>
+                    <span>{order.couponCode}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between">
                   <span className="text-[#A0A0A0]">Shipping</span>
                   <span>NT$ {order.shippingFee.toLocaleString()}</span>

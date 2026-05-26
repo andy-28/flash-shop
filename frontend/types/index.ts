@@ -77,6 +77,7 @@ export interface Order {
   status: OrderStatus;
   totalAmount: number;
   discountAmount: number;
+  couponCode?: string | null;
   shippingFee: number;
   finalAmount: number;
   createdAt: string;
@@ -137,4 +138,37 @@ export interface ContentBlockPayload {
   isActive: boolean;
   startAt?: string | null;
   endAt?: string | null;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountType: "Fixed" | "Percentage" | string;
+  discountValue: number;
+  minOrderAmount: number;
+  usageLimit: number;
+  usedCount: number;
+  validFrom: string;
+  validUntil: string;
+  isExpired: boolean;
+  isFullyUsed: boolean;
+}
+
+export interface CouponPayload {
+  code: string;
+  discountType: "Fixed" | "Percentage";
+  discountValue: number;
+  minOrderAmount: number;
+  usageLimit: number;
+  validFrom: string;
+  validUntil: string;
+}
+
+export interface ApplyCouponResult {
+  isValid: boolean;
+  errorMessage: string | null;
+  couponId: string | null;
+  code: string | null;
+  discountType: string | null;
+  discountAmount: number;
 }

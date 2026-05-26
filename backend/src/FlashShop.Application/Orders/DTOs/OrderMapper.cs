@@ -13,6 +13,7 @@ public static class OrderMapper
             Status = order.Status,
             TotalAmount = order.TotalAmount,
             DiscountAmount = order.DiscountAmount,
+            CouponCode = order.Coupon?.Code,
             ShippingFee = order.ShippingFee,
             FinalAmount = order.FinalAmount,
             CreatedAt = order.CreatedAt,
