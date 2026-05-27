@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Inventory.DTOs;
@@ -13,7 +14,10 @@ public sealed class UpdateInventoryCommand : IRequest<InventoryDto>
     public int AvailableStock { get; set; }
 }
 
-public sealed class UpdateInventoryCommandHandler(IProductRepository productRepository, IUnitOfWork unitOfWork)
+public sealed class UpdateInventoryCommandHandler(
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork,
+    ICacheService cacheService)
     : IRequestHandler<UpdateInventoryCommand, InventoryDto>
 {
     public async Task<InventoryDto> Handle(UpdateInventoryCommand request, CancellationToken cancellationToken)
@@ -44,6 +48,8 @@ public sealed class UpdateInventoryCommandHandler(IProductRepository productRepo
         inventory.Version += 1;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await cacheService.RemoveByPrefixAsync(CacheKeys.ProductListPrefix, cancellationToken);
+        await cacheService.RemoveAsync(CacheKeys.ProductDetail(request.ProductId), cancellationToken);
 
         return new InventoryDto
         {

@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Domain.Entities;
@@ -25,7 +26,10 @@ public sealed class UpdateProductVariantCommand
     public int? TotalStock { get; set; }
 }
 
-public sealed class UpdateProductCommandHandler(IProductRepository productRepository, IUnitOfWork unitOfWork)
+public sealed class UpdateProductCommandHandler(
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork,
+    ICacheService cacheService)
     : IRequestHandler<UpdateProductCommand>
 {
     public async Task Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -105,5 +109,7 @@ public sealed class UpdateProductCommandHandler(IProductRepository productReposi
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await cacheService.RemoveByPrefixAsync(CacheKeys.ProductListPrefix, cancellationToken);
+        await cacheService.RemoveAsync(CacheKeys.ProductDetail(product.Id), cancellationToken);
     }
 }

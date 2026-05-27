@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using MediatR;
@@ -12,7 +13,8 @@ public sealed class ReorderContentBlocksCommand : IRequest
 
 public sealed class ReorderContentBlocksCommandHandler(
     IContentRepository contentRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<ReorderContentBlocksCommand>
+    IUnitOfWork unitOfWork,
+    ICacheService cacheService) : IRequestHandler<ReorderContentBlocksCommand>
 {
     public async Task Handle(ReorderContentBlocksCommand request, CancellationToken cancellationToken)
     {
@@ -38,5 +40,6 @@ public sealed class ReorderContentBlocksCommandHandler(
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await cacheService.RemoveAsync(CacheKeys.Content(placement), cancellationToken);
     }
 }

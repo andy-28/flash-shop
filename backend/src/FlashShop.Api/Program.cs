@@ -44,9 +44,11 @@ builder.Services.AddMediatR(configuration =>
     configuration.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterCommand).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditLogBehavior<,>));
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<ICacheStatusService, CacheStatusService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
 builder.Services.AddHostedService<OrderTimeoutJob>();
@@ -73,6 +75,7 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<CacheHeaderMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

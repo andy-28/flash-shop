@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Products.DTOs;
@@ -10,15 +11,26 @@ public sealed class GetProductDetailQuery : IRequest<ProductDetailDto>
     public Guid Id { get; set; }
 }
 
-public sealed class GetProductDetailQueryHandler(IProductRepository productRepository)
+public sealed class GetProductDetailQueryHandler(
+    IProductRepository productRepository,
+    ICacheService cacheService,
+    ICacheStatusService cacheStatusService)
     : IRequestHandler<GetProductDetailQuery, ProductDetailDto>
 {
     public async Task<ProductDetailDto> Handle(GetProductDetailQuery request, CancellationToken cancellationToken)
     {
+        var cacheKey = CacheKeys.ProductDetail(request.Id);
+        var cached = await cacheService.GetAsync<ProductDetailDto>(cacheKey, cancellationToken);
+        if (cached is not null)
+        {
+            cacheStatusService.SetHit();
+            return cached;
+        }
+
         var product = await productRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException("Product was not found.");
 
-        return new ProductDetailDto
+        var result = new ProductDetailDto
         {
             Id = product.Id,
             Name = product.Name,
@@ -34,5 +46,9 @@ public sealed class GetProductDetailQueryHandler(IProductRepository productRepos
                 AvailableStock = variant.Inventory?.AvailableStock ?? 0
             }).ToList()
         };
+
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5), cancellationToken);
+        cacheStatusService.SetMiss();
+        return result;
     }
 }

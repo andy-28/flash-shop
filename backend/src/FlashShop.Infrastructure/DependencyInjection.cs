@@ -8,6 +8,7 @@ using FlashShop.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace FlashShop.Infrastructure;
@@ -29,7 +30,7 @@ public static class DependencyInjection
                 try
                 {
                     var redis = ConnectionMultiplexer.Connect(redisConnection);
-                    return new RedisCacheService(redis);
+                    return new RedisCacheService(redis, serviceProvider.GetRequiredService<ILogger<RedisCacheService>>());
                 }
                 catch (RedisConnectionException)
                 {
@@ -46,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IContentRepository, ContentRepository>();
         services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IInventoryLogRepository, InventoryLogRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IOrderRepository, OrderRepository>();

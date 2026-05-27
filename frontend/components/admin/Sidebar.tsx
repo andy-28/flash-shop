@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, FileText, LayoutDashboard, Package, Settings, ShoppingCart, TicketPercent } from "lucide-react";
+import { BarChart3, ClipboardList, FileText, LayoutDashboard, Package, Settings, ShoppingCart, TicketPercent } from "lucide-react";
 
 const items = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -7,6 +7,7 @@ const items = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/content", label: "Content", icon: FileText },
+  { href: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
   { href: "/admin/dashboard#analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/dashboard#settings", label: "Settings", icon: Settings },
 ];

@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Content.DTOs;
@@ -20,7 +21,8 @@ public sealed class UpdateContentBlockCommand : IRequest<ContentBlockDto>
 
 public sealed class UpdateContentBlockCommandHandler(
     IContentRepository contentRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<UpdateContentBlockCommand, ContentBlockDto>
+    IUnitOfWork unitOfWork,
+    ICacheService cacheService) : IRequestHandler<UpdateContentBlockCommand, ContentBlockDto>
 {
     public async Task<ContentBlockDto> Handle(UpdateContentBlockCommand request, CancellationToken cancellationToken)
     {
@@ -53,6 +55,7 @@ public sealed class UpdateContentBlockCommandHandler(
         block.UpdatedAt = DateTime.UtcNow;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await cacheService.RemoveAsync(CacheKeys.Content(block.Placement), cancellationToken);
         return ContentBlockMapper.ToDto(block);
     }
 }

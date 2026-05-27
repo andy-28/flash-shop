@@ -172,3 +172,56 @@ export interface ApplyCouponResult {
   discountType: string | null;
   discountAmount: number;
 }
+
+export interface DashboardSummary {
+  todayOrderCount: number;
+  todayRevenue: number;
+  todayNewUsers: number;
+  totalProducts: number;
+  totalOrders: number;
+  totalRevenue: number;
+  lowStockCount: number;
+  dailyStats: DailyStat[];
+  recentOrders: RecentOrder[];
+  topProducts: TopProduct[];
+}
+
+export interface DailyStat {
+  date: string;
+  orderCount: number;
+  revenue: number;
+}
+
+export interface RecentOrder {
+  id: string;
+  orderNo: string;
+  userName: string;
+  userEmail: string;
+  status: OrderStatus;
+  finalAmount: number;
+  createdAt: string;
+}
+
+export interface TopProduct {
+  productId: string;
+  productName: string;
+  totalSold: number;
+  totalRevenue: number;
+}
+
+export interface AuditLog {
+  id: string;
+  userName: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  detail: string | null;
+  createdAt: string;
+}
+
+export interface AuditLogList {
+  items: AuditLog[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}

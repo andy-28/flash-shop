@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Content.DTOs;
@@ -10,7 +11,10 @@ public sealed class GetContentByPlacementQuery : IRequest<IReadOnlyCollection<Co
     public string Placement { get; set; } = string.Empty;
 }
 
-public sealed class GetContentByPlacementQueryHandler(IContentRepository contentRepository)
+public sealed class GetContentByPlacementQueryHandler(
+    IContentRepository contentRepository,
+    ICacheService cacheService,
+    ICacheStatusService cacheStatusService)
     : IRequestHandler<GetContentByPlacementQuery, IReadOnlyCollection<ContentBlockDto>>
 {
     public async Task<IReadOnlyCollection<ContentBlockDto>> Handle(GetContentByPlacementQuery request, CancellationToken cancellationToken)
@@ -21,7 +25,19 @@ public sealed class GetContentByPlacementQueryHandler(IContentRepository content
             throw new BusinessException("Placement is required.");
         }
 
+        var cacheKey = CacheKeys.Content(placement);
+        var cached = await cacheService.GetAsync<List<ContentBlockDto>>(cacheKey, cancellationToken);
+        if (cached is not null)
+        {
+            cacheStatusService.SetHit();
+            return cached;
+        }
+
         var blocks = await contentRepository.ListPublicByPlacementAsync(placement, DateTime.UtcNow, cancellationToken);
-        return blocks.Select(ContentBlockMapper.ToDto).ToList();
+        var result = blocks.Select(ContentBlockMapper.ToDto).ToList();
+
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5), cancellationToken);
+        cacheStatusService.SetMiss();
+        return result;
     }
 }
