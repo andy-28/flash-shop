@@ -49,9 +49,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ICacheStatusService, CacheStatusService>();
+builder.Services.AddScoped<IDashboardNotifier, DashboardNotifier>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<FlashSaleOrderChannel>();
 builder.Services.AddHostedService<OrderTimeoutJob>();
+builder.Services.AddHostedService<FlashSaleOrderWorker>();
 
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "this-is-a-dev-secret-key-at-least-32-chars!!";
 builder.Services
@@ -67,6 +70,20 @@ builder.Services
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 builder.Services.AddAuthorization();

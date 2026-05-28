@@ -21,6 +21,8 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis") ?? "localhost:6379"));
         services.AddMemoryCache();
         services.AddSingleton<ICacheService>(serviceProvider =>
         {
@@ -29,7 +31,7 @@ public static class DependencyInjection
             {
                 try
                 {
-                    var redis = ConnectionMultiplexer.Connect(redisConnection);
+                    var redis = serviceProvider.GetRequiredService<IConnectionMultiplexer>();
                     return new RedisCacheService(redis, serviceProvider.GetRequiredService<ILogger<RedisCacheService>>());
                 }
                 catch (RedisConnectionException)
@@ -40,6 +42,7 @@ public static class DependencyInjection
 
             return new MemoryCacheService(serviceProvider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>());
         });
+        services.AddScoped<IFlashSaleService, FlashSaleService>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IProductRepository, ProductRepository>();

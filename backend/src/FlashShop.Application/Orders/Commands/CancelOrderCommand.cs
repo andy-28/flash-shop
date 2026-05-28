@@ -17,6 +17,7 @@ public sealed class CancelOrderCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IInventoryLogRepository inventoryLogRepository,
+    IDashboardNotifier dashboardNotifier,
     IUnitOfWork unitOfWork) : IRequestHandler<CancelOrderCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(CancelOrderCommand request, CancellationToken cancellationToken)
@@ -67,6 +68,7 @@ public sealed class CancelOrderCommandHandler(
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await dashboardNotifier.NotifyOrderCancelled(order.OrderNo, cancellationToken);
 
         var updatedOrder = await orderRepository.GetByIdAsync(order.Id, cancellationToken)
             ?? throw new NotFoundException("Order was not found.");

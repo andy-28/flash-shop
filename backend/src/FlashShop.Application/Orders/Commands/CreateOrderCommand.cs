@@ -20,6 +20,7 @@ public sealed class CreateOrderCommandHandler(
     ICouponRepository couponRepository,
     IInventoryLogRepository inventoryLogRepository,
     IOrderSettings orderSettings,
+    IDashboardNotifier dashboardNotifier,
     IUnitOfWork unitOfWork) : IRequestHandler<CreateOrderCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -147,6 +148,7 @@ public sealed class CreateOrderCommandHandler(
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await dashboardNotifier.NotifyOrderCreated(order.OrderNo, order.FinalAmount, cancellationToken);
 
         var createdOrder = await orderRepository.GetByIdAsync(order.Id, cancellationToken)
             ?? throw new NotFoundException("Order was not found after creation.");

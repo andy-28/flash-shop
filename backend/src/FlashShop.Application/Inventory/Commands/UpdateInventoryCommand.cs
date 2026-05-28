@@ -17,7 +17,8 @@ public sealed class UpdateInventoryCommand : IRequest<InventoryDto>
 public sealed class UpdateInventoryCommandHandler(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService)
+    ICacheService cacheService,
+    IDashboardNotifier dashboardNotifier)
     : IRequestHandler<UpdateInventoryCommand, InventoryDto>
 {
     public async Task<InventoryDto> Handle(UpdateInventoryCommand request, CancellationToken cancellationToken)
@@ -50,6 +51,14 @@ public sealed class UpdateInventoryCommandHandler(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveByPrefixAsync(CacheKeys.ProductListPrefix, cancellationToken);
         await cacheService.RemoveAsync(CacheKeys.ProductDetail(request.ProductId), cancellationToken);
+        if (inventory.AvailableStock <= 5)
+        {
+            await dashboardNotifier.NotifyInventoryAlert(
+                variant.Product?.Name ?? "Unknown product",
+                variant.SpecName,
+                inventory.AvailableStock,
+                cancellationToken);
+        }
 
         return new InventoryDto
         {

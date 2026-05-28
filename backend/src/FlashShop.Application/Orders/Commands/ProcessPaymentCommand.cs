@@ -18,6 +18,7 @@ public sealed class ProcessPaymentCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IInventoryLogRepository inventoryLogRepository,
+    IDashboardNotifier dashboardNotifier,
     IUnitOfWork unitOfWork) : IRequestHandler<ProcessPaymentCommand, OrderDto>
 {
     public async Task<OrderDto> Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
@@ -76,6 +77,7 @@ public sealed class ProcessPaymentCommandHandler(
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await dashboardNotifier.NotifyOrderPaid(order.OrderNo, order.FinalAmount, cancellationToken);
 
         var updatedOrder = await orderRepository.GetByIdAsync(order.Id, cancellationToken)
             ?? throw new NotFoundException("Order was not found.");

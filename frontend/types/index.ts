@@ -225,3 +225,31 @@ export interface AuditLogList {
   page: number;
   pageSize: number;
 }
+
+export interface FlashSale {
+  id: string;
+  variantId: string;
+  productId?: string;
+  productName: string;
+  specName: string;
+  title: string;
+  originalPrice?: number;
+  flashPrice: number;
+  totalStock: number;
+  remainingStock?: number;
+  soldCount: number;
+  perUserLimit: number;
+  startAt: string;
+  endAt: string;
+  status: "Pending" | "Active" | "Ended" | "Cancelled" | string;
+}
+
+export interface FlashSalePayload {
+  variantId: string;
+  title: string;
+  flashPrice: number;
+  totalStock: number;
+  perUserLimit: number;
+  startAt: string;
+  endAt: string;
+}

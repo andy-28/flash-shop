@@ -1,3 +1,4 @@
+using FlashShop.Application.Common.Interfaces;
 using FlashShop.Domain.Entities;
 using FlashShop.Domain.Enums;
 using FlashShop.Infrastructure.Persistence;
@@ -48,6 +49,7 @@ public sealed class OrderTimeoutJob(
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var dashboardNotifier = scope.ServiceProvider.GetRequiredService<IDashboardNotifier>();
         var now = DateTime.UtcNow;
 
         var expiredOrders = await dbContext.Orders
@@ -70,6 +72,7 @@ public sealed class OrderTimeoutJob(
             try
             {
                 await CancelExpiredOrderAsync(dbContext, order, cancellationToken);
+                await dashboardNotifier.NotifyOrderExpired(order.OrderNo, cancellationToken);
                 logger.LogInformation(
                     "Auto-cancelled expired order {OrderNo} (created {CreatedAt}, expired {ExpiredAt})",
                     order.OrderNo,
