@@ -86,13 +86,12 @@ public sealed class AdminDashboardController(AppDbContext dbContext) : Controlle
                 order.CreatedAt))
             .ToListAsync(cancellationToken);
 
-        var topProducts = await dbContext.OrderItems
+        var paidOrderItems = await dbContext.OrderItems
             .Where(item => item.Order != null && paidStatuses.Contains(item.Order.Status))
-            .GroupBy(item => new
-            {
-                ProductId = item.Variant!.ProductId,
-                ProductName = item.Variant.Product!.Name
-            })
+            .ToListAsync(cancellationToken);
+
+        var topProducts = paidOrderItems
+            .GroupBy(item => new { ProductId = item.VariantId, item.ProductName })
             .Select(group => new TopProductDto(
                 group.Key.ProductId,
                 group.Key.ProductName,
@@ -100,7 +99,7 @@ public sealed class AdminDashboardController(AppDbContext dbContext) : Controlle
                 group.Sum(item => item.Subtotal)))
             .OrderByDescending(product => product.TotalSold)
             .Take(5)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return Ok(new DashboardSummaryDto(
             todayOrderCount,

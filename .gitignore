@@ -16,6 +16,7 @@ out/
 dist/
 coverage/
 *.tsbuildinfo
+backend/.build-check/
 .env
 .env*.local
 !.env.local.example
