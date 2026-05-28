@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
+import { ToastProvider } from "@/components/admin/Toast";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -14,6 +16,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === "Admin";
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!hasHydrated) {
@@ -47,23 +50,37 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   }
 
   return (
-    <div className="min-h-screen bg-black text-white md:grid md:grid-cols-[248px_1fr]">
-      <Sidebar />
-      <div className="min-w-0">
-        <header className="flex h-16 items-center justify-between border-b border-white/10 bg-zinc-950 px-5">
-          <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Workspace</p>
-            <p className="text-sm font-semibold">Local Development</p>
+    <ToastProvider>
+      <div className="flex min-h-screen bg-[#0A0A0A] text-white">
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
+        <div className="min-w-0 flex-1">
+          <header className="flex h-16 items-center justify-between border-b border-[#2A2A2A] bg-[#141414] px-5 md:hidden">
+            <button
+              type="button"
+              className="inline-flex size-9 items-center justify-center rounded-md border border-[#2A2A2A] text-white"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="size-4" />
+            </button>
+            <p className="text-sm font-semibold">FlashShop Admin</p>
+            <Link href="/" className="inline-flex h-9 items-center rounded-md border border-[#2A2A2A] px-3 text-sm font-medium text-[#A0A0A0] hover:bg-[#1E1E1E] hover:text-white">View site</Link>
+          </header>
+          <main className="p-5 md:p-8">{children}</main>
+        </div>
+        {isSidebarOpen ? (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <button className="absolute inset-0 bg-black/70" type="button" aria-label="Close navigation" onClick={() => setIsSidebarOpen(false)} />
+            <div className="relative h-full w-60">
+              <button className="absolute right-3 top-3 z-10 inline-flex size-8 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-[#1E1E1E] hover:text-white" type="button" onClick={() => setIsSidebarOpen(false)}>
+                <X className="size-4" />
+              </button>
+              <Sidebar />
+            </div>
           </div>
-          <Link
-            href="/"
-            className="inline-flex h-9 items-center rounded-md border border-white/10 px-3 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
-          >
-            View site
-          </Link>
-        </header>
-        <main className="p-5">{children}</main>
+        ) : null}
       </div>
-    </div>
+    </ToastProvider>
   );
 }
