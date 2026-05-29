@@ -14,9 +14,13 @@ public sealed class UpdateContentBlockCommand : IRequest<ContentBlockDto>
     public string ImageUrl { get; set; } = string.Empty;
     public string? LinkUrl { get; set; }
     public string LinkType { get; set; } = "None";
+    public string? Body { get; set; }
+    public string? Slug { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
+    public string? ChangeNote { get; set; }
+    public Guid ModifiedBy { get; set; }
 }
 
 public sealed class UpdateContentBlockCommandHandler(
@@ -50,11 +54,17 @@ public sealed class UpdateContentBlockCommandHandler(
         block.ImageUrl = request.ImageUrl.Trim();
         block.LinkUrl = string.IsNullOrWhiteSpace(request.LinkUrl) ? null : request.LinkUrl.Trim();
         block.LinkType = string.IsNullOrWhiteSpace(request.LinkType) ? "None" : request.LinkType.Trim();
-        block.IsActive = request.IsActive;
+        block.Body = string.IsNullOrWhiteSpace(request.Body) ? null : request.Body.Trim();
+        block.Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim();
+        block.IsActive = block.Status == "Published" && request.IsActive;
         block.StartAt = request.StartAt;
         block.EndAt = request.EndAt;
+        block.Version += 1;
         block.UpdatedAt = DateTime.UtcNow;
 
+        await contentRepository.AddVersionAsync(
+            ContentBlockMapper.CreateVersion(block, request.ModifiedBy, string.IsNullOrWhiteSpace(request.ChangeNote) ? "Updated content" : request.ChangeNote.Trim()),
+            cancellationToken);
         await mediaRepository.ClearUsageAsync("ContentBlock", block.Id, "ImageUrl", cancellationToken);
         await mediaRepository.TrackUsageByPathAsync(block.ImageUrl, "ContentBlock", block.Id, "ImageUrl", cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

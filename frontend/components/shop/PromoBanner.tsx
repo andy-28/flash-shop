@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RichTextDisplay } from "@/components/shop/RichTextDisplay";
 import type { ContentBlock } from "@/types";
 import { assetUrl } from "@/lib/utils/assetUrl";
 
@@ -20,6 +21,11 @@ export function PromoBanner({ item }: Readonly<{ item: ContentBlock | null }>) {
           </div>
         ) : null}
       </div>
+      {item.body ? (
+        <div className="mt-4 rounded-md border border-white/10 bg-[#141414] p-5">
+          <RichTextDisplay html={item.body} />
+        </div>
+      ) : null}
     </section>
   );
 

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import type { ContentBlock, ContentBlockPayload } from "@/types";
+import type { ContentBlock, ContentBlockPayload, ContentVersion } from "@/types";
 
 export async function getContentByPlacement(placement: string) {
   const response = await apiClient.get<ContentBlock[]>("/content", { params: { placement } });
@@ -29,6 +29,36 @@ export async function deleteContentBlock(id: string) {
 
 export async function toggleContentBlock(id: string) {
   const response = await apiClient.patch<ContentBlock>(`/admin/content/${id}/toggle`);
+  return response.data;
+}
+
+export async function publishContentBlock(id: string) {
+  const response = await apiClient.post<ContentBlock>(`/admin/content/${id}/publish`);
+  return response.data;
+}
+
+export async function unpublishContentBlock(id: string) {
+  const response = await apiClient.post<ContentBlock>(`/admin/content/${id}/unpublish`);
+  return response.data;
+}
+
+export async function archiveContentBlock(id: string) {
+  const response = await apiClient.post<ContentBlock>(`/admin/content/${id}/archive`);
+  return response.data;
+}
+
+export async function getContentVersions(id: string) {
+  const response = await apiClient.get<ContentVersion[]>(`/admin/content/${id}/versions`);
+  return response.data;
+}
+
+export async function restoreContentVersion(id: string, versionId: string) {
+  const response = await apiClient.post<ContentBlock>(`/admin/content/${id}/restore`, { versionId });
+  return response.data;
+}
+
+export async function previewContentBlock(id: string) {
+  const response = await apiClient.get<ContentBlock>(`/admin/content/${id}/preview`);
   return response.data;
 }
 

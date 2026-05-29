@@ -15,7 +15,9 @@ public sealed class CreateContentBlockCommand : IRequest<ContentBlockDto>
     public string? LinkUrl { get; set; }
     public string LinkType { get; set; } = "None";
     public string Placement { get; set; } = string.Empty;
-    public bool IsActive { get; set; } = true;
+    public string? Body { get; set; }
+    public string? Slug { get; set; }
+    public bool IsActive { get; set; }
     public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
     public Guid CreatedBy { get; set; }
@@ -64,16 +66,21 @@ public sealed class CreateContentBlockCommandHandler(
             LinkUrl = string.IsNullOrWhiteSpace(request.LinkUrl) ? null : request.LinkUrl.Trim(),
             LinkType = linkType,
             Placement = placement,
+            Status = "Draft",
+            Body = string.IsNullOrWhiteSpace(request.Body) ? null : request.Body.Trim(),
+            Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim(),
             Position = await contentRepository.GetNextPositionAsync(placement, cancellationToken),
-            IsActive = request.IsActive,
+            IsActive = false,
             StartAt = request.StartAt,
             EndAt = request.EndAt,
+            Version = 1,
             CreatedBy = request.CreatedBy,
             CreatedAt = now,
             UpdatedAt = now
         };
 
         await contentRepository.AddAsync(block, cancellationToken);
+        await contentRepository.AddVersionAsync(ContentBlockMapper.CreateVersion(block, request.CreatedBy, "Initial draft"), cancellationToken);
         await mediaRepository.TrackUsageByPathAsync(block.ImageUrl, "ContentBlock", block.Id, "ImageUrl", cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveAsync(CacheKeys.Content(placement), cancellationToken);

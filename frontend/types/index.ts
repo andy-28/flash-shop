@@ -122,10 +122,15 @@ export interface ContentBlock {
   linkUrl: string | null;
   linkType: "Internal" | "External" | "Product" | "None" | string;
   placement: string;
+  status: "Draft" | "Published" | "Archived" | string;
+  body: string | null;
+  slug: string | null;
   position: number;
   isActive: boolean;
   startAt: string | null;
   endAt: string | null;
+  publishedAt: string | null;
+  version: number;
   createdAt: string;
   media: ContentBlockMedia[];
 }
@@ -137,9 +142,25 @@ export interface ContentBlockPayload {
   linkUrl?: string | null;
   linkType: string;
   placement: string;
+  body?: string | null;
+  slug?: string | null;
   isActive: boolean;
   startAt?: string | null;
   endAt?: string | null;
+  changeNote?: string | null;
+}
+
+export interface ContentVersion {
+  id: string;
+  versionNumber: number;
+  title: string;
+  subtitle: string | null;
+  body: string | null;
+  imageUrl: string;
+  placement: string;
+  modifiedByName: string;
+  changeNote: string;
+  createdAt: string;
 }
 
 export interface Coupon {

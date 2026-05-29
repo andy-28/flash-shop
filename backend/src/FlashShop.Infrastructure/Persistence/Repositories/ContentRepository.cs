@@ -19,7 +19,15 @@ public sealed class ContentRepository(AppDbContext dbContext) : IContentReposito
     {
         return dbContext.ContentBlocks
             .Include(block => block.Media)
+            .Include(block => block.Versions)
             .FirstOrDefaultAsync(block => block.Id == id, cancellationToken);
+    }
+
+    public Task<ContentVersion?> GetVersionAsync(Guid contentBlockId, Guid versionId, CancellationToken cancellationToken = default)
+    {
+        return dbContext.ContentVersions
+            .Include(version => version.ModifiedByUser)
+            .FirstOrDefaultAsync(version => version.ContentBlockId == contentBlockId && version.Id == versionId, cancellationToken);
     }
 
     public async Task<IReadOnlyCollection<ContentBlock>> ListPublicByPlacementAsync(
@@ -31,7 +39,7 @@ public sealed class ContentRepository(AppDbContext dbContext) : IContentReposito
             .Include(block => block.Media)
             .AsNoTracking()
             .Where(block => block.Placement == placement)
-            .Where(block => block.IsActive)
+            .Where(block => block.Status == "Published" && block.IsActive)
             .Where(block => block.StartAt == null || block.StartAt <= now)
             .Where(block => block.EndAt == null || block.EndAt >= now)
             .OrderBy(block => block.Position)
@@ -70,6 +78,21 @@ public sealed class ContentRepository(AppDbContext dbContext) : IContentReposito
     public Task AddAsync(ContentBlock block, CancellationToken cancellationToken = default)
     {
         return dbContext.ContentBlocks.AddAsync(block, cancellationToken).AsTask();
+    }
+
+    public async Task<IReadOnlyCollection<ContentVersion>> ListVersionsAsync(Guid contentBlockId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.ContentVersions
+            .Include(version => version.ModifiedByUser)
+            .AsNoTracking()
+            .Where(version => version.ContentBlockId == contentBlockId)
+            .OrderByDescending(version => version.VersionNumber)
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task AddVersionAsync(ContentVersion version, CancellationToken cancellationToken = default)
+    {
+        return dbContext.ContentVersions.AddAsync(version, cancellationToken).AsTask();
     }
 
     public void Remove(ContentBlock block)

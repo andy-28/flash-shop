@@ -6,32 +6,23 @@ using MediatR;
 
 namespace FlashShop.Application.Content.Commands;
 
-public sealed class ToggleContentBlockCommand : IRequest<ContentBlockDto>
+public sealed class UnpublishContentBlockCommand : IRequest<ContentBlockDto>
 {
     public Guid Id { get; set; }
 }
 
-public sealed class ToggleContentBlockCommandHandler(
+public sealed class UnpublishContentBlockCommandHandler(
     IContentRepository contentRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService) : IRequestHandler<ToggleContentBlockCommand, ContentBlockDto>
+    ICacheService cacheService) : IRequestHandler<UnpublishContentBlockCommand, ContentBlockDto>
 {
-    public async Task<ContentBlockDto> Handle(ToggleContentBlockCommand request, CancellationToken cancellationToken)
+    public async Task<ContentBlockDto> Handle(UnpublishContentBlockCommand request, CancellationToken cancellationToken)
     {
         var block = await contentRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException("Content block was not found.");
 
-        if (block.Status == "Archived")
-        {
-            throw new BusinessException("Archived content cannot be toggled.");
-        }
-
-        block.Status = block.Status == "Published" ? "Draft" : "Published";
-        block.IsActive = block.Status == "Published";
-        if (block.Status == "Published" && block.PublishedAt is null)
-        {
-            block.PublishedAt = DateTime.UtcNow;
-        }
+        block.Status = "Draft";
+        block.IsActive = false;
         block.UpdatedAt = DateTime.UtcNow;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

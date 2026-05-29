@@ -31,6 +31,7 @@ public sealed class AdminContentController(IMediator mediator, ICurrentUserServi
     public async Task<IActionResult> UpdateContent(Guid id, [FromBody] UpdateContentBlockCommand command, CancellationToken cancellationToken)
     {
         command.Id = id;
+        command.ModifiedBy = currentUserService.UserId ?? throw new UnauthorizedAccessException();
         var block = await mediator.Send(command, cancellationToken);
         return Ok(block);
     }
@@ -49,6 +50,53 @@ public sealed class AdminContentController(IMediator mediator, ICurrentUserServi
         return Ok(block);
     }
 
+    [HttpPost("{id:guid}/publish")]
+    public async Task<IActionResult> PublishContent(Guid id, CancellationToken cancellationToken)
+    {
+        var block = await mediator.Send(new PublishContentBlockCommand { Id = id }, cancellationToken);
+        return Ok(block);
+    }
+
+    [HttpPost("{id:guid}/unpublish")]
+    public async Task<IActionResult> UnpublishContent(Guid id, CancellationToken cancellationToken)
+    {
+        var block = await mediator.Send(new UnpublishContentBlockCommand { Id = id }, cancellationToken);
+        return Ok(block);
+    }
+
+    [HttpPost("{id:guid}/archive")]
+    public async Task<IActionResult> ArchiveContent(Guid id, CancellationToken cancellationToken)
+    {
+        var block = await mediator.Send(new ArchiveContentBlockCommand { Id = id }, cancellationToken);
+        return Ok(block);
+    }
+
+    [HttpGet("{id:guid}/versions")]
+    public async Task<IActionResult> GetVersions(Guid id, CancellationToken cancellationToken)
+    {
+        var versions = await mediator.Send(new GetContentVersionsQuery { ContentBlockId = id }, cancellationToken);
+        return Ok(versions);
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    public async Task<IActionResult> RestoreVersion(Guid id, [FromBody] RestoreVersionRequest request, CancellationToken cancellationToken)
+    {
+        var block = await mediator.Send(new RestoreContentVersionCommand
+        {
+            ContentBlockId = id,
+            VersionId = request.VersionId,
+            ModifiedBy = currentUserService.UserId ?? throw new UnauthorizedAccessException()
+        }, cancellationToken);
+        return Ok(block);
+    }
+
+    [HttpGet("{id:guid}/preview")]
+    public async Task<IActionResult> PreviewContent(Guid id, CancellationToken cancellationToken)
+    {
+        var block = await mediator.Send(new GetContentPreviewQuery { Id = id }, cancellationToken);
+        return Ok(block);
+    }
+
     [HttpPut("reorder")]
     public async Task<IActionResult> ReorderContent([FromBody] ReorderContentBlocksCommand command, CancellationToken cancellationToken)
     {
@@ -56,3 +104,5 @@ public sealed class AdminContentController(IMediator mediator, ICurrentUserServi
         return NoContent();
     }
 }
+
+public sealed record RestoreVersionRequest(Guid VersionId);

@@ -6,32 +6,29 @@ using MediatR;
 
 namespace FlashShop.Application.Content.Commands;
 
-public sealed class ToggleContentBlockCommand : IRequest<ContentBlockDto>
+public sealed class PublishContentBlockCommand : IRequest<ContentBlockDto>
 {
     public Guid Id { get; set; }
 }
 
-public sealed class ToggleContentBlockCommandHandler(
+public sealed class PublishContentBlockCommandHandler(
     IContentRepository contentRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService) : IRequestHandler<ToggleContentBlockCommand, ContentBlockDto>
+    ICacheService cacheService) : IRequestHandler<PublishContentBlockCommand, ContentBlockDto>
 {
-    public async Task<ContentBlockDto> Handle(ToggleContentBlockCommand request, CancellationToken cancellationToken)
+    public async Task<ContentBlockDto> Handle(PublishContentBlockCommand request, CancellationToken cancellationToken)
     {
         var block = await contentRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException("Content block was not found.");
 
         if (block.Status == "Archived")
         {
-            throw new BusinessException("Archived content cannot be toggled.");
+            throw new BusinessException("Archived content must be restored before publishing.");
         }
 
-        block.Status = block.Status == "Published" ? "Draft" : "Published";
-        block.IsActive = block.Status == "Published";
-        if (block.Status == "Published" && block.PublishedAt is null)
-        {
-            block.PublishedAt = DateTime.UtcNow;
-        }
+        block.Status = "Published";
+        block.IsActive = true;
+        block.PublishedAt ??= DateTime.UtcNow;
         block.UpdatedAt = DateTime.UtcNow;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
