@@ -22,6 +22,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ContentBlock> ContentBlocks => Set<ContentBlock>();
     public DbSet<ContentBlockMedia> ContentBlockMedia => Set<ContentBlockMedia>();
+    public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
+    public DbSet<MediaFileUsage> MediaFileUsages => Set<MediaFileUsage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

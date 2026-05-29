@@ -5,6 +5,7 @@ export interface Product {
   name: string;
   description: string;
   category: string;
+  imageUrl?: string | null;
   status: string;
   minPrice?: number;
   availableStock?: number;
@@ -23,6 +24,7 @@ export interface CreateProductPayload {
   name: string;
   description: string;
   category: string;
+  imageUrl?: string | null;
   variants: Array<{
     sku: string;
     specName: string;
@@ -252,4 +254,36 @@ export interface FlashSalePayload {
   perUserLimit: number;
   startAt: string;
   endAt: string;
+}
+
+export interface MediaFileUsage {
+  id: string;
+  entityType: string;
+  entityId: string;
+  fieldName: string;
+  createdAt: string;
+}
+
+export interface MediaFile {
+  id: string;
+  fileName: string;
+  filePath: string;
+  thumbnailPath: string | null;
+  mimeType: string;
+  fileSize: number;
+  width: number | null;
+  height: number | null;
+  altText: string | null;
+  folder: string | null;
+  uploadedByName: string;
+  createdAt: string;
+  usageCount: number;
+  usages?: MediaFileUsage[];
+}
+
+export interface MediaList {
+  items: MediaFile[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
 }

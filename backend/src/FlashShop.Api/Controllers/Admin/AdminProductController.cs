@@ -1,4 +1,6 @@
 using FlashShop.Application.Inventory.Commands;
+using FlashShop.Application.Common.Interfaces;
+using FlashShop.Application.Media.Commands;
 using FlashShop.Application.Products.Commands;
 using FlashShop.Application.Products.Queries;
 using MediatR;
@@ -10,7 +12,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/products")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminProductController(IMediator mediator, IWebHostEnvironment environment) : ControllerBase
+public sealed class AdminProductController(IMediator mediator, ICurrentUserService currentUser) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProducts(
@@ -66,26 +68,16 @@ public sealed class AdminProductController(IMediator mediator, IWebHostEnvironme
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadImage(IFormFile file, CancellationToken cancellationToken)
     {
-        if (file.Length == 0)
+        await using var stream = file.OpenReadStream();
+        var media = await mediator.Send(new UploadMediaCommand
         {
-            return BadRequest(new { message = "File is required." });
-        }
+            FileStream = stream,
+            FileName = file.FileName,
+            MimeType = file.ContentType,
+            Folder = "products",
+            UploadedBy = currentUser.UserId ?? Guid.Empty
+        }, cancellationToken);
 
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".webp" };
-        if (!allowedExtensions.Contains(extension))
-        {
-            return BadRequest(new { message = "Only jpg, png, and webp images are allowed." });
-        }
-
-        var uploadsPath = Path.Combine(environment.WebRootPath ?? Path.Combine(environment.ContentRootPath, "wwwroot"), "uploads");
-        Directory.CreateDirectory(uploadsPath);
-
-        var fileName = $"{Guid.NewGuid():N}{extension}";
-        var fullPath = Path.Combine(uploadsPath, fileName);
-        await using var stream = System.IO.File.Create(fullPath);
-        await file.CopyToAsync(stream, cancellationToken);
-
-        return Ok(new { url = $"/uploads/{fileName}" });
+        return Ok(new { url = media.FilePath, media });
     }
 }

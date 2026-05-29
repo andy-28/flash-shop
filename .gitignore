@@ -15,8 +15,11 @@ node_modules/
 out/
 dist/
 coverage/
+.build/
 *.tsbuildinfo
 backend/.build-check/
+backend/src/FlashShop.Api/wwwroot/uploads/
+upload-test.png
 .env
 .env*.local
 !.env.local.example

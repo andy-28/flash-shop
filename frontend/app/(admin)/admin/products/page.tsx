@@ -6,17 +6,20 @@ import { PackagePlus, Plus, RotateCcw } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FilterBar } from "@/components/admin/FilterBar";
 import { FormField, FormSection } from "@/components/admin/FormSection";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 import { MutationButton } from "@/components/admin/MutationButton";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusBadge, getStatusBadge } from "@/components/admin/StatusBadge";
 import { useToast } from "@/components/admin/Toast";
 import { createProduct, getAdminProducts, updateInventory } from "@/lib/api/products";
+import { assetUrl } from "@/lib/utils/assetUrl";
 import type { CreateProductPayload, Product } from "@/types";
 
 const emptyProduct: CreateProductPayload = {
   name: "",
   description: "",
   category: "",
+  imageUrl: "",
   variants: [{ sku: "", specName: "", price: 0, totalStock: 0 }, { sku: "", specName: "", price: 0, totalStock: 0 }],
 };
 
@@ -51,7 +54,7 @@ export default function AdminProductsPage() {
     onError: () => toast.error("Failed to update inventory"),
   });
   const columns: Column<Product>[] = [
-    { key: "name", header: "Product", sortable: true, width: "1.4fr", render: (row) => <div><p className="font-medium">{row.name}</p><p className="mt-1 text-xs text-[#666666]">{row.description}</p></div> },
+    { key: "name", header: "Product", sortable: true, width: "1.6fr", render: (row) => <div className="flex items-center gap-3">{row.imageUrl ? <img alt="" className="size-11 rounded object-cover" src={assetUrl(row.imageUrl)} /> : null}<div className="min-w-0"><p className="font-medium">{row.name}</p><p className="mt-1 truncate text-xs text-[#666666]">{row.description}</p></div></div> },
     { key: "category", header: "Category", sortable: true, width: "0.8fr", render: (row) => <span className="text-[#A0A0A0]">{row.category}</span> },
     { key: "variants", header: "Variants", width: "1fr", render: (row) => <div className="space-y-1 text-[#A0A0A0]">{row.variants.map((variant) => <p key={variant.id}>{variant.specName}</p>)}</div> },
     { key: "availableStock", header: "Stock", sortable: true, width: "0.7fr", render: (row) => row.variants.reduce((sum, variant) => sum + variant.availableStock, 0) },
@@ -92,6 +95,7 @@ export default function AdminProductsPage() {
             <FormField label="Name" required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} /></FormField>
             <FormField label="Category" required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} /></FormField>
             <FormField label="Description" required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></FormField>
+            <FormField label="Product image"><MediaPicker value={form.imageUrl} folder="products" onChange={(url) => setForm((current) => ({ ...current, imageUrl: url || null }))} /></FormField>
           </FormSection>
           <FormSection title="Variants">
             {form.variants.map((variant, index) => (

@@ -1,7 +1,13 @@
 import { apiClient } from "./client";
 import type { CreateProductPayload, Product, UpdateInventoryPayload } from "@/types";
 
-export async function getProducts(params?: { search?: string; category?: string }) {
+export async function getProducts(params?: {
+  search?: string;
+  category?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+}) {
   const response = await apiClient.get<Product[]>("/products", { params });
   return response.data;
 }

@@ -1,6 +1,7 @@
 import {
   ClipboardList,
   FileText,
+  Image,
   LayoutDashboard,
   Package,
   ShoppingCart,
@@ -23,6 +24,7 @@ export const adminRoutes: AdminRoute[] = [
   { path: "/admin/content", label: "Content", icon: FileText, group: "marketing" },
   { path: "/admin/coupons", label: "Coupons", icon: Ticket, group: "marketing" },
   { path: "/admin/flash-sale", label: "Flash Sale", icon: Zap, group: "marketing" },
+  { path: "/admin/media", label: "Media", icon: Image, group: "system" },
   { path: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, group: "system" },
 ];
 

@@ -22,7 +22,8 @@ public sealed class UpdateContentBlockCommand : IRequest<ContentBlockDto>
 public sealed class UpdateContentBlockCommandHandler(
     IContentRepository contentRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService) : IRequestHandler<UpdateContentBlockCommand, ContentBlockDto>
+    ICacheService cacheService,
+    IMediaRepository mediaRepository) : IRequestHandler<UpdateContentBlockCommand, ContentBlockDto>
 {
     public async Task<ContentBlockDto> Handle(UpdateContentBlockCommand request, CancellationToken cancellationToken)
     {
@@ -54,6 +55,8 @@ public sealed class UpdateContentBlockCommandHandler(
         block.EndAt = request.EndAt;
         block.UpdatedAt = DateTime.UtcNow;
 
+        await mediaRepository.ClearUsageAsync("ContentBlock", block.Id, "ImageUrl", cancellationToken);
+        await mediaRepository.TrackUsageByPathAsync(block.ImageUrl, "ContentBlock", block.Id, "ImageUrl", cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveAsync(CacheKeys.Content(block.Placement), cancellationToken);
         return ContentBlockMapper.ToDto(block);

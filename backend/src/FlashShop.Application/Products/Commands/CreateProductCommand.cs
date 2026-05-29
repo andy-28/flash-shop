@@ -11,6 +11,7 @@ public sealed class CreateProductCommand : IRequest<Guid>
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public IReadOnlyCollection<CreateProductVariantCommand> Variants { get; set; } = Array.Empty<CreateProductVariantCommand>();
 }
 
@@ -25,7 +26,8 @@ public sealed class CreateProductVariantCommand
 public sealed class CreateProductCommandHandler(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService)
+    ICacheService cacheService,
+    IMediaRepository mediaRepository)
     : IRequestHandler<CreateProductCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -51,6 +53,7 @@ public sealed class CreateProductCommandHandler(
             Name = request.Name.Trim(),
             Description = request.Description.Trim(),
             Category = request.Category.Trim(),
+            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
             Status = "Active",
             CreatedAt = now,
             UpdatedAt = now,
@@ -81,6 +84,11 @@ public sealed class CreateProductCommandHandler(
         };
 
         await productRepository.AddAsync(product, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+        {
+            await mediaRepository.TrackUsageByPathAsync(product.ImageUrl, "Product", product.Id, "ImageUrl", cancellationToken);
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveByPrefixAsync(CacheKeys.ProductListPrefix, cancellationToken);
         return product.Id;

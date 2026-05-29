@@ -12,6 +12,7 @@ public sealed class UpdateProductCommand : IRequest
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public string Status { get; set; } = "Active";
     public IReadOnlyCollection<UpdateProductVariantCommand> Variants { get; set; } = Array.Empty<UpdateProductVariantCommand>();
 }
@@ -29,7 +30,8 @@ public sealed class UpdateProductVariantCommand
 public sealed class UpdateProductCommandHandler(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService)
+    ICacheService cacheService,
+    IMediaRepository mediaRepository)
     : IRequestHandler<UpdateProductCommand>
 {
     public async Task Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -54,6 +56,7 @@ public sealed class UpdateProductCommandHandler(
         product.Name = request.Name.Trim();
         product.Description = request.Description.Trim();
         product.Category = request.Category.Trim();
+        product.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
         product.Status = request.Status.Trim();
         product.UpdatedAt = now;
 
@@ -106,6 +109,12 @@ public sealed class UpdateProductCommandHandler(
                 variant.Inventory.AvailableStock = totalStock - variant.Inventory.FrozenStock - variant.Inventory.SoldCount;
                 variant.Inventory.Version += 1;
             }
+        }
+
+        await mediaRepository.ClearUsageAsync("Product", product.Id, "ImageUrl", cancellationToken);
+        if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+        {
+            await mediaRepository.TrackUsageByPathAsync(product.ImageUrl, "Product", product.Id, "ImageUrl", cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

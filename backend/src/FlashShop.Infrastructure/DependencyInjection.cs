@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IInventoryLogRepository, InventoryLogRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IMediaRepository, MediaRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IOrderRepository, OrderRepository>();

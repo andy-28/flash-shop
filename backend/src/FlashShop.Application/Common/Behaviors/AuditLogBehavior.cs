@@ -116,7 +116,7 @@ public sealed class AuditLogBehavior<TRequest, TResponse>(
     {
         return request.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(property => !IsSensitive(property.Name))
+            .Where(property => !IsSensitive(property.Name) && !IsUnsafeForAudit(property))
             .ToDictionary(property => property.Name, property => property.GetValue(request));
     }
 
@@ -125,5 +125,11 @@ public sealed class AuditLogBehavior<TRequest, TResponse>(
         return propertyName.Contains("Password", StringComparison.OrdinalIgnoreCase)
             || propertyName.Contains("Token", StringComparison.OrdinalIgnoreCase)
             || propertyName.Contains("Secret", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsUnsafeForAudit(PropertyInfo property)
+    {
+        return typeof(Stream).IsAssignableFrom(property.PropertyType)
+            || property.PropertyType.Name.Contains("FormFile", StringComparison.OrdinalIgnoreCase);
     }
 }

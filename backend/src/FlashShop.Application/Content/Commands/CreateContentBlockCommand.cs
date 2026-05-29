@@ -24,7 +24,8 @@ public sealed class CreateContentBlockCommand : IRequest<ContentBlockDto>
 public sealed class CreateContentBlockCommandHandler(
     IContentRepository contentRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService) : IRequestHandler<CreateContentBlockCommand, ContentBlockDto>
+    ICacheService cacheService,
+    IMediaRepository mediaRepository) : IRequestHandler<CreateContentBlockCommand, ContentBlockDto>
 {
     public async Task<ContentBlockDto> Handle(CreateContentBlockCommand request, CancellationToken cancellationToken)
     {
@@ -73,6 +74,7 @@ public sealed class CreateContentBlockCommandHandler(
         };
 
         await contentRepository.AddAsync(block, cancellationToken);
+        await mediaRepository.TrackUsageByPathAsync(block.ImageUrl, "ContentBlock", block.Id, "ImageUrl", cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveAsync(CacheKeys.Content(placement), cancellationToken);
 

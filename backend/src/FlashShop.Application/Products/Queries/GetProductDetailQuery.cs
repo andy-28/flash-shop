@@ -36,6 +36,7 @@ public sealed class GetProductDetailQueryHandler(
             Name = product.Name,
             Description = product.Description,
             Category = product.Category,
+            ImageUrl = product.ImageUrl,
             Status = product.Status,
             Variants = product.Variants.Select(variant => new ProductVariantDto
             {

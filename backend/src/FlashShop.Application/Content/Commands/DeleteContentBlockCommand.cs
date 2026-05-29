@@ -13,7 +13,8 @@ public sealed class DeleteContentBlockCommand : IRequest
 public sealed class DeleteContentBlockCommandHandler(
     IContentRepository contentRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cacheService) : IRequestHandler<DeleteContentBlockCommand>
+    ICacheService cacheService,
+    IMediaRepository mediaRepository) : IRequestHandler<DeleteContentBlockCommand>
 {
     public async Task Handle(DeleteContentBlockCommand request, CancellationToken cancellationToken)
     {
@@ -21,6 +22,7 @@ public sealed class DeleteContentBlockCommandHandler(
             ?? throw new NotFoundException("Content block was not found.");
 
         var placement = block.Placement;
+        await mediaRepository.ClearUsageAsync("ContentBlock", block.Id, "ImageUrl", cancellationToken);
         contentRepository.Remove(block);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await cacheService.RemoveAsync(CacheKeys.Content(placement), cancellationToken);

@@ -42,6 +42,7 @@ public sealed class GetProductListQueryHandler(
             Name = product.Name,
             Description = product.Description,
             Category = product.Category,
+            ImageUrl = product.ImageUrl,
             Status = product.Status,
             MinPrice = product.Variants.Count == 0 ? 0 : product.Variants.Min(x => x.Price),
             AvailableStock = product.Variants.Sum(x => x.Inventory?.AvailableStock ?? 0),

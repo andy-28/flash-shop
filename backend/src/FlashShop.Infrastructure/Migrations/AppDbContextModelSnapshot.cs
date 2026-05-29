@@ -470,6 +470,126 @@ namespace FlashShop.Infrastructure.Migrations
                     b.ToTable("inventory_logs", (string)null);
                 });
 
+            modelBuilder.Entity("FlashShop.Domain.Entities.MediaFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("alt_text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("file_path");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_size");
+
+                    b.Property<string>("Folder")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("folder");
+
+                    b.Property<int?>("Height")
+                        .HasColumnType("integer")
+                        .HasColumnName("height");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("mime_type");
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("stored_file_name");
+
+                    b.Property<string>("ThumbnailPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("thumbnail_path");
+
+                    b.Property<Guid>("UploadedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uploaded_by");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("integer")
+                        .HasColumnName("width");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FileName");
+
+                    b.HasIndex("Folder");
+
+                    b.HasIndex("UploadedBy");
+
+                    b.ToTable("media_files", (string)null);
+                });
+
+            modelBuilder.Entity("FlashShop.Domain.Entities.MediaFileUsage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("field_name");
+
+                    b.Property<Guid>("MediaFileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("media_file_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityType", "EntityId");
+
+                    b.HasIndex("MediaFileId", "EntityType", "EntityId", "FieldName")
+                        .IsUnique();
+
+                    b.ToTable("media_file_usages", (string)null);
+                });
+
             modelBuilder.Entity("FlashShop.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -659,6 +779,11 @@ namespace FlashShop.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("image_url");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -936,6 +1061,28 @@ namespace FlashShop.Infrastructure.Migrations
                     b.Navigation("Inventory");
                 });
 
+            modelBuilder.Entity("FlashShop.Domain.Entities.MediaFile", b =>
+                {
+                    b.HasOne("FlashShop.Domain.Entities.User", "UploadedByUser")
+                        .WithMany()
+                        .HasForeignKey("UploadedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UploadedByUser");
+                });
+
+            modelBuilder.Entity("FlashShop.Domain.Entities.MediaFileUsage", b =>
+                {
+                    b.HasOne("FlashShop.Domain.Entities.MediaFile", "MediaFile")
+                        .WithMany("Usages")
+                        .HasForeignKey("MediaFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MediaFile");
+                });
+
             modelBuilder.Entity("FlashShop.Domain.Entities.Order", b =>
                 {
                     b.HasOne("FlashShop.Domain.Entities.Coupon", "Coupon")
@@ -1023,6 +1170,11 @@ namespace FlashShop.Infrastructure.Migrations
             modelBuilder.Entity("FlashShop.Domain.Entities.Inventory", b =>
                 {
                     b.Navigation("Logs");
+                });
+
+            modelBuilder.Entity("FlashShop.Domain.Entities.MediaFile", b =>
+                {
+                    b.Navigation("Usages");
                 });
 
             modelBuilder.Entity("FlashShop.Domain.Entities.Order", b =>

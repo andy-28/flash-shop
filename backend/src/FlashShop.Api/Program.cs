@@ -50,6 +50,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ICacheStatusService, CacheStatusService>();
 builder.Services.AddScoped<IDashboardNotifier, DashboardNotifier>();
+builder.Services.AddScoped<IMediaService, LocalMediaService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<FlashSaleOrderChannel>();

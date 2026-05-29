@@ -2,16 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, ImagePlus, Pencil, Plus, Power, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Plus, Power, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FilterBar } from "@/components/admin/FilterBar";
 import { FormField, FormSection } from "@/components/admin/FormSection";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 import { MutationButton } from "@/components/admin/MutationButton";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { useToast } from "@/components/admin/Toast";
-import { createContentBlock, deleteContentBlock, getAdminContentList, reorderContentBlocks, toggleContentBlock, updateContentBlock, uploadContentImage } from "@/lib/api/content";
+import { createContentBlock, deleteContentBlock, getAdminContentList, reorderContentBlocks, toggleContentBlock, updateContentBlock } from "@/lib/api/content";
 import type { ContentBlock, ContentBlockPayload } from "@/types";
 
 const placements = ["All", "home_banner", "home_story", "home_promo", "shop_banner"];
@@ -47,7 +48,6 @@ export default function AdminContentPage() {
     },
     onSuccess: async () => { toast.success("Content reordered"); await invalidate(); },
   });
-  const uploadMutation = useMutation({ mutationFn: uploadContentImage, onSuccess: (url) => { setForm((current) => ({ ...current, imageUrl: url })); toast.success("Image uploaded"); } });
   const columns: Column<ContentBlock>[] = [
     { key: "title", header: "Content", sortable: true, width: "1.4fr", render: (row) => <div><p className="font-medium">{row.title}</p><p className="mt-1 text-xs text-[#666666]">{row.subtitle}</p></div> },
     { key: "placement", header: "Placement", sortable: true, width: "0.8fr", render: (row) => <span className="text-[#A0A0A0]">{row.placement}</span> },
@@ -77,11 +77,7 @@ export default function AdminContentPage() {
           <FormSection title={editing ? "Edit Content" : "Create Content"}>
             <TextField label="Title" value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
             <TextField label="Subtitle" value={form.subtitle ?? ""} onChange={(value) => setForm({ ...form, subtitle: value })} />
-            <TextField label="Image URL" value={form.imageUrl} onChange={(value) => setForm({ ...form, imageUrl: value })} />
-            <label className="mb-5 flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#404040] text-sm text-[#A0A0A0] hover:bg-[#1E1E1E]">
-              <ImagePlus className="size-4" />{uploadMutation.isPending ? "Uploading..." : "Upload image"}
-              <input type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadMutation.mutate(file); }} />
-            </label>
+            <FormField label="Banner image" required><MediaPicker value={form.imageUrl} folder="banners" onChange={(url) => setForm({ ...form, imageUrl: url })} /></FormField>
             <TextField label="Link URL" value={form.linkUrl ?? ""} onChange={(value) => setForm({ ...form, linkUrl: value })} />
             <div className="grid gap-3 sm:grid-cols-2"><SelectField label="Link Type" value={form.linkType} options={linkTypes} onChange={(value) => setForm({ ...form, linkType: value })} /><SelectField disabled={!!editing} label="Placement" value={form.placement} options={placements.filter((item) => item !== "All")} onChange={(value) => setForm({ ...form, placement: value })} /></div>
             <div className="grid gap-3 sm:grid-cols-2"><DateField label="Start" value={form.startAt ?? ""} onChange={(value) => setForm({ ...form, startAt: value })} /><DateField label="End" value={form.endAt ?? ""} onChange={(value) => setForm({ ...form, endAt: value })} /></div>
