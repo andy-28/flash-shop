@@ -18,6 +18,10 @@ public static class ContentBlockMapper
             block.Status,
             block.Body,
             block.Slug,
+            block.Category,
+            block.VideoUrl,
+            block.Summary,
+            block.ViewCount,
             block.Position,
             block.IsActive,
             block.StartAt,
@@ -41,6 +45,9 @@ public static class ContentBlockMapper
             Title = block.Title,
             Subtitle = block.Subtitle,
             Body = block.Body,
+            Category = block.Category,
+            VideoUrl = block.VideoUrl,
+            Summary = block.Summary,
             ImageUrl = block.ImageUrl,
             LinkUrl = block.LinkUrl,
             LinkType = block.LinkType,
@@ -62,10 +69,51 @@ public static class ContentBlockMapper
             version.Title,
             version.Subtitle,
             version.Body,
+            version.Category,
+            version.VideoUrl,
+            version.Summary,
             version.ImageUrl,
             version.Placement,
             version.ModifiedByUser.Name,
             version.ChangeNote,
             version.CreatedAt);
+    }
+
+    public static ContentFeedDto ToFeedDto(ContentBlock block)
+    {
+        return new ContentFeedDto(
+            block.Id,
+            block.Title,
+            block.Subtitle,
+            block.Summary,
+            block.ImageUrl,
+            block.VideoUrl,
+            block.Category,
+            block.Slug,
+            block.ViewCount,
+            block.CreatedAt,
+            block.PublishedAt);
+    }
+
+    public static ContentDetailDto ToDetailDto(ContentBlock block, IEnumerable<ContentBlock> related)
+    {
+        return new ContentDetailDto(
+            block.Id,
+            block.Title,
+            block.Subtitle,
+            block.Body,
+            block.Summary,
+            block.ImageUrl,
+            block.VideoUrl,
+            block.Category,
+            block.Slug,
+            block.ViewCount,
+            block.CreatedAt,
+            block.PublishedAt,
+            block.Media
+                .OrderBy(media => media.Position)
+                .Select(media => new ContentBlockMediaDto(media.Id, media.MediaType, media.MediaUrl, media.Position))
+                .ToList(),
+            related.Select(ToFeedDto).ToList());
     }
 }

@@ -3,6 +3,7 @@ using System;
 using FlashShop.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FlashShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602052026_AddCommunity")]
+    partial class AddCommunity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,11 +235,6 @@ namespace FlashShop.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("body");
 
-                    b.Property<string>("Category")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("category");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -306,11 +304,6 @@ namespace FlashShop.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("subtitle");
 
-                    b.Property<string>("Summary")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("summary");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -327,20 +320,7 @@ namespace FlashShop.Infrastructure.Migrations
                         .HasDefaultValue(1)
                         .HasColumnName("version");
 
-                    b.Property<string>("VideoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("video_url");
-
-                    b.Property<int>("ViewCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("view_count");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("Category");
 
                     b.HasIndex("CreatedBy");
 
@@ -406,11 +386,6 @@ namespace FlashShop.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("body");
 
-                    b.Property<string>("Category")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("category");
-
                     b.Property<string>("ChangeNote")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -469,11 +444,6 @@ namespace FlashShop.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("subtitle");
 
-                    b.Property<string>("Summary")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("summary");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -483,11 +453,6 @@ namespace FlashShop.Infrastructure.Migrations
                     b.Property<int>("VersionNumber")
                         .HasColumnType("integer")
                         .HasColumnName("version_number");
-
-                    b.Property<string>("VideoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("video_url");
 
                     b.HasKey("Id");
 

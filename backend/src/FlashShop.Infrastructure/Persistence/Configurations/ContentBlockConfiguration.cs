@@ -21,6 +21,10 @@ public sealed class ContentBlockConfiguration : IEntityTypeConfiguration<Content
         builder.Property(x => x.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue("Draft");
         builder.Property(x => x.Body).HasColumnName("body");
         builder.Property(x => x.Slug).HasColumnName("slug").HasMaxLength(200);
+        builder.Property(x => x.Category).HasColumnName("category").HasMaxLength(50);
+        builder.Property(x => x.VideoUrl).HasColumnName("video_url").HasMaxLength(500);
+        builder.Property(x => x.Summary).HasColumnName("summary").HasMaxLength(500);
+        builder.Property(x => x.ViewCount).HasColumnName("view_count").HasDefaultValue(0);
         builder.Property(x => x.Position).HasColumnName("position");
         builder.Property(x => x.IsActive).HasColumnName("is_active");
         builder.Property(x => x.StartAt).HasColumnName("start_at");
@@ -33,6 +37,7 @@ public sealed class ContentBlockConfiguration : IEntityTypeConfiguration<Content
 
         builder.HasIndex(x => x.Placement);
         builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => x.Category);
         builder.HasIndex(x => x.Slug).IsUnique().HasFilter("slug IS NOT NULL");
         builder.HasIndex(x => new { x.Placement, x.IsActive, x.Position });
 

@@ -6,7 +6,8 @@ import StarterKit from "@tiptap/starter-kit";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Heading2, Heading3, Image, Italic, Link, List, ListOrdered, Quote, Redo2, Strikethrough, Undo2 } from "lucide-react";
+import YoutubeExtension from "@tiptap/extension-youtube";
+import { Bold, Heading2, Heading3, Image, Italic, Link, List, ListOrdered, PlaySquare, Quote, Redo2, Strikethrough, Undo2 } from "lucide-react";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 
 interface RichTextEditorProps {
@@ -23,6 +24,7 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
       LinkExtension.configure({ openOnClick: false }),
       ImageExtension,
       Placeholder.configure({ placeholder }),
+      YoutubeExtension.configure({ inline: false, width: 640, height: 360 }),
     ],
     content: value,
     editorProps: {
@@ -46,6 +48,13 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
+  const setYoutube = useCallback(() => {
+    if (!editor) return;
+    const url = window.prompt("YouTube URL");
+    if (!url) return;
+    editor.commands.setYoutubeVideo({ src: url });
+  }, [editor]);
+
   if (!editor) {
     return <div className="min-h-[260px] animate-pulse rounded-md border border-[#2A2A2A] bg-[#1E1E1E]" />;
   }
@@ -63,6 +72,7 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
         <ToolbarButton active={editor.isActive("blockquote")} icon={Quote} label="Quote" onClick={() => editor.chain().focus().toggleBlockquote().run()} />
         <ToolbarButton active={editor.isActive("link")} icon={Link} label="Link" onClick={setLink} />
         <ToolbarButton icon={Image} label="Image" onClick={() => setShowImagePicker((current) => !current)} />
+        <ToolbarButton icon={PlaySquare} label="YouTube" onClick={setYoutube} />
         <ToolbarButton icon={Undo2} label="Undo" onClick={() => editor.chain().focus().undo().run()} />
         <ToolbarButton icon={Redo2} label="Redo" onClick={() => editor.chain().focus().redo().run()} />
       </div>

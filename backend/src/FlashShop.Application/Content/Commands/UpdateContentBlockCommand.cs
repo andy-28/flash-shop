@@ -16,6 +16,9 @@ public sealed class UpdateContentBlockCommand : IRequest<ContentBlockDto>
     public string LinkType { get; set; } = "None";
     public string? Body { get; set; }
     public string? Slug { get; set; }
+    public string? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Summary { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
@@ -56,6 +59,9 @@ public sealed class UpdateContentBlockCommandHandler(
         block.LinkType = string.IsNullOrWhiteSpace(request.LinkType) ? "None" : request.LinkType.Trim();
         block.Body = string.IsNullOrWhiteSpace(request.Body) ? null : request.Body.Trim();
         block.Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim();
+        block.Category = string.IsNullOrWhiteSpace(request.Category) ? null : request.Category.Trim();
+        block.VideoUrl = string.IsNullOrWhiteSpace(request.VideoUrl) ? null : request.VideoUrl.Trim();
+        block.Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim();
         block.IsActive = block.Status == "Published" && request.IsActive;
         block.StartAt = request.StartAt;
         block.EndAt = request.EndAt;

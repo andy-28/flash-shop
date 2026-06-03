@@ -17,6 +17,9 @@ public sealed class CreateContentBlockCommand : IRequest<ContentBlockDto>
     public string Placement { get; set; } = string.Empty;
     public string? Body { get; set; }
     public string? Slug { get; set; }
+    public string? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Summary { get; set; }
     public bool IsActive { get; set; }
     public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
@@ -69,6 +72,9 @@ public sealed class CreateContentBlockCommandHandler(
             Status = "Draft",
             Body = string.IsNullOrWhiteSpace(request.Body) ? null : request.Body.Trim(),
             Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim(),
+            Category = string.IsNullOrWhiteSpace(request.Category) ? null : request.Category.Trim(),
+            VideoUrl = string.IsNullOrWhiteSpace(request.VideoUrl) ? null : request.VideoUrl.Trim(),
+            Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim(),
             Position = await contentRepository.GetNextPositionAsync(placement, cancellationToken),
             IsActive = false,
             StartAt = request.StartAt,

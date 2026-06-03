@@ -1,8 +1,23 @@
 import { apiClient } from "@/lib/api/client";
-import type { ContentBlock, ContentBlockPayload, ContentVersion } from "@/types";
+import type { ContentBlock, ContentBlockPayload, ContentDetail, ContentFeedItem, ContentVersion, PagedResult } from "@/types";
 
 export async function getContentByPlacement(placement: string) {
   const response = await apiClient.get<ContentBlock[]>("/content", { params: { placement } });
+  return response.data;
+}
+
+export async function getContentsFeed(params?: { category?: string; page?: number; pageSize?: number }) {
+  const response = await apiClient.get<PagedResult<ContentFeedItem>>("/content/feed", { params });
+  return response.data;
+}
+
+export async function getContentDetail(id: string) {
+  const response = await apiClient.get<ContentDetail>(`/content/feed/${id}`);
+  return response.data;
+}
+
+export async function getContentCategories() {
+  const response = await apiClient.get<string[]>("/content/feed/categories");
   return response.data;
 }
 

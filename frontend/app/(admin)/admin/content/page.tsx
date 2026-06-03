@@ -27,9 +27,10 @@ import {
 } from "@/lib/api/content";
 import type { ContentBlock, ContentBlockPayload, ContentVersion } from "@/types";
 
-const placements = ["All", "home_banner", "home_story", "home_promo", "shop_banner"];
+const placements = ["All", "home_banner", "home_story", "home_promo", "shop_banner", "contents_feed"];
 const statuses = ["All", "Draft", "Published", "Archived"];
 const linkTypes = ["None", "Internal", "External", "Product"];
+const contentCategories = ["", "News", "Behind", "Video", "Event"];
 const emptyForm: ContentBlockPayload = {
   title: "",
   subtitle: "",
@@ -39,6 +40,9 @@ const emptyForm: ContentBlockPayload = {
   placement: "home_banner",
   body: "",
   slug: "",
+  category: "",
+  videoUrl: "",
+  summary: "",
   isActive: false,
   startAt: null,
   endAt: null,
@@ -115,6 +119,9 @@ export default function AdminContentPage() {
       placement: block.placement,
       body: block.body ?? "",
       slug: block.slug ?? "",
+      category: block.category ?? "",
+      videoUrl: block.videoUrl ?? "",
+      summary: block.summary ?? "",
       isActive: block.isActive,
       startAt: toDateTimeLocal(block.startAt),
       endAt: toDateTimeLocal(block.endAt),
@@ -163,9 +170,12 @@ export default function AdminContentPage() {
             <TextField label="Title" value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
             <TextField label="Subtitle" value={form.subtitle ?? ""} onChange={(value) => setForm({ ...form, subtitle: value })} />
             <TextField label="Slug" value={form.slug ?? ""} onChange={(value) => setForm({ ...form, slug: value })} />
+            <TextField label="Summary" value={form.summary ?? ""} onChange={(value) => setForm({ ...form, summary: value })} />
             <FormField label="Banner image" required><MediaPicker value={form.imageUrl} folder="banners" onChange={(url) => setForm({ ...form, imageUrl: url })} /></FormField>
             <FormField label="Body"><RichTextEditor value={form.body ?? ""} onChange={(value) => setForm({ ...form, body: value })} placeholder="Write rich content..." /></FormField>
             <TextField label="Link URL" value={form.linkUrl ?? ""} onChange={(value) => setForm({ ...form, linkUrl: value })} />
+            <TextField label="Video URL" value={form.videoUrl ?? ""} onChange={(value) => setForm({ ...form, videoUrl: value })} />
+            <SelectField label="Category" value={form.category ?? ""} options={contentCategories} onChange={(value) => setForm({ ...form, category: value })} />
             <div className="grid gap-3 sm:grid-cols-2"><SelectField label="Link Type" value={form.linkType} options={linkTypes} onChange={(value) => setForm({ ...form, linkType: value })} /><SelectField disabled={!!editing} label="Placement" value={form.placement} options={placements.filter((item) => item !== "All")} onChange={(value) => setForm({ ...form, placement: value })} /></div>
             <div className="grid gap-3 sm:grid-cols-2"><DateField label="Start" value={form.startAt ?? ""} onChange={(value) => setForm({ ...form, startAt: value })} /><DateField label="End" value={form.endAt ?? ""} onChange={(value) => setForm({ ...form, endAt: value })} /></div>
             {editing ? <TextField label="Change Note" value={form.changeNote ?? ""} onChange={(value) => setForm({ ...form, changeNote: value })} /> : null}

@@ -34,6 +34,9 @@ public sealed class RestoreContentVersionCommandHandler(
         block.Title = version.Title;
         block.Subtitle = version.Subtitle;
         block.Body = version.Body;
+        block.Category = version.Category;
+        block.VideoUrl = version.VideoUrl;
+        block.Summary = version.Summary;
         block.ImageUrl = version.ImageUrl;
         block.LinkUrl = version.LinkUrl;
         block.LinkType = version.LinkType;

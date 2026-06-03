@@ -17,6 +17,9 @@ public sealed class ContentVersionConfiguration : IEntityTypeConfiguration<Conte
         builder.Property(x => x.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
         builder.Property(x => x.Subtitle).HasColumnName("subtitle").HasMaxLength(200);
         builder.Property(x => x.Body).HasColumnName("body");
+        builder.Property(x => x.Category).HasColumnName("category").HasMaxLength(50);
+        builder.Property(x => x.VideoUrl).HasColumnName("video_url").HasMaxLength(500);
+        builder.Property(x => x.Summary).HasColumnName("summary").HasMaxLength(500);
         builder.Property(x => x.ImageUrl).HasColumnName("image_url").HasMaxLength(500).IsRequired();
         builder.Property(x => x.LinkUrl).HasColumnName("link_url").HasMaxLength(500);
         builder.Property(x => x.LinkType).HasColumnName("link_type").HasMaxLength(50).IsRequired();

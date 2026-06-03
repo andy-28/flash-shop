@@ -125,6 +125,10 @@ export interface ContentBlock {
   status: "Draft" | "Published" | "Archived" | string;
   body: string | null;
   slug: string | null;
+  category: string | null;
+  videoUrl: string | null;
+  summary: string | null;
+  viewCount: number;
   position: number;
   isActive: boolean;
   startAt: string | null;
@@ -144,6 +148,9 @@ export interface ContentBlockPayload {
   placement: string;
   body?: string | null;
   slug?: string | null;
+  category?: string | null;
+  videoUrl?: string | null;
+  summary?: string | null;
   isActive: boolean;
   startAt?: string | null;
   endAt?: string | null;
@@ -156,11 +163,34 @@ export interface ContentVersion {
   title: string;
   subtitle: string | null;
   body: string | null;
+  category: string | null;
+  videoUrl: string | null;
+  summary: string | null;
   imageUrl: string;
   placement: string;
   modifiedByName: string;
   changeNote: string;
   createdAt: string;
+}
+
+export interface ContentFeedItem {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  summary: string | null;
+  imageUrl: string | null;
+  videoUrl: string | null;
+  category: string | null;
+  slug: string | null;
+  viewCount: number;
+  createdAt: string;
+  publishedAt: string | null;
+}
+
+export interface ContentDetail extends ContentFeedItem {
+  body: string | null;
+  media: ContentBlockMedia[];
+  relatedContents: ContentFeedItem[];
 }
 
 export interface Coupon {
@@ -307,4 +337,57 @@ export interface MediaList {
   totalCount: number;
   page: number;
   pageSize: number;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface CommunityPost {
+  id: string;
+  authorName: string;
+  authorAvatarUrl: string | null;
+  category: string;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  isPinned: boolean;
+  likeCount: number;
+  commentCount: number;
+  viewCount: number;
+  isLikedByMe: boolean;
+  createdAt: string;
+}
+
+export interface CommunityPostDetail extends CommunityPost {
+  authorId: string;
+  comments: CommunityComment[];
+}
+
+export interface CommunityComment {
+  id: string;
+  authorName: string;
+  authorAvatarUrl: string | null;
+  authorId: string;
+  content: string;
+  likeCount: number;
+  isLikedByMe: boolean;
+  createdAt: string;
+  parentCommentId: string | null;
+  replies: CommunityComment[];
+}
+
+export interface AdminCommunityPost {
+  id: string;
+  title: string;
+  authorName: string;
+  category: string;
+  likeCount: number;
+  commentCount: number;
+  isPinned: boolean;
+  isHidden: boolean;
+  createdAt: string;
 }

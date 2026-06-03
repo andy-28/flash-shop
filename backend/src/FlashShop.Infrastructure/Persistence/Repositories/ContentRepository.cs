@@ -46,6 +46,78 @@ public sealed class ContentRepository(AppDbContext dbContext) : IContentReposito
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<(IReadOnlyCollection<ContentBlock> Items, int TotalCount)> ListPublicFeedAsync(
+        string? category,
+        int page,
+        int pageSize,
+        DateTime now,
+        CancellationToken cancellationToken = default)
+    {
+        var query = dbContext.ContentBlocks
+            .Include(block => block.Media)
+            .AsNoTracking()
+            .Where(block => block.Placement == "contents_feed")
+            .Where(block => block.Status == "Published" && block.IsActive)
+            .Where(block => block.StartAt == null || block.StartAt <= now)
+            .Where(block => block.EndAt == null || block.EndAt >= now);
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(block => block.Category == category);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderByDescending(block => block.PublishedAt ?? block.CreatedAt)
+            .ThenByDescending(block => block.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    public Task<ContentBlock?> GetPublicFeedDetailAsync(Guid id, DateTime now, CancellationToken cancellationToken = default)
+    {
+        return dbContext.ContentBlocks
+            .Include(block => block.Media)
+            .FirstOrDefaultAsync(
+                block => block.Id == id
+                    && block.Placement == "contents_feed"
+                    && block.Status == "Published"
+                    && block.IsActive
+                    && (block.StartAt == null || block.StartAt <= now)
+                    && (block.EndAt == null || block.EndAt >= now),
+                cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<ContentBlock>> ListRelatedFeedAsync(
+        Guid excludeId,
+        string? category,
+        DateTime now,
+        int take = 3,
+        CancellationToken cancellationToken = default)
+    {
+        var query = dbContext.ContentBlocks
+            .AsNoTracking()
+            .Where(block => block.Id != excludeId)
+            .Where(block => block.Placement == "contents_feed")
+            .Where(block => block.Status == "Published" && block.IsActive)
+            .Where(block => block.StartAt == null || block.StartAt <= now)
+            .Where(block => block.EndAt == null || block.EndAt >= now);
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(block => block.Category == category);
+        }
+
+        return await query
+            .OrderByDescending(block => block.PublishedAt ?? block.CreatedAt)
+            .ThenByDescending(block => block.CreatedAt)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<ContentBlock>> ListAdminAsync(
         string? placement,
         CancellationToken cancellationToken = default)

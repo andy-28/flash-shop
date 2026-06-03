@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { CommunityPreview } from "@/components/shop/CommunityPreview";
 import { FeaturedProducts } from "@/components/shop/FeaturedProducts";
 import { FlashSalePreview } from "@/components/shop/FlashSalePreview";
 import { Footer } from "@/components/shop/Footer";
 import { HeroBanner } from "@/components/shop/HeroBanner";
+import { LatestContentsList } from "@/components/shop/LatestContentsList";
 import { PromoBanner } from "@/components/shop/PromoBanner";
 import { Section } from "@/components/shop/Section";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { StoryCircles } from "@/components/shop/StoryCircles";
-import { getContentByPlacement } from "@/lib/api/content";
+import { getContentByPlacement, getContentsFeed } from "@/lib/api/content";
+import { getPosts } from "@/lib/api/community";
 import { getActiveFlashSales } from "@/lib/api/flashSale";
 import { getProducts } from "@/lib/api/products";
 
@@ -40,6 +43,14 @@ export default function HomePage() {
     queryKey: ["products", "latest"],
     queryFn: () => getProducts({ page: 1, pageSize: 8 }),
   });
+  const latestPostsQuery = useQuery({
+    queryKey: ["community", "latest"],
+    queryFn: () => getPosts({ page: 1, pageSize: 4, sortBy: "latest" }),
+  });
+  const latestContentsQuery = useQuery({
+    queryKey: ["content-feed", "latest"],
+    queryFn: () => getContentsFeed({ page: 1, pageSize: 4 }),
+  });
 
   const banners = bannersQuery.data ?? [];
   const stories = storiesQuery.data ?? [];
@@ -47,6 +58,8 @@ export default function HomePage() {
   const flashSales = flashSalesQuery.data ?? [];
   const featuredProducts = (featuredQuery.data ?? []).slice(0, 8);
   const latestProducts = (latestQuery.data ?? []).slice(0, 8);
+  const latestPosts = latestPostsQuery.data?.items ?? [];
+  const latestContents = latestContentsQuery.data?.items ?? [];
 
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white">
@@ -99,6 +112,26 @@ export default function HomePage() {
         ) : latestProducts.length > 0 ? (
           <Section title="New Arrivals" subtitle="最新上架" action={{ label: "查看全部", href: "/products" }}>
             <FeaturedProducts products={latestProducts} />
+          </Section>
+        ) : null}
+
+        {latestPostsQuery.isLoading ? (
+          <Section title="Community" subtitle="最新討論" action={{ label: "查看全部", href: "/community" }}>
+            <BlockSkeleton />
+          </Section>
+        ) : latestPosts.length > 0 ? (
+          <Section title="Community" subtitle="最新討論" action={{ label: "查看全部", href: "/community" }}>
+            <CommunityPreview posts={latestPosts} />
+          </Section>
+        ) : null}
+
+        {latestContentsQuery.isLoading ? (
+          <Section title="Contents" subtitle="最新內容" action={{ label: "查看全部", href: "/contents" }}>
+            <BlockSkeleton />
+          </Section>
+        ) : latestContents.length > 0 ? (
+          <Section title="Contents" subtitle="最新內容" action={{ label: "查看全部", href: "/contents" }}>
+            <LatestContentsList items={latestContents} />
           </Section>
         ) : null}
       </div>

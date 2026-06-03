@@ -8,6 +8,9 @@ public interface IContentRepository
     Task<ContentBlock?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ContentVersion?> GetVersionAsync(Guid contentBlockId, Guid versionId, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<ContentBlock>> ListPublicByPlacementAsync(string placement, DateTime now, CancellationToken cancellationToken = default);
+    Task<(IReadOnlyCollection<ContentBlock> Items, int TotalCount)> ListPublicFeedAsync(string? category, int page, int pageSize, DateTime now, CancellationToken cancellationToken = default);
+    Task<ContentBlock?> GetPublicFeedDetailAsync(Guid id, DateTime now, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<ContentBlock>> ListRelatedFeedAsync(Guid excludeId, string? category, DateTime now, int take = 3, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<ContentBlock>> ListAdminAsync(string? placement, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<ContentBlock>> ListByPlacementAsync(string placement, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<ContentVersion>> ListVersionsAsync(Guid contentBlockId, CancellationToken cancellationToken = default);

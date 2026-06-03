@@ -25,6 +25,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<ContentVersion> ContentVersions => Set<ContentVersion>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<MediaFileUsage> MediaFileUsages => Set<MediaFileUsage>();
+    public DbSet<CommunityPost> CommunityPosts => Set<CommunityPost>();
+    public DbSet<PostComment> PostComments => Set<PostComment>();
+    public DbSet<PostLike> PostLikes => Set<PostLike>();
+    public DbSet<CommentLike> CommentLikes => Set<CommentLike>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

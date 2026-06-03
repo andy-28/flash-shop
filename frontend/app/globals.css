@@ -189,6 +189,25 @@
   color: #a0a0a0;
 }
 
+.rich-text-editor [data-youtube-video],
+.rich-text-display [data-youtube-video] {
+  position: relative;
+  width: 100%;
+  height: 0;
+  margin: 1.5rem 0;
+  padding-bottom: 56.25%;
+}
+
+.rich-text-editor [data-youtube-video] iframe,
+.rich-text-display [data-youtube-video] iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+}
+
 .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
   color: #666666;
   content: attr(data-placeholder);

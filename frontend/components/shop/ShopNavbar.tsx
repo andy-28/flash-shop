@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, LayoutDashboard, Menu, ReceiptText, ShoppingBag, ShoppingCart, X } from "lucide-react";
+import { Flame, LayoutDashboard, Menu, MessageSquare, ReceiptText, ShoppingBag, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 import { useAuthStore } from "@/stores/authStore";
@@ -84,9 +84,16 @@ function NavLinks({ isAdmin, isAuthenticated }: Readonly<{ isAdmin: boolean; isA
         <ShoppingBag className="size-4" />
         Products
       </Link>
+      <Link href="/contents" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
+        Contents
+      </Link>
       <Link href="/flash-sale" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
         <Flame className="size-4" />
         Flash Sale
+      </Link>
+      <Link href="/community" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
+        <MessageSquare className="size-4" />
+        Community
       </Link>
       {isAuthenticated ? (
         <Link href="/orders" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">

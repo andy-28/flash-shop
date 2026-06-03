@@ -12,6 +12,10 @@ public sealed class ContentBlock
     public string Status { get; set; } = "Draft";
     public string? Body { get; set; }
     public string? Slug { get; set; }
+    public string? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Summary { get; set; }
+    public int ViewCount { get; set; }
     public int Position { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? StartAt { get; set; }

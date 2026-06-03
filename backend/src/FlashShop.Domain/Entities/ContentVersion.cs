@@ -8,6 +8,9 @@ public sealed class ContentVersion
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Body { get; set; }
+    public string? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Summary { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public string? LinkUrl { get; set; }
     public string LinkType { get; set; } = "None";
