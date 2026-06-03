@@ -3,9 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
-import { Loader2 } from "lucide-react";
 import { OrderStatusBadge } from "@/components/shop/OrderStatusBadge";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
+import { useToast } from "@/components/admin/Toast";
+import { LoadingButton } from "@/components/shared/LoadingButton";
 import { cancelOrder, getOrder, payOrder } from "@/lib/api/orders";
 import { useAuthStore } from "@/stores/authStore";
 import type { Order } from "@/types";
@@ -20,18 +21,17 @@ function formatRemaining(seconds: number) {
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const toast = useToast();
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isMutating, setIsMutating] = useState(false);
+  const [mutatingAction, setMutatingAction] = useState<"pay" | "cancel" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!hasHydrated) {
-      return;
-    }
+    if (!hasHydrated) return;
 
     if (!isAuthenticated) {
       router.push("/login");
@@ -53,30 +53,28 @@ export default function OrderDetailPage() {
   }, []);
 
   const remainingSeconds = useMemo(() => {
-    if (!order) {
-      return 0;
-    }
-
+    if (!order) return 0;
     return Math.floor((new Date(order.expiredAt).getTime() - now) / 1000);
   }, [now, order]);
 
-  const mutate = async (action: "pay" | "cancel") => {
-    if (!order) {
-      return;
-    }
+  async function mutate(action: "pay" | "cancel") {
+    if (!order || mutatingAction) return;
 
-    setIsMutating(true);
+    setMutatingAction(action);
     setError(null);
     try {
       const nextOrder = action === "pay" ? await payOrder(order.id) : await cancelOrder(order.id);
       setOrder(nextOrder);
+      toast.success(action === "pay" ? "付款成功" : "訂單已取消");
     } catch (exception) {
       const axiosError = exception as AxiosError<{ message?: string }>;
-      setError(axiosError.response?.data?.message ?? "Unable to update order.");
+      const message = axiosError.response?.data?.message ?? "Unable to update order.";
+      setError(message);
+      toast.error(message);
     } finally {
-      setIsMutating(false);
+      setMutatingAction(null);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -159,28 +157,17 @@ export default function OrderDetailPage() {
                   <p className="text-sm text-[#A0A0A0]">
                     Payment expires in <span className="font-semibold text-white">{remainingSeconds > 0 ? formatRemaining(remainingSeconds) : "Expired"}</span>
                   </p>
-                  <button
-                    type="button"
-                    className="inline-flex h-11 w-full items-center justify-center rounded-md bg-white text-sm font-medium text-black disabled:opacity-40"
-                    disabled={isMutating || remainingSeconds <= 0}
-                    onClick={() => mutate("pay")}
-                  >
-                    {isMutating ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                    Pay now
-                  </button>
-                  <button
-                    type="button"
-                    className="h-11 w-full rounded-md border border-[#2A2A2A] text-sm font-medium text-[#A0A0A0] hover:bg-white/10 hover:text-white disabled:opacity-40"
-                    disabled={isMutating}
-                    onClick={() => mutate("cancel")}
-                  >
-                    Cancel order
-                  </button>
+                  <LoadingButton fullWidth size="lg" isLoading={mutatingAction === "pay"} loadingText="付款處理中..." disabled={!!mutatingAction || remainingSeconds <= 0} onClick={() => mutate("pay")}>
+                    付款
+                  </LoadingButton>
+                  <LoadingButton fullWidth size="lg" variant="ghost" isLoading={mutatingAction === "cancel"} loadingText="取消中..." disabled={!!mutatingAction} onClick={() => mutate("cancel")}>
+                    取消訂單
+                  </LoadingButton>
                 </div>
               ) : null}
               {order.status === "Expired" ? (
                 <p className="mt-5 rounded-md border border-zinc-700 bg-zinc-900 p-3 text-sm text-zinc-300">
-                  訂單已過期，凍結庫存已自動釋放。
+                  訂單已過期，凍結庫存會由系統自動釋放。
                 </p>
               ) : null}
             </aside>

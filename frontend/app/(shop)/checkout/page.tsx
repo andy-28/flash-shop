@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Check, Loader2, ShoppingBag, Tag, X } from "lucide-react";
 import { AxiosError } from "axios";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
+import { useToast } from "@/components/admin/Toast";
+import { LoadingButton } from "@/components/shared/LoadingButton";
 import { validateCoupon } from "@/lib/api/coupons";
 import { createOrder } from "@/lib/api/orders";
 import { useAuthStore } from "@/stores/authStore";
@@ -13,6 +15,7 @@ import type { ApplyCouponResult } from "@/types";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const toast = useToast();
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { clearCart, fetchCart, items, totalAmount } = useCartStore();
@@ -40,6 +43,8 @@ export default function CheckoutPage() {
   const finalAmount = Math.max(totalAmount - appliedDiscount, 0);
 
   const applyCoupon = async () => {
+    if (isApplyingCoupon) return;
+
     const trimmedCode = couponCode.trim();
     if (!trimmedCode) {
       setCouponResult(null);
@@ -55,13 +60,16 @@ export default function CheckoutPage() {
       if (result.isValid) {
         setCouponResult(result);
         setCouponCode(result.code ?? trimmedCode);
+        toast.success("優惠券已套用");
         return;
       }
 
       setCouponError(result.errorMessage ?? "Coupon is not valid.");
+      toast.error(result.errorMessage ?? "優惠券不可用");
     } catch (exception) {
       const axiosError = exception as AxiosError<{ message?: string }>;
       setCouponError(axiosError.response?.data?.message ?? "Unable to validate coupon.");
+      toast.error(axiosError.response?.data?.message ?? "優惠券驗證失敗");
     } finally {
       setIsApplyingCoupon(false);
     }
@@ -74,15 +82,19 @@ export default function CheckoutPage() {
   };
 
   const submitOrder = async () => {
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
     setError(null);
     try {
       const order = await createOrder(couponResult?.isValid ? couponResult.code ?? couponCode.trim() : undefined);
       clearCart();
+      toast.success("訂單建立成功");
       router.push(`/orders/${order.id}`);
     } catch (exception) {
       const axiosError = exception as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message ?? "Unable to create order.");
+      toast.error(axiosError.response?.data?.message ?? "訂單建立失敗，請重新確認。");
     } finally {
       setIsSubmitting(false);
     }
@@ -200,15 +212,17 @@ export default function CheckoutPage() {
             <span>NT$ {finalAmount.toLocaleString()}</span>
           </div>
           {error ? <p className="mt-3 text-sm text-[#EF4444]">{error}</p> : null}
-          <button
-            type="button"
-            className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-md bg-white text-sm font-medium text-black disabled:opacity-40"
-            disabled={items.length === 0 || isSubmitting}
+          <LoadingButton
+            className="mt-5"
+            fullWidth
+            size="lg"
+            isLoading={isSubmitting}
+            loadingText="訂單處理中..."
+            disabled={items.length === 0}
             onClick={submitOrder}
           >
-            {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-            Place order
-          </button>
+            送出訂單
+          </LoadingButton>
         </aside>
       </main>
     </div>

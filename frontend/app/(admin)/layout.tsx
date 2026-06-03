@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
-import { ToastProvider } from "@/components/admin/Toast";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -50,8 +49,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   }
 
   return (
-    <ToastProvider>
-      <div className="flex min-h-screen bg-[#0A0A0A] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
         <div className="hidden md:block">
           <Sidebar />
         </div>
@@ -80,7 +78,6 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
             </div>
           </div>
         ) : null}
-      </div>
-    </ToastProvider>
+    </div>
   );
 }

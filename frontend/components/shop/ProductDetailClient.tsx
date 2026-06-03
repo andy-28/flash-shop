@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, Package } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/admin/Toast";
+import { LoadingButton } from "@/components/shared/LoadingButton";
 import { getProduct } from "@/lib/api/products";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
@@ -14,6 +15,7 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
   const router = useRouter();
+  const toast = useToast();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const addToCart = useCartStore((state) => state.addToCart);
   const isCartLoading = useCartStore((state) => state.isLoading);
@@ -23,10 +25,7 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
   });
 
   const selectedVariant = useMemo(() => {
-    if (!product) {
-      return null;
-    }
-
+    if (!product) return null;
     return product.variants.find((variant) => variant.id === selectedVariantId) ?? product.variants[0] ?? null;
   }, [product, selectedVariantId]);
 
@@ -39,18 +38,21 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
   }
 
   async function handleAddToCart() {
-    if (!selectedVariant) {
-      return;
-    }
+    if (isCartLoading || !selectedVariant) return;
 
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
 
-    await addToCart(selectedVariant.id, 1);
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 2000);
+    try {
+      await addToCart(selectedVariant.id, 1);
+      setAdded(true);
+      toast.success("已加入購物車");
+      window.setTimeout(() => setAdded(false), 2000);
+    } catch {
+      toast.error("加入購物車失敗，請稍後再試。");
+    }
   }
 
   return (
@@ -92,11 +94,10 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
                 <button
                   key={variant.id}
                   type="button"
+                  disabled={isCartLoading}
                   onClick={() => setSelectedVariantId(variant.id)}
-                  className={`flex h-14 items-center justify-between rounded-md border px-3 text-left text-sm transition ${
-                    active
-                      ? "border-emerald-300 bg-emerald-300/10 text-white"
-                      : "border-white/10 bg-zinc-950 text-zinc-300 hover:border-white/30"
+                  className={`flex h-14 items-center justify-between rounded-md border px-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                    active ? "border-emerald-300 bg-emerald-300/10 text-white" : "border-white/10 bg-zinc-950 text-zinc-300 hover:border-white/30"
                   }`}
                 >
                   <span>
@@ -110,13 +111,15 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
           </div>
         </div>
 
-        <Button
-          className="h-10 w-full rounded-md"
-          disabled={!selectedVariant || selectedVariant.availableStock <= 0 || isCartLoading}
+        <LoadingButton
+          fullWidth
+          isLoading={isCartLoading}
+          loadingText="加入中..."
+          disabled={!selectedVariant || selectedVariant.availableStock <= 0}
           onClick={handleAddToCart}
         >
-          {selectedVariant && selectedVariant.availableStock <= 0 ? "售罄" : added ? "已加入 ✓" : "加入購物車"}
-        </Button>
+          {selectedVariant && selectedVariant.availableStock <= 0 ? "已售完" : added ? "✓ 已加入" : "加入購物車"}
+        </LoadingButton>
       </section>
     </main>
   );

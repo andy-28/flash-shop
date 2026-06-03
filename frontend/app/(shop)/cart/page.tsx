@@ -66,7 +66,8 @@ export default function CartPage() {
                     <p className="font-semibold">NT$ {item.subtotal.toLocaleString()}</p>
                     <button
                       type="button"
-                      className="inline-flex size-9 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-white/10 hover:text-white"
+                      className="inline-flex size-9 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={isLoading}
                       onClick={() => removeItem(item.cartItemId)}
                     >
                       <Trash2 className="size-4" />
@@ -102,7 +103,7 @@ export default function CartPage() {
           <button
             type="button"
             className="mt-5 h-11 w-full rounded-md bg-white text-sm font-medium text-black disabled:opacity-40"
-            disabled={items.length === 0 || hasUnavailableItem}
+            disabled={items.length === 0 || hasUnavailableItem || isLoading}
             onClick={() => router.push("/checkout")}
           >
             Checkout

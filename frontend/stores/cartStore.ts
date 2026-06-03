@@ -18,7 +18,7 @@ interface CartState {
   clearCart: () => void;
 }
 
-export const useCartStore = create<CartState>((set) => ({
+export const useCartStore = create<CartState>((set, get) => ({
   items: [],
   totalAmount: 0,
   itemCount: 0,
@@ -27,6 +27,7 @@ export const useCartStore = create<CartState>((set) => ({
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
   fetchCart: async () => {
+    if (get().isLoading) return;
     set({ isLoading: true });
     try {
       const cart = await getCart();
@@ -43,6 +44,7 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
   addToCart: async (variantId, quantity) => {
+    if (get().isLoading) return;
     set({ isLoading: true });
     try {
       const cart = await addCartItem({ variantId, quantity });
@@ -55,6 +57,7 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
   updateQuantity: async (cartItemId, quantity) => {
+    if (get().isLoading) return;
     set({ isLoading: true });
     try {
       const cart = await updateCartItem(cartItemId, quantity);
@@ -67,6 +70,7 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
   removeItem: async (cartItemId) => {
+    if (get().isLoading) return;
     set({ isLoading: true });
     try {
       const cart = await removeCartItem(cartItemId);

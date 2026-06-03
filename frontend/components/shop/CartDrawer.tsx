@@ -13,17 +13,12 @@ export function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50">
-      <button
-        type="button"
-        className="absolute inset-0 bg-black/60"
-        aria-label="Close cart"
-        onClick={closeCart}
-      />
+      <button type="button" className="absolute inset-0 bg-black/60" aria-label="Close cart" onClick={closeCart} />
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[#2A2A2A] bg-[#141414] text-white shadow-2xl">
         <header className="flex h-16 items-center justify-between border-b border-[#2A2A2A] px-5">
           <div>
             <h2 className="text-lg font-semibold">購物車</h2>
-            <p className="text-sm text-[#A0A0A0]">{itemCount} items</p>
+            <p className="text-sm text-[#A0A0A0]">{itemCount} 件商品</p>
           </div>
           <button type="button" className="inline-flex size-9 items-center justify-center rounded-md hover:bg-white/10" onClick={closeCart}>
             <X className="size-5" />
@@ -39,7 +34,7 @@ export function CartDrawer() {
               className="mt-5 inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-medium text-black"
               onClick={closeCart}
             >
-              去逛逛
+              去逛商品
             </Link>
           </div>
         ) : (
@@ -52,14 +47,15 @@ export function CartDrawer() {
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate text-sm font-medium">{item.productName}</h3>
                       <p className="mt-1 text-xs text-[#A0A0A0]">{item.specName}</p>
-                      {!item.isAvailable ? <p className="mt-1 text-xs text-[#EF4444]">此商品已下架</p> : null}
+                      {!item.isAvailable ? <p className="mt-1 text-xs text-[#EF4444]">商品目前無法購買</p> : null}
                       {item.quantity > item.availableStock ? (
-                        <p className="mt-1 text-xs text-[#F59E0B]">庫存僅剩 {item.availableStock} 件</p>
+                        <p className="mt-1 text-xs text-[#F59E0B]">剩餘 {item.availableStock} 件</p>
                       ) : null}
                     </div>
                     <button
                       type="button"
-                      className="inline-flex size-8 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-white/10 hover:text-white"
+                      className="inline-flex size-8 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={isLoading}
                       onClick={() => removeItem(item.cartItemId)}
                     >
                       <Trash2 className="size-4" />
@@ -69,7 +65,7 @@ export function CartDrawer() {
                     <div className="flex items-center rounded-md border border-[#2A2A2A]">
                       <button
                         type="button"
-                        className="inline-flex size-8 items-center justify-center disabled:opacity-40"
+                        className="inline-flex size-8 items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
                         disabled={item.quantity <= 1 || isLoading}
                         onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                       >
@@ -78,7 +74,7 @@ export function CartDrawer() {
                       <span className="w-9 text-center text-sm">{item.quantity}</span>
                       <button
                         type="button"
-                        className="inline-flex size-8 items-center justify-center disabled:opacity-40"
+                        className="inline-flex size-8 items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
                         disabled={item.quantity >= item.availableStock || isLoading}
                         onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                       >
@@ -98,12 +94,12 @@ export function CartDrawer() {
 
         <footer className="border-t border-[#2A2A2A] bg-[#141414] p-5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#A0A0A0]">總計</span>
+            <span className="text-[#A0A0A0]">小計</span>
             <span className="text-xl font-semibold">NT$ {totalAmount.toLocaleString()}</span>
           </div>
           <Link
             href="/cart"
-            className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-md bg-white text-sm font-medium text-black disabled:opacity-50"
+            className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-md bg-white text-sm font-medium text-black"
             onClick={closeCart}
           >
             前往結帳

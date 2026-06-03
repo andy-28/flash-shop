@@ -4,7 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Flame, Loader2 } from "lucide-react";
+import { Flame } from "lucide-react";
+import { useToast } from "@/components/admin/Toast";
+import { LoadingButton } from "@/components/shared/LoadingButton";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { getFlashSale, getFlashSaleStock, purchaseFlashSale } from "@/lib/api/flashSale";
 import { useAuthStore } from "@/stores/authStore";
@@ -24,11 +26,13 @@ function formatRemaining(ms: number) {
 export default function FlashSaleDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const toast = useToast();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const [now, setNow] = useState(() => Date.now());
   const [remainingStock, setRemainingStock] = useState<number | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [purchaseResult, setPurchaseResult] = useState<"idle" | "success" | "failed">("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +71,8 @@ export default function FlashSaleDetailPage() {
   const progress = sale && remainingStock !== null ? Math.max(Math.min((remainingStock / sale.totalStock) * 100, 100), 0) : 0;
 
   const purchase = async () => {
+    if (isPurchasing || purchaseResult === "success") return;
+
     if (!hasHydrated) return;
     if (!isAuthenticated) {
       router.push("/login");
@@ -79,11 +85,16 @@ export default function FlashSaleDetailPage() {
     try {
       const result = await purchaseFlashSale(params.id);
       setRemainingStock(result.remainingStock);
+      setPurchaseResult("success");
       setMessage("Purchase accepted. Your order is being created.");
+      toast.success("搶購成功！訂單建立中...");
       window.setTimeout(() => router.push("/orders"), 1200);
     } catch (exception) {
       const axiosError = exception as AxiosError<{ message?: string }>;
-      setError(axiosError.response?.data?.message ?? "Purchase failed.");
+      const nextError = axiosError.response?.data?.message ?? "Purchase failed.";
+      setPurchaseResult("failed");
+      setError(nextError);
+      toast.error(nextError);
     } finally {
       setIsPurchasing(false);
     }
@@ -132,15 +143,17 @@ export default function FlashSaleDetailPage() {
               {error ? <p className="mt-4 text-sm text-[#EF4444]">{error}</p> : null}
               {message ? <p className="mt-4 text-sm text-[#22C55E]">{message}</p> : null}
 
-              <button
-                type="button"
-                className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-md bg-white text-sm font-medium text-black disabled:opacity-40"
-                disabled={phase !== "live" || isPurchasing}
+              <LoadingButton
+                className="mt-5"
+                fullWidth
+                size="lg"
+                isLoading={isPurchasing}
+                loadingText="搶購中..."
+                disabled={phase !== "live" || purchaseResult === "success"}
                 onClick={purchase}
               >
-                {isPurchasing ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                {phase === "sold-out" ? "Sold out" : "Purchase now"}
-              </button>
+                {purchaseResult === "success" ? "✓ 搶購成功" : phase === "sold-out" ? "Sold out" : "Purchase now"}
+              </LoadingButton>
             </aside>
           </div>
         ) : null}

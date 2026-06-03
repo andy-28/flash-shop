@@ -11,23 +11,42 @@ import { getCategories, getPosts, togglePostLike } from "@/lib/api/community";
 import { assetUrl } from "@/lib/utils/assetUrl";
 import { relativeTime } from "@/lib/utils/relativeTime";
 import { useAuthStore } from "@/stores/authStore";
-import type { CommunityPost } from "@/types";
+import type { CommunityPost, PagedResult } from "@/types";
 
 export default function CommunityPage() {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [category, setCategory] = useState("All");
   const [sortBy, setSortBy] = useState("latest");
+  const queryKey = ["community-posts", category, sortBy];
   const { data: categories = [] } = useQuery({ queryKey: ["community-categories"], queryFn: getCategories });
   const { data, isLoading } = useQuery({
-    queryKey: ["community-posts", category, sortBy],
+    queryKey,
     queryFn: () => getPosts({ category: category === "All" ? undefined : category, page: 1, pageSize: 20, sortBy }),
   });
   const posts = data?.items ?? [];
   const tabs = useMemo(() => ["All", ...categories], [categories]);
   const likeMutation = useMutation({
     mutationFn: togglePostLike,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["community-posts"] }),
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<PagedResult<CommunityPost>>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<PagedResult<CommunityPost>>(queryKey, {
+          ...previous,
+          items: previous.items.map((post) => post.id === postId ? {
+            ...post,
+            isLikedByMe: !post.isLikedByMe,
+            likeCount: post.isLikedByMe ? Math.max(post.likeCount - 1, 0) : post.likeCount + 1,
+          } : post),
+        });
+      }
+      return { previous };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["community-posts"] }),
   });
 
   return (
@@ -63,8 +82,10 @@ export default function CommunityPage() {
 
         <div className="mt-6 grid gap-4">
           {isLoading ? <CommunitySkeleton /> : null}
-          {!isLoading && posts.length === 0 ? <div className="rounded-md border border-white/10 bg-[#141414] p-10 text-center text-zinc-400">還沒有人發文，來當第一個吧！</div> : null}
-          {posts.map((post) => <PostCard key={post.id} onLike={() => isAuthenticated ? likeMutation.mutate(post.id) : location.assign("/login")} post={post} />)}
+          {!isLoading && posts.length === 0 ? <div className="rounded-md border border-white/10 bg-[#141414] p-10 text-center text-zinc-400">還沒有文章，來當第一個發文的人吧。</div> : null}
+          {posts.map((post) => (
+            <PostCard key={post.id} onLike={() => isAuthenticated ? likeMutation.mutate(post.id) : location.assign("/login")} post={post} />
+          ))}
         </div>
       </section>
     </main>
