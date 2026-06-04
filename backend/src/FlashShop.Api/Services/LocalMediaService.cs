@@ -10,8 +10,14 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
     {
         "image/jpeg",
         "image/png",
-        "image/gif",
         "image/webp"
+    };
+
+    private static readonly Dictionary<string, string[]> AllowedExtensionsByMimeType = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["image/jpeg"] = [".jpg", ".jpeg"],
+        ["image/png"] = [".png"],
+        ["image/webp"] = [".webp"]
     };
 
     private const long MaxFileSize = 5 * 1024 * 1024;
@@ -26,7 +32,7 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
     {
         if (!AllowedMimeTypes.Contains(mimeType))
         {
-            throw new BusinessException($"Unsupported file type: {mimeType}. Only JPEG, PNG, GIF, and WebP are allowed.");
+            throw new BusinessException($"Unsupported file type: {mimeType}. Only JPEG, PNG, and WebP are allowed.");
         }
 
         if (fileStream.Length <= 0)
@@ -39,17 +45,22 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
             throw new BusinessException("File size cannot exceed 5MB.");
         }
 
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        var extension = Path.GetExtension(Path.GetFileName(fileName)).ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(extension))
         {
             extension = mimeType.ToLowerInvariant() switch
             {
                 "image/jpeg" => ".jpg",
                 "image/png" => ".png",
-                "image/gif" => ".gif",
                 "image/webp" => ".webp",
                 _ => ".img"
             };
+        }
+
+        if (!AllowedExtensionsByMimeType.TryGetValue(mimeType, out var allowedExtensions) ||
+            !allowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new BusinessException("File extension does not match the allowed image types.");
         }
 
         var now = DateTime.UtcNow;

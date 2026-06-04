@@ -1,5 +1,6 @@
 import { apiClient } from "./client";
-import type { CreateProductPayload, Product, UpdateInventoryPayload } from "@/types";
+import { uploadMedia } from "./media";
+import type { CreateProductPayload, Product, UpdateInventoryPayload, UpdateProductPayload } from "@/types";
 
 export async function getProducts(params?: {
   search?: string;
@@ -27,7 +28,44 @@ export async function createProduct(payload: CreateProductPayload) {
   return response.data;
 }
 
+export async function updateProduct(productId: string, payload: UpdateProductPayload) {
+  await apiClient.put(`/admin/products/${productId}`, payload);
+}
+
+export async function uploadProductImage(file: File) {
+  return uploadMedia(file, "products");
+}
+
+export async function updateProductImageUrl(product: Product, imageUrl: string | null) {
+  await updateProduct(product.id, toUpdateProductPayload(product, imageUrl));
+}
+
+export async function deleteProductImage(product: Product) {
+  await updateProductImageUrl(product, null);
+}
+
+export async function setPrimaryProductImage(product: Product, imageUrl: string) {
+  await updateProductImageUrl(product, imageUrl);
+}
+
 export async function updateInventory(productId: string, payload: UpdateInventoryPayload) {
   const response = await apiClient.put(`/admin/products/${productId}/inventory`, payload);
   return response.data;
+}
+
+function toUpdateProductPayload(product: Product, imageUrl: string | null): UpdateProductPayload {
+  return {
+    name: product.name,
+    description: product.description,
+    category: product.category,
+    imageUrl,
+    status: product.status || "Active",
+    variants: product.variants.map((variant) => ({
+      id: variant.id,
+      sku: variant.sku,
+      specName: variant.specName,
+      price: variant.price,
+      status: "Active",
+    })),
+  };
 }

@@ -33,6 +33,22 @@ export interface CreateProductPayload {
   }>;
 }
 
+export interface UpdateProductPayload {
+  name: string;
+  description: string;
+  category: string;
+  imageUrl?: string | null;
+  status: string;
+  variants: Array<{
+    id?: string;
+    sku: string;
+    specName: string;
+    price: number;
+    status?: string;
+    totalStock?: number;
+  }>;
+}
+
 export interface UpdateInventoryPayload {
   variantId: string;
   totalStock: number;
