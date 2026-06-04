@@ -8,9 +8,12 @@ using FlashShop.Application.Auth.Commands;
 using FlashShop.Application.Common.Behaviors;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Infrastructure;
+using FlashShop.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,11 +32,18 @@ builder.Services.AddControllers(options =>
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+var jwtSecret = GetRequiredSecret(builder.Configuration, "Jwt:Secret");
+var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "http://localhost:3000,http://localhost:3001")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultCors", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -57,7 +67,13 @@ builder.Services.AddSingleton<FlashSaleOrderChannel>();
 builder.Services.AddHostedService<OrderTimeoutJob>();
 builder.Services.AddHostedService<FlashSaleOrderWorker>();
 
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "this-is-a-dev-secret-key-at-least-32-chars!!";
+if (!string.IsNullOrWhiteSpace(defaultConnectionString) && !string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(defaultConnectionString, name: "postgresql")
+        .AddRedis(redisConnectionString, name: "redis");
+}
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -107,9 +123,46 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<DashboardHub>("/hubs/dashboard");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString(),
+                duration = entry.Value.Duration.TotalMilliseconds
+            }),
+            totalDuration = report.TotalDuration.TotalMilliseconds
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+if (app.Environment.IsProduction())
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
 await DevAdminSeeder.SeedAsync(app);
 
 app.Run();
+
+static string GetRequiredSecret(IConfiguration configuration, string key)
+{
+    var value = configuration[key];
+    if (!string.IsNullOrWhiteSpace(value))
+    {
+        return value;
+    }
+
+    throw new InvalidOperationException($"{key} is required.");
+}
 
 public partial class Program;

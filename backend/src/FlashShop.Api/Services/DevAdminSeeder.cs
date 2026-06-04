@@ -10,17 +10,19 @@ public static class DevAdminSeeder
 {
     public static async Task SeedAsync(WebApplication app)
     {
-        if (!app.Environment.IsDevelopment())
+        var adminEmail = app.Configuration["AdminSeed:Email"] ?? "admin@flashshop.dev";
+        var adminPassword = app.Configuration["AdminSeed:Password"];
+
+        if (string.IsNullOrWhiteSpace(adminPassword))
         {
-            return;
+            throw new InvalidOperationException("AdminSeed:Password is required.");
         }
 
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var email = "admin@flashshop.dev";
 
-        if (await dbContext.Users.AnyAsync(x => x.Email == email))
+        if (await dbContext.Users.AnyAsync(x => x.Email == adminEmail))
         {
             return;
         }
@@ -28,9 +30,9 @@ public static class DevAdminSeeder
         dbContext.Users.Add(new User
         {
             Id = Guid.NewGuid(),
-            Email = email,
+            Email = adminEmail,
             Name = "FlashShop Admin",
-            PasswordHash = passwordHasher.Hash("Admin123!"),
+            PasswordHash = passwordHasher.Hash(adminPassword),
             Role = UserRole.Admin,
             CreatedAt = DateTime.UtcNow
         });

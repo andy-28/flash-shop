@@ -13,9 +13,9 @@ export default function RegisterPage() {
   const toast = useToast();
   const register = useAuthStore((state) => state.register);
   const fetchCart = useCartStore((state) => state.fetchCart);
-  const [name, setName] = useState("Buyer");
-  const [email, setEmail] = useState("buyer@test.com");
-  const [password, setPassword] = useState("Test123!");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,7 +41,7 @@ export default function RegisterPage() {
     <main className="grid min-h-screen place-items-center bg-black px-4 text-white">
       <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-[#2A2A2A] bg-[#141414] p-5">
         <h1 className="text-2xl font-semibold">註冊</h1>
-        <p className="mt-2 text-sm text-[#A0A0A0]">建立帳號後即可購物、下單與參與社群討論。</p>
+        <p className="mt-2 text-sm text-[#A0A0A0]">建立帳號後即可使用購物車、訂單與社群功能。</p>
         <div className="mt-5 space-y-3">
           <input value={name} onChange={(event) => setName(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Name" required disabled={isLoading} />
           <input value={email} onChange={(event) => setEmail(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Email" type="email" required disabled={isLoading} />

@@ -26,17 +26,17 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
     {
         if (!AllowedMimeTypes.Contains(mimeType))
         {
-            throw new BusinessException($"不支援的檔案類型：{mimeType}。僅允許 JPEG, PNG, GIF, WebP。");
+            throw new BusinessException($"Unsupported file type: {mimeType}. Only JPEG, PNG, GIF, and WebP are allowed.");
         }
 
         if (fileStream.Length <= 0)
         {
-            throw new BusinessException("檔案是空的。");
+            throw new BusinessException("File is empty.");
         }
 
         if (fileStream.Length > MaxFileSize)
         {
-            throw new BusinessException("檔案大小不能超過 5MB。");
+            throw new BusinessException("File size cannot exceed 5MB.");
         }
 
         var extension = Path.GetExtension(fileName).ToLowerInvariant();

@@ -23,7 +23,12 @@ public sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenSer
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
-        var secret = configuration["Jwt:Secret"] ?? "this-is-a-dev-secret-key-at-least-32-chars!!";
+        var secret = configuration["Jwt:Secret"];
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            throw new InvalidOperationException("Jwt:Secret is required.");
+        }
+
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
             SecurityAlgorithms.HmacSha256);

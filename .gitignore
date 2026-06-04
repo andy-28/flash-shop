@@ -21,8 +21,10 @@ backend/.build-check/
 backend/src/FlashShop.Api/wwwroot/uploads/
 upload-test.png
 .env
+.env.production
 .env*.local
 !.env.local.example
+!.env.production.example
 
 # Docker / local data
 docker/postgres/data/

@@ -9,8 +9,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
 
 const demoAccounts = {
-  admin: { email: "admin@flashshop.dev", password: "Admin123!" },
-  buyer: { email: "buyer@test.com", password: "Test123!" },
+  admin: { email: "admin@flashshop.dev" },
+  buyer: { email: "buyer@test.com" },
 };
 
 export default function LoginPage() {
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const login = useAuthStore((state) => state.login);
   const fetchCart = useCartStore((state) => state.fetchCart);
   const [email, setEmail] = useState(demoAccounts.admin.email);
-  const [password, setPassword] = useState(demoAccounts.admin.password);
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [reason, setReason] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function LoginPage() {
   function selectDemoAccount(type: keyof typeof demoAccounts) {
     if (isLoading) return;
     setEmail(demoAccounts[type].email);
-    setPassword(demoAccounts[type].password);
+    setPassword("");
     setError(null);
   }
 
@@ -64,15 +64,15 @@ export default function LoginPage() {
       <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-[#2A2A2A] bg-[#141414] p-5">
         <h1 className="text-2xl font-semibold">登入</h1>
         <p className="mt-2 text-sm text-[#A0A0A0]">
-          {reason === "admin" ? "請使用 Admin 帳號登入後台。" : "登入後可以購物、下單、發文與管理內容。"}
+          {reason === "admin" ? "請使用 Admin 帳號登入後台。" : "登入後即可使用購物車、訂單、社群與後台功能。"}
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
           <button type="button" className="h-9 rounded-md border border-white/10 bg-white text-sm font-medium text-black disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("admin")}>
-            Admin 帳號
+            Admin Email
           </button>
           <button type="button" className="h-9 rounded-md border border-white/10 text-sm font-medium text-zinc-300 hover:bg-white/10 disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("buyer")}>
-            Buyer 帳號
+            Buyer Email
           </button>
         </div>
 

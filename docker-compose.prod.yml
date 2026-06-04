@@ -1,0 +1,99 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flashshop-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-flashshop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-flashshop}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flashshop}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flashshop-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: flashshop-redis
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flashshop-network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flashshop-api
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-flashshop};Username=${POSTGRES_USER:-flashshop};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379,password=${REDIS_PASSWORD},abortConnect=false"
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
+      Jwt__Issuer: FlashShop
+      Jwt__Audience: FlashShop
+      Jwt__ExpirationMinutes: 60
+      AdminSeed__Email: ${ADMIN_EMAIL:-admin@flashshop.dev}
+      AdminSeed__Password: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      CORS__AllowedOrigins: ${FRONTEND_URL:-http://localhost}
+    volumes:
+      - uploads_data:/app/wwwroot/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - flashshop-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost/api}
+    container_name: flashshop-frontend
+    restart: always
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api
+    networks:
+      - flashshop-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: flashshop-nginx
+    restart: always
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - flashshop-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:
+
+networks:
+  flashshop-network:
+    driver: bridge
