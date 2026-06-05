@@ -6,17 +6,27 @@ interface UserAvatarProps {
   name: string;
   avatarUrl?: string | null;
   size?: number;
+  onClick?: () => void;
 }
 
-export function UserAvatar({ avatarUrl, name, size = 32 }: Readonly<UserAvatarProps>) {
+export function UserAvatar({ avatarUrl, name, onClick, size = 32 }: Readonly<UserAvatarProps>) {
   if (avatarUrl) {
-    return <img alt={name} className="rounded-full object-cover" src={assetUrl(avatarUrl)} style={{ height: size, width: size }} />;
+    return (
+      <img
+        alt={name}
+        className={`rounded-full object-cover ${onClick ? "cursor-pointer" : ""}`}
+        src={assetUrl(avatarUrl)}
+        style={{ height: size, width: size }}
+        onClick={onClick}
+      />
+    );
   }
 
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+      className={`inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${onClick ? "cursor-pointer" : ""}`}
       style={{ backgroundColor: getColorFromName(name), height: size, width: size }}
+      onClick={onClick}
     >
       {name.trim().charAt(0).toUpperCase() || "U"}
     </span>

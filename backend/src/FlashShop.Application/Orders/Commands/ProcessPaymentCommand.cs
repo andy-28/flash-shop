@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Orders.DTOs;
@@ -31,10 +32,7 @@ public sealed class ProcessPaymentCommandHandler(
             throw new NotFoundException("Order was not found.");
         }
 
-        if (order.Status != OrderStatus.Pending)
-        {
-            throw new BusinessException("Only pending orders can be paid.");
-        }
+        OrderStateMachine.ValidateTransition(order.Status, OrderStatus.Paid);
 
         if (DateTime.UtcNow >= order.ExpiredAt)
         {

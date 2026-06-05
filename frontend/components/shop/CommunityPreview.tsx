@@ -13,9 +13,9 @@ export function CommunityPreview({ posts }: Readonly<{ posts: CommunityPost[] }>
       {posts.map((post) => (
         <Link className="rounded-md border border-white/10 bg-[#141414] p-4 transition hover:border-white/25" href={`/community/${post.id}`} key={post.id}>
           <div className="flex items-center gap-3">
-            <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorName} />
+            <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorDisplayName || post.authorName} />
             <div className="min-w-0">
-              <p className="truncate text-sm text-white">{post.authorName}</p>
+              <p className="truncate text-sm text-white">{post.authorDisplayName || post.authorName}</p>
               <p className="text-xs text-zinc-500">{relativeTime(post.createdAt)}</p>
             </div>
           </div>

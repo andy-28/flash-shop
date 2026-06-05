@@ -65,6 +65,7 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<FlashSaleOrderChannel>();
 builder.Services.AddHostedService<OrderTimeoutJob>();
+builder.Services.AddHostedService<MockDeliveryJob>();
 builder.Services.AddHostedService<FlashSaleOrderWorker>();
 
 if (!string.IsNullOrWhiteSpace(defaultConnectionString) && !string.IsNullOrWhiteSpace(redisConnectionString))

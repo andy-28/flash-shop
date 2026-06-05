@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Eye, Loader2, MessageCircle, Pin, Send, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -93,13 +94,13 @@ export default function CommunityPostDetailPage() {
           <>
             <article className="rounded-xl border border-white/10 bg-[#141414] p-5">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorName} />
+                <Link className="flex min-w-0 items-center gap-3 hover:opacity-85" href={`/user/${post.authorId}`}>
+                  <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorDisplayName || post.authorName} />
                   <div>
-                    <p className="text-sm text-white">{post.authorName}</p>
+                    <p className="text-sm text-white hover:underline">{post.authorDisplayName || post.authorName}</p>
                     <p className="text-xs text-zinc-500">{relativeTime(post.createdAt)}</p>
                   </div>
-                </div>
+                </Link>
                 {post.isPinned ? <Pin className="size-4" /> : null}
               </div>
               <span className="mt-5 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300">{post.category}</span>
@@ -193,12 +194,16 @@ function CommentThread({ comment, isAuthenticated, isReplying, onLike, onReply }
 }
 
 function CommentBody({ comment, onLike, onReply }: Readonly<{ comment: CommunityComment; onLike: (id: string) => void; onReply?: () => void }>) {
+  const authorLabel = comment.authorDisplayName || comment.authorName;
+
   return (
     <div className="flex gap-3">
-      <UserAvatar avatarUrl={comment.authorAvatarUrl} name={comment.authorName} size={32} />
+      <Link href={`/user/${comment.authorId}`}>
+        <UserAvatar avatarUrl={comment.authorAvatarUrl} name={authorLabel} size={32} />
+      </Link>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-white">{comment.authorName}</p>
+          <Link className="text-sm text-white hover:underline" href={`/user/${comment.authorId}`}>{authorLabel}</Link>
           <span className="text-xs text-zinc-500">{relativeTime(comment.createdAt)}</span>
         </div>
         <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{comment.content}</p>

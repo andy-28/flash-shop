@@ -93,28 +93,32 @@ export default function CommunityPage() {
 }
 
 function PostCard({ onLike, post }: Readonly<{ post: CommunityPost; onLike: () => void }>) {
+  const authorLabel = post.authorDisplayName || post.authorName;
+
   return (
-    <Link className={`block rounded-xl border bg-[#141414] p-5 transition hover:border-white/25 ${post.isPinned ? "border-l-white border-l-4 border-white/10" : "border-white/10"}`} href={`/community/${post.id}`}>
+    <article className={`rounded-xl border bg-[#141414] p-5 transition hover:border-white/25 ${post.isPinned ? "border-l-white border-l-4 border-white/10" : "border-white/10"}`}>
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorName} />
+        <Link className="flex min-w-0 items-center gap-3 rounded-md hover:opacity-85" href={`/user/${post.authorId}`}>
+          <UserAvatar avatarUrl={post.authorAvatarUrl} name={authorLabel} />
           <div className="min-w-0">
-            <p className="truncate text-sm text-white">{post.authorName}</p>
+            <p className="truncate text-sm text-white hover:underline">{authorLabel}</p>
             <p className="text-xs text-zinc-500">{relativeTime(post.createdAt)}</p>
           </div>
-        </div>
+        </Link>
         {post.isPinned ? <Pin className="size-4 text-white" /> : null}
       </div>
-      <span className="mt-4 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300">{post.category}</span>
-      <h2 className="mt-3 text-lg font-medium text-white">{post.title}</h2>
-      <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-400">{stripHtml(post.content)}</p>
-      {post.imageUrl ? <img alt={post.title} className="mt-4 max-h-80 w-full rounded-md object-cover" src={assetUrl(post.imageUrl)} /> : null}
+      <Link className="block" href={`/community/${post.id}`}>
+        <span className="mt-4 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300">{post.category}</span>
+        <h2 className="mt-3 text-lg font-medium text-white">{post.title}</h2>
+        <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-400">{stripHtml(post.content)}</p>
+        {post.imageUrl ? <img alt={post.title} className="mt-4 max-h-80 w-full rounded-md object-cover" src={assetUrl(post.imageUrl)} /> : null}
+      </Link>
       <div className="mt-4 flex items-center gap-5 text-sm text-zinc-400">
         <LikeButton count={post.likeCount} isLiked={post.isLikedByMe} onToggle={onLike} />
         <span className="inline-flex items-center gap-1.5"><MessageCircle className="size-4" />{post.commentCount}</span>
         <span className="inline-flex items-center gap-1.5"><Eye className="size-4" />{post.viewCount}</span>
       </div>
-    </Link>
+    </article>
   );
 }
 

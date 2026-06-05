@@ -49,6 +49,9 @@ public sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenSer
                 Id = user.Id,
                 Email = user.Email,
                 Name = user.Name,
+                DisplayName = user.DisplayName,
+                AvatarUrl = user.AvatarUrl,
+                Bio = user.Bio,
                 Role = user.Role.ToString()
             }
         };

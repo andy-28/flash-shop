@@ -44,6 +44,24 @@ public sealed class DashboardNotifier(IHubContext<DashboardHub> hubContext) : ID
         }, cancellationToken);
     }
 
+    public Task NotifyOrderShipped(string orderNo, CancellationToken cancellationToken = default)
+    {
+        return hubContext.Clients.All.SendAsync("OrderShipped", new
+        {
+            OrderNo = orderNo,
+            Timestamp = DateTime.UtcNow
+        }, cancellationToken);
+    }
+
+    public Task NotifyOrderDelivered(string orderNo, CancellationToken cancellationToken = default)
+    {
+        return hubContext.Clients.All.SendAsync("OrderDelivered", new
+        {
+            OrderNo = orderNo,
+            Timestamp = DateTime.UtcNow
+        }, cancellationToken);
+    }
+
     public Task NotifyInventoryAlert(string productName, string specName, int availableStock, CancellationToken cancellationToken = default)
     {
         return hubContext.Clients.All.SendAsync("InventoryAlert", new

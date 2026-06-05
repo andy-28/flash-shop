@@ -62,12 +62,14 @@ export default function AdminDashboardPage() {
     });
     const offCancelled = on("OrderCancelled", (payload) => updateOrderStatus(payload as DashboardEvent, "Cancelled", setRecentOrders));
     const offExpired = on("OrderExpired", (payload) => updateOrderStatus(payload as DashboardEvent, "Expired", setRecentOrders));
+    const offShipped = on("OrderShipped", (payload) => updateOrderStatus(payload as DashboardEvent, "Shipping", setRecentOrders));
+    const offDelivered = on("OrderDelivered", (payload) => updateOrderStatus(payload as DashboardEvent, "Delivered", setRecentOrders));
     const offInventory = on("InventoryAlert", (payload) => {
       const event = payload as DashboardEvent;
       setLowStockCount((value) => value + 1);
       setInventoryAlert(`${eventValue(event, "productName", "ProductName", "Unknown product")} / ${eventValue(event, "specName", "SpecName", "Variant")} has only ${eventNumber(event, "availableStock", "AvailableStock")} left.`);
     });
-    return () => { offCreated(); offPaid(); offCancelled(); offExpired(); offInventory(); };
+    return () => { offCreated(); offPaid(); offCancelled(); offExpired(); offShipped(); offDelivered(); offInventory(); };
   }, [on]);
 
   if (isLoading) return <p className="text-sm text-[#A0A0A0]">Loading dashboard...</p>;

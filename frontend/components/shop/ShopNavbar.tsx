@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, LayoutDashboard, Menu, MessageSquare, ReceiptText, ShoppingBag, ShoppingCart, X } from "lucide-react";
+import { Flame, LayoutDashboard, LogOut, Menu, MessageSquare, ReceiptText, ShoppingBag, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CartDrawer } from "@/components/shop/CartDrawer";
+import { UserAvatar } from "@/components/shop/UserAvatar";
 import { useAuthStore } from "@/stores/authStore";
+import type { AuthUser } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
 
 export function ShopNavbar() {
@@ -12,10 +14,12 @@ export function ShopNavbar() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const itemCount = useCartStore((state) => state.itemCount);
   const openCart = useCartStore((state) => state.openCart);
   const fetchCart = useCartStore((state) => state.fetchCart);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
     if (hasHydrated && isAuthenticated && accessToken) {
@@ -45,6 +49,15 @@ export function ShopNavbar() {
                 </span>
               ) : null}
             </button>
+            {isAuthenticated && user ? (
+              <UserMenu
+                isOpen={isUserMenuOpen}
+                onClose={() => setIsUserMenuOpen(false)}
+                onLogout={logout}
+                onToggle={() => setIsUserMenuOpen((value) => !value)}
+                user={user}
+              />
+            ) : null}
           </div>
           <div className="flex items-center gap-2 md:hidden">
             <button
@@ -96,9 +109,9 @@ function NavLinks({ isAdmin, isAuthenticated }: Readonly<{ isAdmin: boolean; isA
         Community
       </Link>
       {isAuthenticated ? (
-        <Link href="/orders" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
-          <ReceiptText className="size-4" />
-          Orders
+        <Link href="/profile" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
+          <User className="size-4" />
+          Profile
         </Link>
       ) : (
         <Link href="/login" className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
@@ -112,5 +125,57 @@ function NavLinks({ isAdmin, isAuthenticated }: Readonly<{ isAdmin: boolean; isA
         </Link>
       ) : null}
     </>
+  );
+}
+
+function UserMenu({
+  isOpen,
+  onClose,
+  onLogout,
+  onToggle,
+  user,
+}: Readonly<{
+  isOpen: boolean;
+  onClose: () => void;
+  onLogout: () => void;
+  onToggle: () => void;
+  user: AuthUser;
+}>) {
+  const label = user.displayName || user.name;
+
+  return (
+    <div className="relative">
+      <button className="inline-flex h-9 items-center gap-2 rounded-md px-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" type="button" onClick={onToggle}>
+        <UserAvatar avatarUrl={user.avatarUrl} name={label} size={28} />
+        <span className="max-w-28 truncate">{label}</span>
+      </button>
+      {isOpen ? (
+        <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-lg border border-white/10 bg-[#141414] shadow-xl">
+          <Link className="flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" href="/profile" onClick={onClose}>
+            <User className="size-4" />
+            My profile
+          </Link>
+          <Link className="flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" href="/orders" onClick={onClose}>
+            <ReceiptText className="size-4" />
+            My orders
+          </Link>
+          <Link className="flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" href="/community" onClick={onClose}>
+            <MessageSquare className="size-4" />
+            Community
+          </Link>
+          <button
+            className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-3 text-left text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+            type="button"
+            onClick={() => {
+              onLogout();
+              onClose();
+            }}
+          >
+            <LogOut className="size-4" />
+            Logout
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }

@@ -80,6 +80,9 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  displayName?: string | null;
+  avatarUrl?: string | null;
+  bio?: string | null;
   role: string;
 }
 
@@ -106,6 +109,7 @@ export interface Order {
   userEmail?: string | null;
   items: OrderItem[];
   payment?: Payment | null;
+  shipment?: Shipment | null;
 }
 
 export interface OrderItem {
@@ -121,6 +125,16 @@ export interface Payment {
   status: "Pending" | "Success" | "Failed" | "Refunded";
   paidAt: string | null;
   transactionId: string | null;
+}
+
+export interface Shipment {
+  id: string;
+  orderId: string;
+  carrier: string;
+  trackingNo: string | null;
+  status: "Pending" | "Shipped" | "Delivered" | string;
+  shippedAt: string | null;
+  deliveredAt: string | null;
 }
 
 export interface ContentBlockMedia {
@@ -362,9 +376,41 @@ export interface PagedResult<T> {
   pageSize: number;
 }
 
+export interface UserStats {
+  totalOrders: number;
+  totalSpent: number;
+  communityPosts: number;
+  communityLikes: number;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  displayName: string | null;
+  email: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  role: string;
+  createdAt: string;
+  stats: UserStats | null;
+}
+
+export interface PublicUserProfile {
+  id: string;
+  name: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+  createdAt: string;
+  communityPosts: number;
+  communityLikes: number;
+}
+
 export interface CommunityPost {
   id: string;
+  authorId: string;
   authorName: string;
+  authorDisplayName: string | null;
   authorAvatarUrl: string | null;
   category: string;
   title: string;
@@ -386,6 +432,7 @@ export interface CommunityPostDetail extends CommunityPost {
 export interface CommunityComment {
   id: string;
   authorName: string;
+  authorDisplayName: string | null;
   authorAvatarUrl: string | null;
   authorId: string;
   content: string;

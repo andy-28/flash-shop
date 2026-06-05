@@ -1,4 +1,5 @@
 using FlashShop.Application.Common.Interfaces;
+using FlashShop.Application.Common;
 using FlashShop.Domain.Entities;
 using FlashShop.Domain.Enums;
 using FlashShop.Infrastructure.Persistence;
@@ -88,7 +89,7 @@ public sealed class OrderTimeoutJob(
 
     private async Task CancelExpiredOrderAsync(AppDbContext dbContext, Order order, CancellationToken cancellationToken)
     {
-        if (order.Status != OrderStatus.Pending)
+        if (!OrderStateMachine.CanTransition(order.Status, OrderStatus.Expired))
         {
             logger.LogDebug("Skipped order {OrderNo} because status is {Status}", order.OrderNo, order.Status);
             return;

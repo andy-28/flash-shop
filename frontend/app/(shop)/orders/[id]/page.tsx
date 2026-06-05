@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { OrderStatusBadge } from "@/components/shop/OrderStatusBadge";
+import { OrderTimeline } from "@/components/shop/OrderTimeline";
 import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { useToast } from "@/components/admin/Toast";
 import { LoadingButton } from "@/components/shared/LoadingButton";
@@ -96,6 +97,8 @@ export default function OrderDetailPage() {
               </div>
 
               <div className="mt-6 space-y-3">
+                <OrderStateNotice order={order} />
+                <OrderTimeline order={order} />
                 {order.items.map((item, index) => (
                   <article key={`${item.productName}-${item.specName}-${index}`} className="grid gap-4 rounded-md border border-[#2A2A2A] bg-[#141414] p-4 md:grid-cols-[1fr_110px_130px]">
                     <div>
@@ -152,6 +155,24 @@ export default function OrderDetailPage() {
                 ) : null}
               </div>
 
+              {order.shipment ? (
+                <div className="mt-5 rounded-md border border-[#2A2A2A] bg-black/30 p-3 text-sm">
+                  <h3 className="font-medium text-white">Shipping information</h3>
+                  <p className="mt-3 text-[#A0A0A0]">Carrier</p>
+                  <p className="mt-1">{order.shipment.carrier}</p>
+                  <p className="mt-3 text-[#A0A0A0]">Tracking no</p>
+                  <p className="mt-1 break-all">{order.shipment.trackingNo || "Not provided"}</p>
+                  <p className="mt-3 text-[#A0A0A0]">Shipped at</p>
+                  <p className="mt-1">{order.shipment.shippedAt ? new Date(order.shipment.shippedAt).toLocaleString() : "-"}</p>
+                  {order.shipment.deliveredAt ? (
+                    <>
+                      <p className="mt-3 text-[#A0A0A0]">Delivered at</p>
+                      <p className="mt-1">{new Date(order.shipment.deliveredAt).toLocaleString()}</p>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+
               {order.status === "Pending" ? (
                 <div className="mt-5 space-y-3">
                   <p className="text-sm text-[#A0A0A0]">
@@ -176,4 +197,24 @@ export default function OrderDetailPage() {
       </main>
     </div>
   );
+}
+
+function OrderStateNotice({ order }: Readonly<{ order: Order }>) {
+  if (order.status === "Paid") {
+    return <p className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-3 text-sm text-[#93C5FD]">Payment received. Your order is waiting for shipment.</p>;
+  }
+
+  if (order.status === "Shipping") {
+    return <p className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-3 text-sm text-[#93C5FD]">Your order has shipped. Tracking information is available below.</p>;
+  }
+
+  if (order.status === "Delivered") {
+    return <p className="rounded-md border border-[#22C55E]/30 bg-[#22C55E]/10 p-3 text-sm text-[#22C55E]">Order completed. Thanks for shopping with FlashShop.</p>;
+  }
+
+  if (order.status === "Cancelled") {
+    return <p className="rounded-md border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-sm text-[#EF4444]">This order was cancelled.</p>;
+  }
+
+  return null;
 }

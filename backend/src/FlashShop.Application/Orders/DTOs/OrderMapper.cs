@@ -1,4 +1,5 @@
 using FlashShop.Domain.Entities;
+using FlashShop.Application.Shipments.DTOs;
 
 namespace FlashShop.Application.Orders.DTOs;
 
@@ -41,7 +42,8 @@ public static class OrderMapper
                     Status = order.Payment.Status,
                     PaidAt = order.Payment.PaidAt,
                     TransactionId = order.Payment.TransactionId
-                }
+                },
+            Shipment = order.Shipment is null ? null : ShipmentMapper.ToDto(order.Shipment)
         };
     }
 }

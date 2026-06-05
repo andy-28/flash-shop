@@ -1,3 +1,4 @@
+using FlashShop.Application.Common;
 using FlashShop.Application.Common.Exceptions;
 using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Orders.DTOs;
@@ -30,10 +31,7 @@ public sealed class CancelOrderCommandHandler(
             throw new NotFoundException("Order was not found.");
         }
 
-        if (order.Status != OrderStatus.Pending)
-        {
-            throw new BusinessException("Only pending orders can be cancelled.");
-        }
+        OrderStateMachine.ValidateTransition(order.Status, OrderStatus.Cancelled);
 
         var now = DateTime.UtcNow;
         order.Status = OrderStatus.Cancelled;

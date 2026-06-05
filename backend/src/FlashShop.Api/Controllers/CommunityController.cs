@@ -75,9 +75,10 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
 
         return Ok(new PostDetailDto(
             post.Id,
-            post.Author.Name,
-            null,
             post.AuthorId,
+            post.Author.Name,
+            post.Author.DisplayName,
+            post.Author.AvatarUrl,
             post.Category,
             post.Title,
             post.Content,
@@ -234,14 +235,14 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
 
     private bool CanManage(Guid authorId) => currentUser.UserId == authorId || currentUser.Role == "Admin";
     private static string NormalizeCategory(string category) => Categories.Contains(category) ? category : "General";
-    private static PostDto ToPostDto(CommunityPost post, bool liked) => new(post.Id, post.Author.Name, null, post.Category, post.Title, post.Content, post.ImageUrl, post.IsPinned, post.LikeCount, post.CommentCount, post.ViewCount, liked, post.CreatedAt);
-    private static CommentDto ToCommentDto(PostComment comment, IReadOnlyCollection<Guid> likedCommentIds) => new(comment.Id, comment.Author.Name, null, comment.AuthorId, comment.Content, comment.LikeCount, likedCommentIds.Contains(comment.Id), comment.CreatedAt, comment.ParentCommentId, comment.Replies.Where(reply => !reply.IsHidden).OrderBy(reply => reply.CreatedAt).Select(reply => ToCommentDto(reply, likedCommentIds)).ToList());
+    private static PostDto ToPostDto(CommunityPost post, bool liked) => new(post.Id, post.AuthorId, post.Author.Name, post.Author.DisplayName, post.Author.AvatarUrl, post.Category, post.Title, post.Content, post.ImageUrl, post.IsPinned, post.LikeCount, post.CommentCount, post.ViewCount, liked, post.CreatedAt);
+    private static CommentDto ToCommentDto(PostComment comment, IReadOnlyCollection<Guid> likedCommentIds) => new(comment.Id, comment.Author.Name, comment.Author.DisplayName, comment.Author.AvatarUrl, comment.AuthorId, comment.Content, comment.LikeCount, likedCommentIds.Contains(comment.Id), comment.CreatedAt, comment.ParentCommentId, comment.Replies.Where(reply => !reply.IsHidden).OrderBy(reply => reply.CreatedAt).Select(reply => ToCommentDto(reply, likedCommentIds)).ToList());
 }
 
 public sealed record CreatePostRequest(string Title, string Content, string Category, string? ImageUrl);
 public sealed record CreateCommentRequest(string Content, Guid? ParentCommentId);
 public sealed record LikeResult(bool IsLiked, int LikeCount);
 public sealed record PagedResult<T>(List<T> Items, int TotalCount, int Page, int PageSize);
-public sealed record PostDto(Guid Id, string AuthorName, string? AuthorAvatarUrl, string Category, string Title, string Content, string? ImageUrl, bool IsPinned, int LikeCount, int CommentCount, int ViewCount, bool IsLikedByMe, DateTime CreatedAt);
-public sealed record PostDetailDto(Guid Id, string AuthorName, string? AuthorAvatarUrl, Guid AuthorId, string Category, string Title, string Content, string? ImageUrl, bool IsPinned, int LikeCount, int CommentCount, int ViewCount, bool IsLikedByMe, DateTime CreatedAt, List<CommentDto> Comments);
-public sealed record CommentDto(Guid Id, string AuthorName, string? AuthorAvatarUrl, Guid AuthorId, string Content, int LikeCount, bool IsLikedByMe, DateTime CreatedAt, Guid? ParentCommentId, List<CommentDto> Replies);
+public sealed record PostDto(Guid Id, Guid AuthorId, string AuthorName, string? AuthorDisplayName, string? AuthorAvatarUrl, string Category, string Title, string Content, string? ImageUrl, bool IsPinned, int LikeCount, int CommentCount, int ViewCount, bool IsLikedByMe, DateTime CreatedAt);
+public sealed record PostDetailDto(Guid Id, Guid AuthorId, string AuthorName, string? AuthorDisplayName, string? AuthorAvatarUrl, string Category, string Title, string Content, string? ImageUrl, bool IsPinned, int LikeCount, int CommentCount, int ViewCount, bool IsLikedByMe, DateTime CreatedAt, List<CommentDto> Comments);
+public sealed record CommentDto(Guid Id, string AuthorName, string? AuthorDisplayName, string? AuthorAvatarUrl, Guid AuthorId, string Content, int LikeCount, bool IsLikedByMe, DateTime CreatedAt, Guid? ParentCommentId, List<CommentDto> Replies);

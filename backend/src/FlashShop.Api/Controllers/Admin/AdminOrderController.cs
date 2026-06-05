@@ -1,4 +1,5 @@
 using FlashShop.Application.Orders.Queries;
+using FlashShop.Application.Shipments.Commands;
 using FlashShop.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +45,39 @@ public sealed class AdminOrderController(IMediator mediator) : ControllerBase
 
         return Ok(order);
     }
+
+    [HttpPost("{id:guid}/ship")]
+    public async Task<IActionResult> ShipOrder(Guid id, [FromBody] ShipOrderRequest request, CancellationToken cancellationToken)
+    {
+        var shipment = await mediator.Send(new CreateShipmentCommand
+        {
+            OrderId = id,
+            Carrier = request.Carrier,
+            TrackingNo = request.TrackingNo
+        }, cancellationToken);
+
+        return Ok(shipment);
+    }
+
+    [HttpPost("{id:guid}/deliver")]
+    public async Task<IActionResult> DeliverOrder(Guid id, CancellationToken cancellationToken)
+    {
+        var shipment = await mediator.Send(new MarkDeliveredCommand { OrderId = id }, cancellationToken);
+        return Ok(shipment);
+    }
+
+    [HttpPut("{id:guid}/tracking")]
+    public async Task<IActionResult> UpdateTracking(Guid id, [FromBody] UpdateTrackingRequest request, CancellationToken cancellationToken)
+    {
+        var shipment = await mediator.Send(new UpdateTrackingCommand
+        {
+            OrderId = id,
+            TrackingNo = request.TrackingNo
+        }, cancellationToken);
+
+        return Ok(shipment);
+    }
 }
+
+public sealed record ShipOrderRequest(string Carrier, string? TrackingNo);
+public sealed record UpdateTrackingRequest(string? TrackingNo);

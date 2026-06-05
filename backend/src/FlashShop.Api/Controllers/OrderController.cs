@@ -40,6 +40,18 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
         return Ok(order);
     }
 
+    [HttpGet("{id:guid}/shipment")]
+    public async Task<IActionResult> GetShipment(Guid id, CancellationToken cancellationToken)
+    {
+        var order = await mediator.Send(new GetOrderDetailQuery
+        {
+            OrderId = id,
+            UserId = GetUserId()
+        }, cancellationToken);
+
+        return Ok(order.Shipment);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest? request, CancellationToken cancellationToken)
     {

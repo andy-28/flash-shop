@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getMe, login, register } from "@/lib/api/auth";
+import { updateProfile } from "@/lib/api/profile";
 import type { AuthUser } from "@/types";
 
 interface AuthState {
@@ -13,6 +14,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   fetchMe: () => Promise<void>;
+  updateProfile: (data: { displayName?: string | null; bio?: string | null; avatarUrl?: string | null }) => Promise<void>;
   logout: () => void;
 }
 
@@ -36,6 +38,21 @@ export const useAuthStore = create<AuthState>()(
       fetchMe: async () => {
         const user = await getMe();
         set({ user, isAuthenticated: true });
+      },
+      updateProfile: async (data) => {
+        const profile = await updateProfile(data);
+        const current = get().user;
+        set({
+          user: current ? {
+            ...current,
+            displayName: profile.displayName,
+            avatarUrl: profile.avatarUrl,
+            bio: profile.bio,
+            name: profile.name,
+            email: profile.email,
+            role: profile.role,
+          } : null,
+        });
       },
       logout: () => set({ accessToken: null, user: null, isAuthenticated: false }),
     }),
