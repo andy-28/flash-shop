@@ -2,6 +2,7 @@ using FlashShop.Application.Common.Interfaces;
 using FlashShop.Infrastructure.Caching;
 using FlashShop.Infrastructure.Messaging;
 using FlashShop.Infrastructure.Persistence;
+using FlashShop.Infrastructure.Persistence.ReadServices;
 using FlashShop.Infrastructure.Persistence.Repositories;
 using FlashShop.Infrastructure.Security;
 using FlashShop.Infrastructure.Settings;
@@ -54,6 +55,7 @@ public static class DependencyInjection
         services.AddScoped<IMediaRepository, MediaRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IAdminDashboardReadService, AdminDashboardReadService>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddSingleton<IOrderSettings, OrderSettings>();

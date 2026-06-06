@@ -13,7 +13,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/products")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminProductController(IMediator mediator, ICurrentUserService currentUser) : ControllerBase
+public sealed class AdminProductController(IMediator mediator, ICurrentUserService currentUser) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProducts(
@@ -31,7 +31,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(products);
+        return OkResponse(products);
     }
 
     [HttpPost]
@@ -40,7 +40,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
         CancellationToken cancellationToken)
     {
         var productId = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetProducts), new { id = productId }, new { id = productId });
+        return CreatedResponse(new { id = productId });
     }
 
     [HttpPut("{id:guid}")]
@@ -51,7 +51,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
     {
         command.Id = id;
         await mediator.Send(command, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [HttpPut("{id:guid}/inventory")]
@@ -62,7 +62,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
     {
         command.ProductId = id;
         var inventory = await mediator.Send(command, cancellationToken);
-        return Ok(inventory);
+        return OkResponse(inventory);
     }
 
     [HttpPost("upload")]
@@ -79,7 +79,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
             UploadedBy = currentUser.UserId ?? Guid.Empty
         }, cancellationToken);
 
-        return Ok(new { url = media.FilePath, media });
+        return OkResponse(new { url = media.FilePath, media });
     }
 
     [HttpPost("variants/{variantId:guid}/mark-arrival")]
@@ -94,7 +94,7 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
             ArrivalStock = request.ArrivalStock
         }, cancellationToken);
 
-        return Ok(new { notifiedOrders });
+        return OkResponse(new { notifiedOrders });
     }
 }
 

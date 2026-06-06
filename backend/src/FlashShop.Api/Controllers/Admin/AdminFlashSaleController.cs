@@ -12,7 +12,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [Authorize(Roles = "Admin")]
 public sealed class AdminFlashSaleController(
     AppDbContext dbContext,
-    IFlashSaleService flashSaleService) : ControllerBase
+    IFlashSaleService flashSaleService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetList(CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public sealed class AdminFlashSaleController(
             .OrderByDescending(sale => sale.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        return Ok(sales.Select(ToAdminDto));
+        return OkResponse(sales.Select(ToAdminDto));
     }
 
     [HttpPost]
@@ -34,12 +34,12 @@ public sealed class AdminFlashSaleController(
             .FirstOrDefaultAsync(candidate => candidate.Id == request.VariantId, cancellationToken);
         if (variant is null)
         {
-            return BadRequest(new { message = "Product variant was not found." });
+            throw new BusinessException("Product variant was not found.");
         }
 
         if (request.TotalStock <= 0 || request.FlashPrice <= 0 || request.StartAt >= request.EndAt)
         {
-            return BadRequest(new { message = "Flash sale settings are invalid." });
+            throw new BusinessException("Flash sale settings are invalid.");
         }
 
         var sale = new FlashSale
@@ -61,7 +61,7 @@ public sealed class AdminFlashSaleController(
         await dbContext.SaveChangesAsync(cancellationToken);
 
         sale.Variant = variant;
-        return CreatedAtAction(nameof(GetList), new { id = sale.Id }, ToAdminDto(sale));
+        return CreatedResponse(ToAdminDto(sale));
     }
 
     [HttpPut("{id:guid}")]
@@ -70,12 +70,12 @@ public sealed class AdminFlashSaleController(
         var sale = await dbContext.FlashSales.FindAsync([id], cancellationToken);
         if (sale is null)
         {
-            return NotFound(new { message = "Flash sale was not found." });
+            throw new NotFoundException("Flash sale was not found.");
         }
 
         if (sale.Status == "Active")
         {
-            return BadRequest(new { message = "Active flash sale cannot be edited." });
+            throw new BusinessException("Active flash sale cannot be edited.");
         }
 
         sale.Title = request.Title.Trim();
@@ -86,7 +86,7 @@ public sealed class AdminFlashSaleController(
         sale.EndAt = request.EndAt;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [HttpPost("{id:guid}/activate")]
@@ -97,7 +97,7 @@ public sealed class AdminFlashSaleController(
             .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (sale is null)
         {
-            return NotFound(new { message = "Flash sale was not found." });
+            throw new NotFoundException("Flash sale was not found.");
         }
 
         sale.Status = "Active";
@@ -105,7 +105,7 @@ public sealed class AdminFlashSaleController(
         await flashSaleService.LoadSaleInfoToRedisAsync(sale, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToAdminDto(sale));
+        return OkResponse(ToAdminDto(sale));
     }
 
     [HttpPost("{id:guid}/end")]
@@ -114,12 +114,12 @@ public sealed class AdminFlashSaleController(
         var sale = await dbContext.FlashSales.FindAsync([id], cancellationToken);
         if (sale is null)
         {
-            return NotFound(new { message = "Flash sale was not found." });
+            throw new NotFoundException("Flash sale was not found.");
         }
 
         sale.Status = "Ended";
         await dbContext.SaveChangesAsync(cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     private static AdminFlashSaleDto ToAdminDto(FlashSale sale)

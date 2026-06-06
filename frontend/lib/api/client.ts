@@ -1,5 +1,13 @@
 import axios from "axios";
 
+interface ApiEnvelope<T = unknown> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  errors?: string[];
+  traceId?: string;
+}
+
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -26,7 +34,23 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const body = response.data as ApiEnvelope | undefined;
+    if (body && typeof body.success === "boolean") {
+      if (!body.success) {
+        return Promise.reject({
+          response: {
+            status: response.status,
+            data: body,
+          },
+        });
+      }
+
+      response.data = body.data;
+    }
+
+    return response;
+  },
   (error) => {
     if (error?.response?.status === 401 && typeof window !== "undefined") {
       window.localStorage.removeItem("flashshop-auth");

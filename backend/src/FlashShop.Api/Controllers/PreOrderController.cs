@@ -9,7 +9,7 @@ namespace FlashShop.Api.Controllers;
 [ApiController]
 [Route("api/pre-orders")]
 [Authorize]
-public sealed class PreOrderController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
+public sealed class PreOrderController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreatePreOrder([FromBody] CreatePreOrderRequest request, CancellationToken cancellationToken)
@@ -21,7 +21,7 @@ public sealed class PreOrderController(IMediator mediator, ICurrentUserService c
             Quantity = request.Quantity <= 0 ? 1 : request.Quantity
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     [HttpDelete("{orderId:guid}")]
@@ -33,7 +33,7 @@ public sealed class PreOrderController(IMediator mediator, ICurrentUserService c
             UserId = GetUserId()
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     private Guid GetUserId()

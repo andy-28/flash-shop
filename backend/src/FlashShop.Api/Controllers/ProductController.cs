@@ -6,7 +6,7 @@ namespace FlashShop.Api.Controllers;
 
 [ApiController]
 [Route("api/products")]
-public sealed class ProductController(IMediator mediator) : ControllerBase
+public sealed class ProductController(IMediator mediator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProducts(
@@ -24,13 +24,13 @@ public sealed class ProductController(IMediator mediator) : ControllerBase
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(products);
+        return OkResponse(products);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetProduct(Guid id, CancellationToken cancellationToken)
     {
         var product = await mediator.Send(new GetProductDetailQuery { Id = id }, cancellationToken);
-        return Ok(product);
+        return OkResponse(product);
     }
 }

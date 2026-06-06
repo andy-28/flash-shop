@@ -9,20 +9,20 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/coupons")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminCouponController(IMediator mediator) : ControllerBase
+public sealed class AdminCouponController(IMediator mediator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetCoupons(CancellationToken cancellationToken)
     {
         var coupons = await mediator.Send(new GetCouponListQuery(), cancellationToken);
-        return Ok(coupons);
+        return OkResponse(coupons);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateCoupon([FromBody] CreateCouponCommand command, CancellationToken cancellationToken)
     {
         var coupon = await mediator.Send(command, cancellationToken);
-        return Ok(coupon);
+        return OkResponse(coupon);
     }
 
     [HttpPut("{id:guid}")]
@@ -30,13 +30,13 @@ public sealed class AdminCouponController(IMediator mediator) : ControllerBase
     {
         command.Id = id;
         var coupon = await mediator.Send(command, cancellationToken);
-        return Ok(coupon);
+        return OkResponse(coupon);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteCoupon(Guid id, CancellationToken cancellationToken)
     {
         await mediator.Send(new DeleteCouponCommand { Id = id }, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 }

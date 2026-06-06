@@ -11,7 +11,7 @@ namespace FlashShop.Api.Controllers;
 public sealed class ProfileController(
     AppDbContext dbContext,
     ICurrentUserService currentUser,
-    IMediaRepository mediaRepository) : ControllerBase
+    IMediaRepository mediaRepository) : ApiControllerBase
 {
     private static readonly OrderStatus[] PaidStatuses = [OrderStatus.Paid, OrderStatus.Shipping, OrderStatus.Delivered];
 
@@ -22,16 +22,16 @@ public sealed class ProfileController(
         var userId = currentUser.UserId;
         if (!userId.HasValue)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
         var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(item => item.Id == userId, cancellationToken);
         if (user is null)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
-        return Ok(await ToUserProfileDto(user, cancellationToken));
+        return OkResponse(await ToUserProfileDto(user, cancellationToken));
     }
 
     [Authorize]
@@ -41,13 +41,13 @@ public sealed class ProfileController(
         var userId = currentUser.UserId;
         if (!userId.HasValue)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
         var user = await dbContext.Users.FirstOrDefaultAsync(item => item.Id == userId, cancellationToken);
         if (user is null)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
         user.DisplayName = Normalize(request.DisplayName, 50);
@@ -61,7 +61,7 @@ public sealed class ProfileController(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return Ok(await ToUserProfileDto(user, cancellationToken));
+        return OkResponse(await ToUserProfileDto(user, cancellationToken));
     }
 
     [HttpGet("api/users/{id:guid}")]
@@ -70,13 +70,13 @@ public sealed class ProfileController(
         var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (user is null)
         {
-            return NotFound();
+            throw new NotFoundException("Resource was not found.");
         }
 
         var communityPosts = await dbContext.CommunityPosts.AsNoTracking().CountAsync(post => post.AuthorId == id && !post.IsHidden, cancellationToken);
         var communityLikes = await dbContext.CommunityPosts.AsNoTracking().Where(post => post.AuthorId == id && !post.IsHidden).SumAsync(post => post.LikeCount, cancellationToken);
 
-        return Ok(new PublicUserProfileDto(
+        return OkResponse(new PublicUserProfileDto(
             user.Id,
             user.Name,
             user.DisplayName,
@@ -101,7 +101,7 @@ public sealed class ProfileController(
         var totalCount = await query.CountAsync(cancellationToken);
         var posts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
 
-        return Ok(new PagedResult<PostDto>(
+        return OkResponse(new PagedResult<PostDto>(
             posts.Select(post => new PostDto(
                 post.Id,
                 post.AuthorId,

@@ -10,7 +10,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/orders")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminOrderController(IMediator mediator) : ControllerBase
+public sealed class AdminOrderController(IMediator mediator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetOrders(
@@ -31,7 +31,7 @@ public sealed class AdminOrderController(IMediator mediator) : ControllerBase
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(orders);
+        return OkResponse(orders);
     }
 
     [HttpGet("{id:guid}")]
@@ -43,7 +43,7 @@ public sealed class AdminOrderController(IMediator mediator) : ControllerBase
             IsAdmin = true
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     [HttpPost("{id:guid}/ship")]
@@ -56,14 +56,14 @@ public sealed class AdminOrderController(IMediator mediator) : ControllerBase
             TrackingNo = request.TrackingNo
         }, cancellationToken);
 
-        return Ok(shipment);
+        return OkResponse(shipment);
     }
 
     [HttpPost("{id:guid}/deliver")]
     public async Task<IActionResult> DeliverOrder(Guid id, CancellationToken cancellationToken)
     {
         var shipment = await mediator.Send(new MarkDeliveredCommand { OrderId = id }, cancellationToken);
-        return Ok(shipment);
+        return OkResponse(shipment);
     }
 
     [HttpPut("{id:guid}/tracking")]
@@ -75,7 +75,7 @@ public sealed class AdminOrderController(IMediator mediator) : ControllerBase
             TrackingNo = request.TrackingNo
         }, cancellationToken);
 
-        return Ok(shipment);
+        return OkResponse(shipment);
     }
 }
 

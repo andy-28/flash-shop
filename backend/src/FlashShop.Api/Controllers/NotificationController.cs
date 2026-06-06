@@ -10,7 +10,7 @@ namespace FlashShop.Api.Controllers;
 [ApiController]
 [Route("api/notifications")]
 [Authorize]
-public sealed class NotificationController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
+public sealed class NotificationController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetNotifications([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
@@ -22,14 +22,14 @@ public sealed class NotificationController(IMediator mediator, ICurrentUserServi
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(notifications);
+        return OkResponse(notifications);
     }
 
     [HttpGet("unread-count")]
     public async Task<IActionResult> GetUnreadCount(CancellationToken cancellationToken)
     {
         var count = await mediator.Send(new GetUnreadCountQuery { UserId = GetUserId() }, cancellationToken);
-        return Ok(new { count });
+        return OkResponse(new { count });
     }
 
     [HttpPost("{id:guid}/read")]
@@ -40,7 +40,7 @@ public sealed class NotificationController(IMediator mediator, ICurrentUserServi
             UserId = GetUserId(),
             NotificationId = id
         }, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [HttpPost("read-all")]
@@ -51,7 +51,7 @@ public sealed class NotificationController(IMediator mediator, ICurrentUserServi
             UserId = GetUserId(),
             MarkAll = true
         }, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     private Guid GetUserId()

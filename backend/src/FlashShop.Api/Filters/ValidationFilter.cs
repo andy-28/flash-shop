@@ -12,11 +12,15 @@ public sealed class ValidationFilter : IActionFilter
             return;
         }
 
-        context.Result = new BadRequestObjectResult(new
-        {
-            code = "VALIDATION_ERROR",
-            message = "Request validation failed"
-        });
+        var errors = context.ModelState.Values
+            .SelectMany(entry => entry.Errors)
+            .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Invalid request value" : error.ErrorMessage)
+            .ToList();
+
+        context.Result = new BadRequestObjectResult(ApiResponse.Fail(
+            "Validation failed",
+            errors,
+            context.HttpContext.TraceIdentifier));
     }
 
     public void OnActionExecuted(ActionExecutedContext context)

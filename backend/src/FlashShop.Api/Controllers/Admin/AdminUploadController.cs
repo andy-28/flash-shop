@@ -9,7 +9,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/upload")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminUploadController(IMediator mediator, ICurrentUserService currentUser) : ControllerBase
+public sealed class AdminUploadController(IMediator mediator, ICurrentUserService currentUser) : ApiControllerBase
 {
     [HttpPost]
     [Consumes("multipart/form-data")]
@@ -25,6 +25,6 @@ public sealed class AdminUploadController(IMediator mediator, ICurrentUserServic
             UploadedBy = currentUser.UserId ?? Guid.Empty
         }, cancellationToken);
 
-        return Ok(new { url = media.FilePath, media });
+        return OkResponse(new { url = media.FilePath, media });
     }
 }

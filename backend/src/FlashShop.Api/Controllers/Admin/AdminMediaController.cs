@@ -10,7 +10,7 @@ namespace FlashShop.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/media")]
 [Authorize(Roles = "Admin")]
-public sealed class AdminMediaController(IMediator mediator, ICurrentUserService currentUser) : ControllerBase
+public sealed class AdminMediaController(IMediator mediator, ICurrentUserService currentUser) : ApiControllerBase
 {
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
@@ -31,7 +31,7 @@ public sealed class AdminMediaController(IMediator mediator, ICurrentUserService
             UploadedBy = currentUser.UserId ?? Guid.Empty
         }, cancellationToken);
 
-        return Ok(media);
+        return OkResponse(media);
     }
 
     [HttpGet]
@@ -50,39 +50,39 @@ public sealed class AdminMediaController(IMediator mediator, ICurrentUserService
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(result);
+        return OkResponse(result);
     }
 
     [HttpGet("folders")]
     public async Task<IActionResult> Folders(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetMediaFoldersQuery(), cancellationToken));
+        return OkResponse(await mediator.Send(new GetMediaFoldersQuery(), cancellationToken));
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Detail(Guid id, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetMediaDetailQuery { Id = id }, cancellationToken));
+        return OkResponse(await mediator.Send(new GetMediaDetailQuery { Id = id }, cancellationToken));
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateMediaCommand command, CancellationToken cancellationToken)
     {
         command.Id = id;
-        return Ok(await mediator.Send(command, cancellationToken));
+        return OkResponse(await mediator.Send(command, cancellationToken));
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, [FromQuery] bool force, CancellationToken cancellationToken)
     {
         await mediator.Send(new DeleteMediaCommand { Id = id, Force = force }, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [HttpPost("bulk-delete")]
     public async Task<IActionResult> BulkDelete([FromBody] BulkDeleteMediaCommand command, CancellationToken cancellationToken)
     {
         await mediator.Send(command, cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 }

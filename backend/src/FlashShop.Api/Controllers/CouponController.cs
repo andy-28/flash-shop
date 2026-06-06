@@ -9,7 +9,7 @@ namespace FlashShop.Api.Controllers;
 [ApiController]
 [Route("api/coupons")]
 [Authorize]
-public sealed class CouponController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
+public sealed class CouponController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpPost("validate")]
     public async Task<IActionResult> ValidateCoupon([FromBody] ValidateCouponRequest request, CancellationToken cancellationToken)
@@ -21,7 +21,7 @@ public sealed class CouponController(IMediator mediator, ICurrentUserService cur
             UserId = currentUserService.UserId ?? throw new UnauthorizedAccessException()
         }, cancellationToken);
 
-        return Ok(result);
+        return OkResponse(result);
     }
 }
 

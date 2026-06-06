@@ -10,7 +10,7 @@ namespace FlashShop.Api.Controllers;
 [ApiController]
 [Route("api/orders")]
 [Authorize]
-public sealed class OrderController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
+public sealed class OrderController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetOrders(
@@ -25,7 +25,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             PageSize = pageSize
         }, cancellationToken);
 
-        return Ok(orders);
+        return OkResponse(orders);
     }
 
     [HttpGet("{id:guid}")]
@@ -37,7 +37,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             UserId = GetUserId()
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     [HttpGet("{id:guid}/shipment")]
@@ -49,7 +49,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             UserId = GetUserId()
         }, cancellationToken);
 
-        return Ok(order.Shipment);
+        return OkResponse(order.Shipment);
     }
 
     [HttpPost]
@@ -61,7 +61,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             CouponCode = request?.CouponCode
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     [HttpPost("{id:guid}/pay")]
@@ -73,7 +73,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             UserId = GetUserId()
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     [HttpPost("{id:guid}/cancel")]
@@ -85,7 +85,7 @@ public sealed class OrderController(IMediator mediator, ICurrentUserService curr
             UserId = GetUserId()
         }, cancellationToken);
 
-        return Ok(order);
+        return OkResponse(order);
     }
 
     private Guid GetUserId()

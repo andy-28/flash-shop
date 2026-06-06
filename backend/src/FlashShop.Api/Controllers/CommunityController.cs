@@ -9,7 +9,7 @@ namespace FlashShop.Api.Controllers;
 
 [ApiController]
 [Route("api/community")]
-public sealed class CommunityController(AppDbContext dbContext, ICurrentUserService currentUser) : ControllerBase
+public sealed class CommunityController(AppDbContext dbContext, ICurrentUserService currentUser) : ApiControllerBase
 {
     private static readonly string[] Categories = ["General", "Unboxing", "Outfit", "QnA", "Announcement"];
 
@@ -39,7 +39,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
             ? await dbContext.PostLikes.AsNoTracking().Where(like => like.UserId == userId && postIds.Contains(like.PostId)).Select(like => like.PostId).ToListAsync(cancellationToken)
             : [];
 
-        return Ok(new PagedResult<PostDto>(
+        return OkResponse(new PagedResult<PostDto>(
             posts.Select(post => ToPostDto(post, likedIds.Contains(post.Id))).ToList(),
             totalCount,
             page,
@@ -52,7 +52,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
         var post = await dbContext.CommunityPosts.Include(item => item.Author).FirstOrDefaultAsync(item => item.Id == id && !item.IsHidden, cancellationToken);
         if (post is null)
         {
-            return NotFound();
+            throw new NotFoundException("Resource was not found.");
         }
 
         post.ViewCount += 1;
@@ -73,7 +73,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
             ? await dbContext.CommentLikes.AsNoTracking().Where(like => like.UserId == userId && commentIds.Contains(like.CommentId)).Select(like => like.CommentId).ToListAsync(cancellationToken)
             : [];
 
-        return Ok(new PostDetailDto(
+        return OkResponse(new PostDetailDto(
             post.Id,
             post.AuthorId,
             post.Author.Name,
@@ -99,7 +99,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
         if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
         {
-            return BadRequest("Title and content are required.");
+            throw new BusinessException("Title and content are required.");
         }
 
         var post = new CommunityPost
@@ -116,7 +116,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
         dbContext.CommunityPosts.Add(post);
         await dbContext.SaveChangesAsync(cancellationToken);
         await dbContext.Entry(post).Reference(item => item.Author).LoadAsync(cancellationToken);
-        return Ok(ToPostDto(post, false));
+        return OkResponse(ToPostDto(post, false));
     }
 
     [Authorize]
@@ -124,7 +124,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     public async Task<IActionResult> UpdatePost(Guid id, [FromBody] CreatePostRequest request, CancellationToken cancellationToken)
     {
         var post = await dbContext.CommunityPosts.FirstOrDefaultAsync(item => item.Id == id && !item.IsHidden, cancellationToken);
-        if (post is null) return NotFound();
+        if (post is null) throw new NotFoundException("Resource was not found.");
         if (!CanManage(post.AuthorId)) return Forbid();
 
         post.Title = request.Title.Trim();
@@ -134,7 +134,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
         post.UpdatedAt = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
         await dbContext.Entry(post).Reference(item => item.Author).LoadAsync(cancellationToken);
-        return Ok(ToPostDto(post, false));
+        return OkResponse(ToPostDto(post, false));
     }
 
     [Authorize]
@@ -142,11 +142,11 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     public async Task<IActionResult> DeletePost(Guid id, CancellationToken cancellationToken)
     {
         var post = await dbContext.CommunityPosts.FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
-        if (post is null) return NotFound();
+        if (post is null) throw new NotFoundException("Resource was not found.");
         if (!CanManage(post.AuthorId)) return Forbid();
         post.IsHidden = true;
         await dbContext.SaveChangesAsync(cancellationToken);
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [Authorize]
@@ -155,7 +155,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     {
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
         var post = await dbContext.CommunityPosts.FirstOrDefaultAsync(item => item.Id == id && !item.IsHidden, cancellationToken);
-        if (post is null) return NotFound();
+        if (post is null) throw new NotFoundException("Resource was not found.");
         var like = await dbContext.PostLikes.FirstOrDefaultAsync(item => item.PostId == id && item.UserId == userId, cancellationToken);
         var isLiked = like is null;
         if (like is null)
@@ -169,7 +169,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
             post.LikeCount = Math.Max(0, post.LikeCount - 1);
         }
         await dbContext.SaveChangesAsync(cancellationToken);
-        return Ok(new LikeResult(isLiked, post.LikeCount));
+        return OkResponse(new LikeResult(isLiked, post.LikeCount));
     }
 
     [Authorize]
@@ -178,12 +178,12 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     {
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
         var post = await dbContext.CommunityPosts.FirstOrDefaultAsync(item => item.Id == id && !item.IsHidden, cancellationToken);
-        if (post is null) return NotFound();
-        if (string.IsNullOrWhiteSpace(request.Content)) return BadRequest("Content is required.");
+        if (post is null) throw new NotFoundException("Resource was not found.");
+        if (string.IsNullOrWhiteSpace(request.Content)) throw new BusinessException("Content is required.");
         if (request.ParentCommentId.HasValue)
         {
             var parentExists = await dbContext.PostComments.AnyAsync(comment => comment.Id == request.ParentCommentId && comment.PostId == id && !comment.IsHidden, cancellationToken);
-            if (!parentExists) return BadRequest("Parent comment was not found.");
+            if (!parentExists) throw new BusinessException("Parent comment was not found.");
         }
 
         var comment = new PostComment { Id = Guid.NewGuid(), PostId = id, AuthorId = userId, ParentCommentId = request.ParentCommentId, Content = request.Content.Trim(), CreatedAt = DateTime.UtcNow };
@@ -191,7 +191,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
         post.CommentCount += 1;
         await dbContext.SaveChangesAsync(cancellationToken);
         await dbContext.Entry(comment).Reference(item => item.Author).LoadAsync(cancellationToken);
-        return Ok(ToCommentDto(comment, []));
+        return OkResponse(ToCommentDto(comment, []));
     }
 
     [Authorize]
@@ -199,7 +199,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     public async Task<IActionResult> DeleteComment(Guid id, CancellationToken cancellationToken)
     {
         var comment = await dbContext.PostComments.Include(item => item.Post).FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
-        if (comment is null) return NotFound();
+        if (comment is null) throw new NotFoundException("Resource was not found.");
         if (!CanManage(comment.AuthorId)) return Forbid();
         if (!comment.IsHidden)
         {
@@ -207,7 +207,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
             comment.Post.CommentCount = Math.Max(0, comment.Post.CommentCount - 1);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
-        return NoContent();
+        return OkMessage("Operation completed successfully.");
     }
 
     [Authorize]
@@ -216,7 +216,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
     {
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
         var comment = await dbContext.PostComments.FirstOrDefaultAsync(item => item.Id == id && !item.IsHidden, cancellationToken);
-        if (comment is null) return NotFound();
+        if (comment is null) throw new NotFoundException("Resource was not found.");
         var like = await dbContext.CommentLikes.FirstOrDefaultAsync(item => item.CommentId == id && item.UserId == userId, cancellationToken);
         var isLiked = like is null;
         if (like is null)
@@ -230,7 +230,7 @@ public sealed class CommunityController(AppDbContext dbContext, ICurrentUserServ
             comment.LikeCount = Math.Max(0, comment.LikeCount - 1);
         }
         await dbContext.SaveChangesAsync(cancellationToken);
-        return Ok(new LikeResult(isLiked, comment.LikeCount));
+        return OkResponse(new LikeResult(isLiked, comment.LikeCount));
     }
 
     private bool CanManage(Guid authorId) => currentUser.UserId == authorId || currentUser.Role == "Admin";

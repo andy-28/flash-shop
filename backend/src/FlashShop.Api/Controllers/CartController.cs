@@ -10,14 +10,14 @@ namespace FlashShop.Api.Controllers;
 [ApiController]
 [Route("api/cart")]
 [Authorize]
-public sealed class CartController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
+public sealed class CartController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetCart(CancellationToken cancellationToken)
     {
         var userId = GetUserId();
         var cart = await mediator.Send(new GetCartQuery { UserId = userId }, cancellationToken);
-        return Ok(cart);
+        return OkResponse(cart);
     }
 
     [HttpPost("items")]
@@ -31,7 +31,7 @@ public sealed class CartController(IMediator mediator, ICurrentUserService curre
             Quantity = request.Quantity
         }, cancellationToken);
 
-        return Ok(cart);
+        return OkResponse(cart);
     }
 
     [HttpPut("items/{cartItemId:guid}")]
@@ -48,7 +48,7 @@ public sealed class CartController(IMediator mediator, ICurrentUserService curre
             Quantity = request.Quantity
         }, cancellationToken);
 
-        return Ok(cart);
+        return OkResponse(cart);
     }
 
     [HttpDelete("items/{cartItemId:guid}")]
@@ -61,7 +61,7 @@ public sealed class CartController(IMediator mediator, ICurrentUserService curre
             CartItemId = cartItemId
         }, cancellationToken);
 
-        return Ok(cart);
+        return OkResponse(cart);
     }
 
     private Guid GetUserId()

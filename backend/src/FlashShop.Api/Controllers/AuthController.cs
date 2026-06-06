@@ -10,20 +10,20 @@ namespace FlashShop.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public sealed class AuthController(IMediator mediator, IUserRepository userRepository) : ControllerBase
+public sealed class AuthController(IMediator mediator, IUserRepository userRepository) : ApiControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return Ok(response);
+        return OkResponse(response);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return Ok(response);
+        return OkResponse(response);
     }
 
     [Authorize]
@@ -33,16 +33,16 @@ public sealed class AuthController(IMediator mediator, IUserRepository userRepos
         var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(id, out var userId))
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
-        return Ok(new AuthUserDto
+        return OkResponse(new AuthUserDto
         {
             Id = user.Id,
             Email = user.Email,

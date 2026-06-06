@@ -14,7 +14,7 @@ public sealed class FlashSaleController(
     AppDbContext dbContext,
     IFlashSaleService flashSaleService,
     ICurrentUserService currentUserService,
-    FlashSaleOrderChannel orderChannel) : ControllerBase
+    FlashSaleOrderChannel orderChannel) : ApiControllerBase
 {
     [HttpGet("active")]
     public async Task<IActionResult> GetActive(CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ public sealed class FlashSaleController(
             result.Add(await ToDtoAsync(sale, cancellationToken));
         }
 
-        return Ok(result);
+        return OkResponse(result);
     }
 
     [HttpGet("{id:guid}")]
@@ -44,7 +44,12 @@ public sealed class FlashSaleController(
             .ThenInclude(variant => variant.Product)
             .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
 
-        return sale is null ? NotFound(new { message = "Flash sale was not found." }) : Ok(await ToDtoAsync(sale, cancellationToken));
+        if (sale is null)
+        {
+            throw new NotFoundException("Flash sale was not found.");
+        }
+
+        return OkResponse(await ToDtoAsync(sale, cancellationToken));
     }
 
     [HttpGet("{id:guid}/stock")]
@@ -53,10 +58,10 @@ public sealed class FlashSaleController(
         var sale = await dbContext.FlashSales.FindAsync([id], cancellationToken);
         if (sale is null)
         {
-            return NotFound(new { message = "Flash sale was not found." });
+            throw new NotFoundException("Flash sale was not found.");
         }
 
-        return Ok(new { remainingStock = await GetRemainingStockAsync(sale, cancellationToken) });
+        return OkResponse(new { remainingStock = await GetRemainingStockAsync(sale, cancellationToken) });
     }
 
     [Authorize]
@@ -66,7 +71,7 @@ public sealed class FlashSaleController(
         var userId = currentUserService.UserId;
         if (!userId.HasValue)
         {
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
         }
 
         var sale = await dbContext.FlashSales
@@ -74,29 +79,29 @@ public sealed class FlashSaleController(
             .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (sale is null)
         {
-            return NotFound(new { message = "Flash sale was not found." });
+            throw new NotFoundException("Flash sale was not found.");
         }
 
         var now = DateTime.UtcNow;
         if (sale.Status != "Active" || now < sale.StartAt)
         {
-            return BadRequest(new { message = "Flash sale has not started." });
+            throw new BusinessException("Flash sale has not started.");
         }
 
         if (now >= sale.EndAt)
         {
-            return BadRequest(new { message = "Flash sale has ended." });
+            throw new BusinessException("Flash sale has ended.");
         }
 
         var attempt = await flashSaleService.TryPurchaseAsync(id, userId.Value, 1, sale.PerUserLimit, cancellationToken);
         if (attempt.Result == FlashSalePurchaseResult.AlreadyPurchased)
         {
-            return BadRequest(new { message = "You already purchased this flash sale item." });
+            throw new BusinessException("You already purchased this flash sale item.");
         }
 
         if (attempt.Result == FlashSalePurchaseResult.SoldOut)
         {
-            return BadRequest(new { message = "Sold out." });
+            throw new BusinessException("Sold out.");
         }
 
         await orderChannel.Writer.WriteAsync(new FlashSaleOrderMessage(
@@ -107,7 +112,7 @@ public sealed class FlashSaleController(
             sale.FlashPrice,
             now), cancellationToken);
 
-        return Accepted(new { remainingStock = attempt.RemainingStock });
+        return AcceptedResponse(new { remainingStock = attempt.RemainingStock });
     }
 
     private async Task<FlashSaleDto> ToDtoAsync(FlashSale sale, CancellationToken cancellationToken)
