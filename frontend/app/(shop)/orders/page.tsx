@@ -34,19 +34,19 @@ export default function OrdersPage() {
   }, [hasHydrated, isAuthenticated, router]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <p className="text-xs uppercase tracking-[0.22em] text-[#A0A0A0]">Orders</p>
+        <p className="text-xs uppercase tracking-[0.22em] text-text-secondary">Orders</p>
         <h1 className="mt-3 text-4xl font-semibold">My orders</h1>
 
-        {isLoading ? <p className="mt-8 text-[#A0A0A0]">Loading orders...</p> : null}
+        {isLoading ? <p className="mt-8 text-text-secondary">Loading orders...</p> : null}
 
         {!isLoading && orders.length === 0 ? (
-          <div className="mt-10 flex min-h-80 flex-col items-center justify-center rounded-md border border-[#2A2A2A] bg-[#141414] text-center">
-            <PackageSearch className="size-12 text-[#666666]" />
+          <div className="mt-10 flex min-h-80 flex-col items-center justify-center rounded-md border border-border-default bg-bg-secondary text-center">
+            <PackageSearch className="size-12 text-text-tertiary" />
             <p className="mt-4 font-medium">No orders yet.</p>
-            <Link href="/products" className="mt-5 inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-medium text-black">
+            <Link href="/products" className="mt-5 inline-flex h-10 items-center rounded-md bg-accent-primary px-4 text-sm font-medium text-accent-primary-text">
               Browse products
             </Link>
           </div>
@@ -57,14 +57,14 @@ export default function OrdersPage() {
             <Link
               key={order.id}
               href={`/orders/${order.id}`}
-              className="grid gap-4 rounded-md border border-[#2A2A2A] bg-[#141414] p-4 hover:border-[#404040] md:grid-cols-[1fr_120px_140px_160px]"
+              className="grid gap-4 rounded-md border border-border-default bg-bg-secondary p-4 hover:border-border-hover md:grid-cols-[1fr_120px_140px_160px]"
             >
               <div>
                 <p className="font-medium">{order.orderNo}</p>
-                <p className="mt-1 text-sm text-[#A0A0A0]">{new Date(order.createdAt).toLocaleString()}</p>
+                <p className="mt-1 text-sm text-text-secondary">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
               <OrderStatusBadge status={order.status} />
-              <p className="text-sm text-[#A0A0A0]">{order.itemCount} items</p>
+              <p className="text-sm text-text-secondary">{order.itemCount} items</p>
               <p className="font-semibold md:text-right">NT$ {order.finalAmount.toLocaleString()}</p>
             </Link>
           ))}

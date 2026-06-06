@@ -86,33 +86,33 @@ export default function CommunityPostDetailPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <section className="mx-auto max-w-3xl px-4 py-10">
         {isLoading ? <div className="h-96 shimmer rounded-xl" /> : null}
         {post ? (
           <>
-            <article className="rounded-xl border border-white/10 bg-[#141414] p-5">
+            <article className="rounded-xl border border-border-default bg-bg-secondary p-5">
               <div className="flex items-center justify-between gap-3">
                 <Link className="flex min-w-0 items-center gap-3 hover:opacity-85" href={`/user/${post.authorId}`}>
                   <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorDisplayName || post.authorName} />
                   <div>
-                    <p className="text-sm text-white hover:underline">{post.authorDisplayName || post.authorName}</p>
-                    <p className="text-xs text-zinc-500">{relativeTime(post.createdAt)}</p>
+                    <p className="text-sm text-text-primary hover:underline">{post.authorDisplayName || post.authorName}</p>
+                    <p className="text-xs text-text-tertiary">{relativeTime(post.createdAt)}</p>
                   </div>
                 </Link>
                 {post.isPinned ? <Pin className="size-4" /> : null}
               </div>
-              <span className="mt-5 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300">{post.category}</span>
+              <span className="mt-5 inline-flex rounded-full bg-bg-tertiary px-2.5 py-1 text-xs text-text-secondary">{post.category}</span>
               <h1 className="mt-4 text-3xl font-semibold">{post.title}</h1>
               <div className="mt-5"><RichTextDisplay html={post.content} /></div>
               {post.imageUrl ? <img alt={post.title} className="mt-5 max-h-[520px] w-full rounded-md object-cover" src={assetUrl(post.imageUrl)} /> : null}
-              <div className="mt-6 flex items-center gap-5 border-t border-white/10 pt-4 text-sm text-zinc-400">
+              <div className="mt-6 flex items-center gap-5 border-t border-border-default pt-4 text-sm text-text-secondary">
                 <LikeButton count={post.likeCount} isLiked={post.isLikedByMe} onToggle={() => isAuthenticated ? likeMutation.mutate() : router.push("/login")} />
                 <span className="inline-flex items-center gap-1.5"><MessageCircle className="size-4" />{post.commentCount}</span>
                 <span className="inline-flex items-center gap-1.5"><Eye className="size-4" />{post.viewCount}</span>
                 {(user?.id === post.authorId || user?.role === "Admin") ? (
-                  <button className="ml-auto inline-flex items-center gap-1.5 text-[#EF4444] disabled:opacity-50" type="button" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate()}>
+                  <button className="ml-auto inline-flex items-center gap-1.5 text-status-danger disabled:opacity-50" type="button" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate()}>
                     {deleteMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
                     Delete
                   </button>
@@ -124,14 +124,14 @@ export default function CommunityPostDetailPage() {
               <h2 className="text-xl font-semibold">留言 ({post.commentCount})</h2>
               {isAuthenticated ? (
                 <div className="mt-4 flex gap-3">
-                  <input className="h-11 flex-1 rounded-md border border-white/10 bg-[#141414] px-3 text-sm outline-none disabled:opacity-60" placeholder="Write a comment..." value={comment} disabled={commentMutation.isPending} onChange={(event) => setComment(event.target.value)} />
-                  <button className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-4 text-sm font-medium text-black disabled:opacity-50" disabled={!comment.trim() || commentMutation.isPending} type="button" onClick={() => commentMutation.mutate({ content: comment })}>
+                  <input className="h-11 flex-1 rounded-md border border-border-default bg-bg-secondary px-3 text-sm outline-none disabled:opacity-60" placeholder="Write a comment..." value={comment} disabled={commentMutation.isPending} onChange={(event) => setComment(event.target.value)} />
+                  <button className="inline-flex h-11 items-center gap-2 rounded-md bg-accent-primary px-4 text-sm font-medium text-accent-primary-text disabled:opacity-50" disabled={!comment.trim() || commentMutation.isPending} type="button" onClick={() => commentMutation.mutate({ content: comment })}>
                     {commentMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
                     {commentMutation.isPending ? "送出中..." : "送出"}
                   </button>
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-zinc-400">登入後即可留言。</p>
+                <p className="mt-4 text-sm text-text-secondary">登入後即可留言。</p>
               )}
               <div className="mt-5 grid gap-4">
                 {post.comments.map((item) => (
@@ -173,19 +173,19 @@ function CommentThread({ comment, isAuthenticated, isReplying, onLike, onReply }
   const [replyOpen, setReplyOpen] = useState(false);
   const [reply, setReply] = useState("");
   return (
-    <div className="rounded-md border border-white/10 bg-[#141414] p-4">
+    <div className="rounded-md border border-border-default bg-bg-secondary p-4">
       <CommentBody comment={comment} onLike={onLike} onReply={() => setReplyOpen((value) => !value)} />
       {replyOpen && isAuthenticated ? (
         <div className="mt-3 flex gap-2 pl-11">
-          <input className="h-10 flex-1 rounded-md border border-white/10 bg-black px-3 text-sm outline-none disabled:opacity-60" placeholder="Reply..." value={reply} disabled={isReplying} onChange={(event) => setReply(event.target.value)} />
-          <button className="inline-flex items-center gap-2 rounded-md bg-white px-3 text-sm text-black disabled:opacity-60" disabled={!reply.trim() || isReplying} type="button" onClick={() => { if (reply.trim()) { onReply(comment.id, reply); setReply(""); setReplyOpen(false); } }}>
+          <input className="h-10 flex-1 rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none disabled:opacity-60" placeholder="Reply..." value={reply} disabled={isReplying} onChange={(event) => setReply(event.target.value)} />
+          <button className="inline-flex items-center gap-2 rounded-md bg-accent-primary px-3 text-sm text-accent-primary-text disabled:opacity-60" disabled={!reply.trim() || isReplying} type="button" onClick={() => { if (reply.trim()) { onReply(comment.id, reply); setReply(""); setReplyOpen(false); } }}>
             {isReplying ? <Loader2 className="size-4 animate-spin" /> : null}
             Send
           </button>
         </div>
       ) : null}
       {comment.replies.length > 0 ? (
-        <div className="mt-4 grid gap-3 border-l border-white/10 pl-6">
+        <div className="mt-4 grid gap-3 border-l border-border-default pl-6">
           {comment.replies.map((replyItem) => <CommentBody comment={replyItem} key={replyItem.id} onLike={onLike} />)}
         </div>
       ) : null}
@@ -203,13 +203,13 @@ function CommentBody({ comment, onLike, onReply }: Readonly<{ comment: Community
       </Link>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <Link className="text-sm text-white hover:underline" href={`/user/${comment.authorId}`}>{authorLabel}</Link>
-          <span className="text-xs text-zinc-500">{relativeTime(comment.createdAt)}</span>
+          <Link className="text-sm text-text-primary hover:underline" href={`/user/${comment.authorId}`}>{authorLabel}</Link>
+          <span className="text-xs text-text-tertiary">{relativeTime(comment.createdAt)}</span>
         </div>
-        <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{comment.content}</p>
+        <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-text-secondary">{comment.content}</p>
         <div className="mt-2 flex gap-4">
           <LikeButton count={comment.likeCount} isLiked={comment.isLikedByMe} onToggle={() => onLike(comment.id)} size="sm" />
-          {onReply ? <button className="text-sm text-zinc-500 hover:text-white" type="button" onClick={onReply}>Reply</button> : null}
+          {onReply ? <button className="text-sm text-text-tertiary hover:text-text-primary" type="button" onClick={onReply}>Reply</button> : null}
         </div>
       </div>
     </div>

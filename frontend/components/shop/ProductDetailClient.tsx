@@ -32,7 +32,7 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
   }, [product, selectedVariantId]);
 
   if (isLoading) {
-    return <main className="mx-auto max-w-6xl px-4 py-10 text-zinc-400">Loading product...</main>;
+    return <main className="mx-auto max-w-6xl px-4 py-10 text-text-secondary">Loading product...</main>;
   }
 
   if (isError || !product) {
@@ -79,28 +79,28 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
 
   return (
     <main className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="min-h-[460px] rounded-md border border-white/10 bg-[radial-gradient(circle_at_30%_25%,rgba(139,92,246,0.22),transparent_35%),linear-gradient(135deg,#18181b,#050505)]" />
+      <section className="min-h-[460px] rounded-md border border-border-default bg-[radial-gradient(circle_at_30%_25%,rgba(139,92,246,0.22),transparent_35%),linear-gradient(135deg,#18181b,#050505)]" />
       <section className="space-y-6">
-        <Link href="/products" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white">
+        <Link href="/products" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
           <ArrowLeft className="size-4" />
           Back to products
         </Link>
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">{product.category}</p>
-          <h1 className="mt-3 text-4xl font-semibold text-white">{product.name}</h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-400">{product.description}</p>
+          <h1 className="mt-3 text-4xl font-semibold text-text-primary">{product.name}</h1>
+          <p className="mt-4 max-w-xl text-sm leading-6 text-text-secondary">{product.description}</p>
         </div>
 
         {selectedVariant ? (
-          <div className={`rounded-md border p-4 ${isPreOrder ? "border-[#8B5CF6]/40 bg-[#8B5CF6]/10" : "border-white/10 bg-zinc-950"}`}>
+          <div className={`rounded-md border p-4 ${isPreOrder ? "border-[#8B5CF6]/40 bg-[#8B5CF6]/10" : "border-border-default bg-bg-secondary"}`}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-zinc-400">{isPreOrder ? "預購規格" : "已選規格"}</p>
-                <p className="mt-1 font-medium text-white">{selectedVariant.specName}</p>
+                <p className="text-sm text-text-secondary">{isPreOrder ? "預購規格" : "已選規格"}</p>
+                <p className="mt-1 font-medium text-text-primary">{selectedVariant.specName}</p>
               </div>
-              <p className={`text-2xl font-semibold ${isPreOrder ? "text-[#C4B5FD]" : "text-white"}`}>NT$ {selectedVariant.price.toLocaleString()}</p>
+              <p className={`text-2xl font-semibold ${isPreOrder ? "text-[#C4B5FD]" : "text-text-primary"}`}>NT$ {selectedVariant.price.toLocaleString()}</p>
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-text-secondary">
               {isPreOrder ? (
                 <>
                   <span className="inline-flex items-center gap-2 text-[#C4B5FD]">
@@ -120,7 +120,7 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
         ) : null}
 
         <div className="space-y-3">
-          <p className="text-sm font-medium text-white">Variants</p>
+          <p className="text-sm font-medium text-text-primary">Variants</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {product.variants.map((variant) => {
               const active = selectedVariant?.id === variant.id;
@@ -133,14 +133,14 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
                   className={`flex h-16 items-center justify-between rounded-md border px-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${
                     active
                       ? variant.isPreOrder
-                        ? "border-[#8B5CF6] bg-[#8B5CF6]/15 text-white"
-                        : "border-emerald-300 bg-emerald-300/10 text-white"
-                      : "border-white/10 bg-zinc-950 text-zinc-300 hover:border-white/30"
+                        ? "border-[#8B5CF6] bg-[#8B5CF6]/15 text-text-primary"
+                        : "border-emerald-300 bg-emerald-300/10 text-text-primary"
+                      : "border-border-default bg-bg-secondary text-text-secondary hover:border-border-hover"
                   }`}
                 >
                   <span>
                     <span className="block font-medium">{variant.specName}</span>
-                    <span className="block text-xs text-zinc-500">{variant.isPreOrder ? "Pre-order" : variant.sku}</span>
+                    <span className="block text-xs text-text-tertiary">{variant.isPreOrder ? "Pre-order" : variant.sku}</span>
                   </span>
                   {active ? <Check className={`size-4 ${variant.isPreOrder ? "text-[#C4B5FD]" : "text-emerald-300"}`} /> : null}
                 </button>
@@ -155,7 +155,7 @@ export function ProductDetailClient({ id }: Readonly<{ id: string }>) {
               fullWidth
               isLoading={isPreOrdering}
               loadingText="預購中..."
-              className="!bg-[#8B5CF6] !text-white hover:!bg-[#7C3AED]"
+              className="!bg-[#8B5CF6] !text-text-primary hover:!bg-[#7C3AED]"
               onClick={handlePreOrder}
             >
               預購

@@ -17,10 +17,10 @@ interface LoadingButtonProps {
 }
 
 const variantClass = {
-  primary: "bg-white text-black hover:bg-zinc-200",
-  danger: "bg-[#EF4444] text-white hover:bg-red-500",
-  ghost: "border border-[#2A2A2A] text-white hover:bg-white/10",
-  outline: "border border-[#404040] text-white hover:bg-white/10",
+  primary: "bg-accent-primary text-accent-primary-text hover:opacity-90",
+  danger: "bg-status-danger text-white hover:bg-red-500",
+  ghost: "border border-border-default text-text-primary hover:bg-bg-tertiary",
+  outline: "border border-border-hover text-text-primary hover:bg-bg-tertiary",
 };
 
 const sizeClass = {

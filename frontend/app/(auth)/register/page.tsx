@@ -38,22 +38,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-black px-4 text-white">
-      <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-[#2A2A2A] bg-[#141414] p-5">
+    <main className="grid min-h-screen place-items-center bg-bg-primary px-4 text-text-primary">
+      <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-border-default bg-bg-secondary p-5">
         <h1 className="text-2xl font-semibold">註冊</h1>
-        <p className="mt-2 text-sm text-[#A0A0A0]">建立帳號後即可使用購物車、訂單與社群功能。</p>
+        <p className="mt-2 text-sm text-text-secondary">建立帳號後即可使用購物車、訂單與社群功能。</p>
         <div className="mt-5 space-y-3">
-          <input value={name} onChange={(event) => setName(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Name" required disabled={isLoading} />
-          <input value={email} onChange={(event) => setEmail(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Email" type="email" required disabled={isLoading} />
-          <input value={password} onChange={(event) => setPassword(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Password" type="password" required disabled={isLoading} />
+          <input value={name} onChange={(event) => setName(event.target.value)} className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none focus:border-accent-primary disabled:opacity-60" placeholder="Name" required disabled={isLoading} />
+          <input value={email} onChange={(event) => setEmail(event.target.value)} className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none focus:border-accent-primary disabled:opacity-60" placeholder="Email" type="email" required disabled={isLoading} />
+          <input value={password} onChange={(event) => setPassword(event.target.value)} className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none focus:border-accent-primary disabled:opacity-60" placeholder="Password" type="password" required disabled={isLoading} />
         </div>
-        {error ? <p className="mt-3 text-sm text-[#EF4444]">{error}</p> : null}
+        {error ? <p className="mt-3 text-sm text-status-danger">{error}</p> : null}
         <LoadingButton className="mt-5" fullWidth isLoading={isLoading} loadingText="註冊中..." type="submit">
           註冊
         </LoadingButton>
-        <p className="mt-4 text-center text-sm text-[#A0A0A0]">
+        <p className="mt-4 text-center text-sm text-text-secondary">
           已經有帳號？{" "}
-          <Link href="/login" className="text-white underline">
+          <Link href="/login" className="text-text-primary underline">
             登入
           </Link>
         </p>

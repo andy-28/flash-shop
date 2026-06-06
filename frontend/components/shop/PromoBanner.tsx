@@ -10,7 +10,7 @@ export function PromoBanner({ item }: Readonly<{ item: ContentBlock | null }>) {
 
   const banner = (
     <section className="mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#141414]">
+      <div className="relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary">
         <img alt={item.title} className="aspect-[16/7] w-full object-cover sm:aspect-[21/9]" src={assetUrl(item.imageUrl)} />
         {(item.title || item.subtitle) ? (
           <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/75 via-black/20 to-transparent p-5 sm:p-8">
@@ -22,7 +22,7 @@ export function PromoBanner({ item }: Readonly<{ item: ContentBlock | null }>) {
         ) : null}
       </div>
       {item.body ? (
-        <div className="mt-4 rounded-md border border-white/10 bg-[#141414] p-5">
+        <div className="mt-4 rounded-md border border-border-default bg-bg-secondary p-5">
           <RichTextDisplay html={item.body} />
         </div>
       ) : null}

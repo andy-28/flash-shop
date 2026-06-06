@@ -41,7 +41,7 @@ export function DragDropImageUploader({ disabled = false, isUploading = false, o
     <div className="space-y-2">
       <button
         className={`flex min-h-36 w-full flex-col items-center justify-center gap-3 rounded-md border border-dashed px-4 py-6 text-center text-sm transition ${
-          isDragging ? "border-white bg-[#252525] text-white" : "border-[#404040] bg-black text-[#A0A0A0] hover:bg-[#1E1E1E]"
+          isDragging ? "border-accent-primary bg-bg-elevated text-text-primary" : "border-border-hover bg-bg-primary text-text-secondary hover:bg-bg-tertiary"
         } disabled:cursor-not-allowed disabled:opacity-60`}
         disabled={disabled || isUploading}
         type="button"
@@ -65,10 +65,10 @@ export function DragDropImageUploader({ disabled = false, isUploading = false, o
         }}
       >
         {isUploading ? <Loader2 className="size-6 animate-spin" /> : <ImagePlus className="size-6" />}
-        <span className="font-medium text-white">{isUploading ? "Uploading image..." : "Drag images here to upload"}</span>
-        <span className="text-xs text-[#A0A0A0]">or click to choose JPG, PNG, or WebP files. Max 5MB each.</span>
+        <span className="font-medium text-text-primary">{isUploading ? "Uploading image..." : "Drag images here to upload"}</span>
+        <span className="text-xs text-text-secondary">or click to choose JPG, PNG, or WebP files. Max 5MB each.</span>
         {!isUploading ? (
-          <span className="inline-flex items-center gap-2 rounded-md border border-[#2A2A2A] px-3 py-1.5 text-xs text-white">
+          <span className="inline-flex items-center gap-2 rounded-md border border-border-default px-3 py-1.5 text-xs text-text-primary">
             <Upload className="size-3.5" />
             Choose image
           </span>
@@ -85,7 +85,7 @@ export function DragDropImageUploader({ disabled = false, isUploading = false, o
           event.currentTarget.value = "";
         }}
       />
-      {error ? <p className="text-xs text-[#EF4444]">{error}</p> : null}
+      {error ? <p className="text-xs text-status-danger">{error}</p> : null}
     </div>
   );
 }

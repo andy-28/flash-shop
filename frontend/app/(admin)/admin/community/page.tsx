@@ -63,7 +63,7 @@ export default function AdminCommunityPage() {
       render: (row) => (
         <div className="min-w-0">
           <p className="truncate font-medium">{row.title}</p>
-          <p className="mt-1 text-xs text-[#666666]">by {row.authorName}</p>
+          <p className="mt-1 text-xs text-text-tertiary">by {row.authorName}</p>
         </div>
       ),
     },
@@ -89,7 +89,7 @@ export default function AdminCommunityPage() {
       header: "Date",
       sortable: true,
       width: "0.9fr",
-      render: (row) => <span className="text-[#A0A0A0]">{new Date(row.createdAt).toLocaleDateString()}</span>,
+      render: (row) => <span className="text-text-secondary">{new Date(row.createdAt).toLocaleDateString()}</span>,
     },
   ];
 
@@ -120,14 +120,14 @@ export default function AdminCommunityPage() {
           <>
             <Link
               href={`/community/${post.id}`}
-              className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#A0A0A0] hover:border-[#404040] hover:text-white"
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-text-secondary hover:border-border-hover hover:text-text-primary"
               title="View"
             >
               <Eye className="size-4" />
             </Link>
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#A0A0A0] hover:border-[#404040] hover:text-white"
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-text-secondary hover:border-border-hover hover:text-text-primary"
               title={post.isPinned ? "Unpin" : "Pin"}
               onClick={() => pinMutation.mutate(post.id)}
             >
@@ -135,7 +135,7 @@ export default function AdminCommunityPage() {
             </button>
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#EF4444] hover:border-[#EF4444] disabled:opacity-40"
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-status-danger hover:border-status-danger disabled:opacity-40"
               title="Hide"
               disabled={post.isHidden}
               onClick={() => setDeleteTarget(post)}

@@ -9,7 +9,7 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <ProductDetailClient id={id} />
     </div>

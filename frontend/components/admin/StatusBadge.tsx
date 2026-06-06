@@ -25,11 +25,11 @@ const statusVariantMap: Record<string, BadgeVariant> = {
 };
 
 const variantClass: Record<BadgeVariant, string> = {
-  success: "bg-[#22C55E]/10 text-[#22C55E]",
-  warning: "bg-[#F59E0B]/10 text-[#F59E0B]",
-  danger: "bg-[#EF4444]/10 text-[#EF4444]",
-  info: "bg-[#3B82F6]/10 text-[#3B82F6]",
-  neutral: "bg-[#666666]/15 text-[#A0A0A0]",
+  success: "bg-status-success/10 text-status-success",
+  warning: "bg-status-warning/10 text-status-warning",
+  danger: "bg-status-danger/10 text-status-danger",
+  info: "bg-status-info/10 text-status-info",
+  neutral: "bg-text-tertiary/15 text-text-secondary",
 };
 
 export function getStatusBadge(status: string): { label: string; variant: BadgeVariant } {

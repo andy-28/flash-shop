@@ -98,95 +98,95 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <main className="mx-auto max-w-5xl px-4 py-8">
-        {isLoading ? <p className="text-[#A0A0A0]">Loading order...</p> : null}
-        {error ? <p className="rounded-md border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-sm text-[#EF4444]">{error}</p> : null}
+        {isLoading ? <p className="text-text-secondary">Loading order...</p> : null}
+        {error ? <p className="rounded-md border border-status-danger/30 bg-status-danger/10 p-3 text-sm text-status-danger">{error}</p> : null}
 
         {order ? (
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <section>
-              <div className="border-b border-[#2A2A2A] pb-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-[#A0A0A0]">Order detail</p>
+              <div className="border-b border-border-default pb-5">
+                <p className="text-xs uppercase tracking-[0.22em] text-text-secondary">Order detail</p>
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <h1 className="text-3xl font-semibold">{order.orderNo}</h1>
                   <OrderStatusBadge status={order.status} />
                 </div>
-                <p className="mt-2 text-sm text-[#A0A0A0]">{new Date(order.createdAt).toLocaleString()}</p>
+                <p className="mt-2 text-sm text-text-secondary">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
 
               <div className="mt-6 space-y-3">
                 <OrderStateNotice order={order} />
                 <OrderTimeline order={order} />
                 {order.items.map((item, index) => (
-                  <article key={`${item.productName}-${item.specName}-${index}`} className="grid gap-4 rounded-md border border-[#2A2A2A] bg-[#141414] p-4 md:grid-cols-[1fr_110px_130px]">
+                  <article key={`${item.productName}-${item.specName}-${index}`} className="grid gap-4 rounded-md border border-border-default bg-bg-secondary p-4 md:grid-cols-[1fr_110px_130px]">
                     <div>
                       <h2 className="font-medium">{item.productName}</h2>
-                      <p className="mt-1 text-sm text-[#A0A0A0]">{item.specName}</p>
-                      <p className="mt-2 text-sm text-[#A0A0A0]">NT$ {item.unitPrice.toLocaleString()} x {item.quantity}</p>
+                      <p className="mt-1 text-sm text-text-secondary">{item.specName}</p>
+                      <p className="mt-2 text-sm text-text-secondary">NT$ {item.unitPrice.toLocaleString()} x {item.quantity}</p>
                     </div>
-                    <p className="text-sm text-[#A0A0A0]">Qty {item.quantity}</p>
+                    <p className="text-sm text-text-secondary">Qty {item.quantity}</p>
                     <p className="font-semibold md:text-right">NT$ {item.subtotal.toLocaleString()}</p>
                   </article>
                 ))}
               </div>
             </section>
 
-            <aside className="h-fit rounded-md border border-[#2A2A2A] bg-[#141414] p-5 lg:sticky lg:top-20">
+            <aside className="h-fit rounded-md border border-border-default bg-bg-secondary p-5 lg:sticky lg:top-20">
               <h2 className="text-lg font-semibold">Payment</h2>
               <div className="mt-5 space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#A0A0A0]">Subtotal</span>
+                  <span className="text-text-secondary">Subtotal</span>
                   <span>NT$ {order.totalAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#A0A0A0]">Discount</span>
-                  <span className={order.discountAmount > 0 ? "text-[#22C55E]" : undefined}>
+                  <span className="text-text-secondary">Discount</span>
+                  <span className={order.discountAmount > 0 ? "text-status-success" : undefined}>
                     {order.discountAmount > 0 ? "-" : ""}NT$ {order.discountAmount.toLocaleString()}
                   </span>
                 </div>
                 {order.couponCode ? (
                   <div className="flex justify-between">
-                    <span className="text-[#A0A0A0]">Coupon</span>
+                    <span className="text-text-secondary">Coupon</span>
                     <span>{order.couponCode}</span>
                   </div>
                 ) : null}
                 <div className="flex justify-between">
-                  <span className="text-[#A0A0A0]">Shipping</span>
+                  <span className="text-text-secondary">Shipping</span>
                   <span>NT$ {order.shippingFee.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between border-t border-[#2A2A2A] pt-4 text-base font-semibold">
+                <div className="flex justify-between border-t border-border-default pt-4 text-base font-semibold">
                   <span>Total</span>
                   <span>NT$ {order.finalAmount.toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="mt-5 rounded-md border border-[#2A2A2A] bg-black/30 p-3 text-sm">
-                <p className="text-[#A0A0A0]">Method</p>
+              <div className="mt-5 rounded-md border border-border-default bg-bg-tertiary p-3 text-sm">
+                <p className="text-text-secondary">Method</p>
                 <p className="mt-1">{order.payment?.method ?? "Mock"}</p>
-                <p className="mt-3 text-[#A0A0A0]">Payment status</p>
+                <p className="mt-3 text-text-secondary">Payment status</p>
                 <p className="mt-1">{order.payment?.status ?? "Pending"}</p>
                 {order.payment?.transactionId ? (
                   <>
-                    <p className="mt-3 text-[#A0A0A0]">Transaction</p>
+                    <p className="mt-3 text-text-secondary">Transaction</p>
                     <p className="mt-1 break-all">{order.payment.transactionId}</p>
                   </>
                 ) : null}
               </div>
 
               {order.shipment ? (
-                <div className="mt-5 rounded-md border border-[#2A2A2A] bg-black/30 p-3 text-sm">
-                  <h3 className="font-medium text-white">Shipping information</h3>
-                  <p className="mt-3 text-[#A0A0A0]">Carrier</p>
+                <div className="mt-5 rounded-md border border-border-default bg-bg-tertiary p-3 text-sm">
+                  <h3 className="font-medium text-text-primary">Shipping information</h3>
+                  <p className="mt-3 text-text-secondary">Carrier</p>
                   <p className="mt-1">{order.shipment.carrier}</p>
-                  <p className="mt-3 text-[#A0A0A0]">Tracking no</p>
+                  <p className="mt-3 text-text-secondary">Tracking no</p>
                   <p className="mt-1 break-all">{order.shipment.trackingNo || "Not provided"}</p>
-                  <p className="mt-3 text-[#A0A0A0]">Shipped at</p>
+                  <p className="mt-3 text-text-secondary">Shipped at</p>
                   <p className="mt-1">{order.shipment.shippedAt ? new Date(order.shipment.shippedAt).toLocaleString() : "-"}</p>
                   {order.shipment.deliveredAt ? (
                     <>
-                      <p className="mt-3 text-[#A0A0A0]">Delivered at</p>
+                      <p className="mt-3 text-text-secondary">Delivered at</p>
                       <p className="mt-1">{new Date(order.shipment.deliveredAt).toLocaleString()}</p>
                     </>
                   ) : null}
@@ -195,8 +195,8 @@ export default function OrderDetailPage() {
 
               {order.status === "Pending" ? (
                 <div className="mt-5 space-y-3">
-                  <p className="text-sm text-[#A0A0A0]">
-                    Payment expires in <span className="font-semibold text-white">{remainingSeconds > 0 ? formatRemaining(remainingSeconds) : "Expired"}</span>
+                  <p className="text-sm text-text-secondary">
+                    Payment expires in <span className="font-semibold text-text-primary">{remainingSeconds > 0 ? formatRemaining(remainingSeconds) : "Expired"}</span>
                   </p>
                   <LoadingButton fullWidth size="lg" isLoading={mutatingAction === "pay"} loadingText="付款處理中..." disabled={!!mutatingAction || remainingSeconds <= 0} onClick={() => mutate("pay")}>
                     付款
@@ -217,7 +217,7 @@ export default function OrderDetailPage() {
                 </div>
               ) : null}
               {order.status === "Expired" ? (
-                <p className="mt-5 rounded-md border border-zinc-700 bg-zinc-900 p-3 text-sm text-zinc-300">
+                <p className="mt-5 rounded-md border border-border-default bg-bg-secondary p-3 text-sm text-text-secondary">
                   訂單已過期，凍結庫存會由系統自動釋放。
                 </p>
               ) : null}
@@ -231,7 +231,7 @@ export default function OrderDetailPage() {
 
 function OrderStateNotice({ order }: Readonly<{ order: Order }>) {
   if (order.status === "Paid") {
-    return <p className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-3 text-sm text-[#93C5FD]">Payment received. Your order is waiting for shipment.</p>;
+    return <p className="rounded-md border border-status-info/30 bg-status-info/10 p-3 text-sm text-[#93C5FD]">Payment received. Your order is waiting for shipment.</p>;
   }
 
   if (order.status === "PreOrdered") {
@@ -239,15 +239,15 @@ function OrderStateNotice({ order }: Readonly<{ order: Order }>) {
   }
 
   if (order.status === "Shipping") {
-    return <p className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-3 text-sm text-[#93C5FD]">Your order has shipped. Tracking information is available below.</p>;
+    return <p className="rounded-md border border-status-info/30 bg-status-info/10 p-3 text-sm text-[#93C5FD]">Your order has shipped. Tracking information is available below.</p>;
   }
 
   if (order.status === "Delivered") {
-    return <p className="rounded-md border border-[#22C55E]/30 bg-[#22C55E]/10 p-3 text-sm text-[#22C55E]">Order completed. Thanks for shopping with FlashShop.</p>;
+    return <p className="rounded-md border border-status-success/30 bg-status-success/10 p-3 text-sm text-status-success">Order completed. Thanks for shopping with FlashShop.</p>;
   }
 
   if (order.status === "Cancelled") {
-    return <p className="rounded-md border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-sm text-[#EF4444]">This order was cancelled.</p>;
+    return <p className="rounded-md border border-status-danger/30 bg-status-danger/10 p-3 text-sm text-status-danger">This order was cancelled.</p>;
   }
 
   return null;

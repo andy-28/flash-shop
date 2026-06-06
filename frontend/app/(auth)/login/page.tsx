@@ -60,33 +60,33 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-black px-4 text-white">
-      <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-[#2A2A2A] bg-[#141414] p-5">
+    <main className="grid min-h-screen place-items-center bg-bg-primary px-4 text-text-primary">
+      <form onSubmit={submit} aria-busy={isLoading} className="w-full max-w-sm rounded-md border border-border-default bg-bg-secondary p-5">
         <h1 className="text-2xl font-semibold">登入</h1>
-        <p className="mt-2 text-sm text-[#A0A0A0]">
+        <p className="mt-2 text-sm text-text-secondary">
           {reason === "admin" ? "請使用 Admin 帳號登入後台。" : "登入後即可使用購物車、訂單、社群與後台功能。"}
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button type="button" className="h-9 rounded-md border border-white/10 bg-white text-sm font-medium text-black disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("admin")}>
+          <button type="button" className="h-9 rounded-md border border-border-default bg-accent-primary text-sm font-medium text-accent-primary-text disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("admin")}>
             Admin Email
           </button>
-          <button type="button" className="h-9 rounded-md border border-white/10 text-sm font-medium text-zinc-300 hover:bg-white/10 disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("buyer")}>
+          <button type="button" className="h-9 rounded-md border border-border-default text-sm font-medium text-text-secondary hover:bg-bg-tertiary disabled:opacity-60" disabled={isLoading} onClick={() => selectDemoAccount("buyer")}>
             Buyer Email
           </button>
         </div>
 
         <div className="mt-5 space-y-3">
-          <input value={email} onChange={(event) => setEmail(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Email" type="email" required disabled={isLoading} />
-          <input value={password} onChange={(event) => setPassword(event.target.value)} className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none focus:border-white disabled:opacity-60" placeholder="Password" type="password" required disabled={isLoading} />
+          <input value={email} onChange={(event) => setEmail(event.target.value)} className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none focus:border-accent-primary disabled:opacity-60" placeholder="Email" type="email" required disabled={isLoading} />
+          <input value={password} onChange={(event) => setPassword(event.target.value)} className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none focus:border-accent-primary disabled:opacity-60" placeholder="Password" type="password" required disabled={isLoading} />
         </div>
-        {error ? <p className="mt-3 text-sm text-[#EF4444]">{error}</p> : null}
+        {error ? <p className="mt-3 text-sm text-status-danger">{error}</p> : null}
         <LoadingButton className="mt-5" fullWidth isLoading={isLoading} loadingText="登入中..." type="submit">
           登入
         </LoadingButton>
-        <p className="mt-4 text-center text-sm text-[#A0A0A0]">
+        <p className="mt-4 text-center text-sm text-text-secondary">
           還沒有帳號？{" "}
-          <Link href="/register" className="text-white underline">
+          <Link href="/register" className="text-text-primary underline">
             註冊
           </Link>
         </p>

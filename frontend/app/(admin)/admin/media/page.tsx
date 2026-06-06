@@ -87,7 +87,7 @@ export default function AdminMediaPage() {
 
   const columns: Column<MediaFile>[] = [
     { key: "thumbnail", header: "", width: "72px", render: (row) => <img alt={row.altText ?? row.fileName} className="size-12 rounded object-cover" src={assetUrl(row.thumbnailPath ?? row.filePath)} /> },
-    { key: "fileName", header: "File", sortable: true, width: "1.5fr", render: (row) => <div><p className="truncate font-medium">{row.fileName}</p><p className="mt-1 text-xs text-[#666666]">{row.mimeType}</p></div> },
+    { key: "fileName", header: "File", sortable: true, width: "1.5fr", render: (row) => <div><p className="truncate font-medium">{row.fileName}</p><p className="mt-1 text-xs text-text-tertiary">{row.mimeType}</p></div> },
     { key: "folder", header: "Folder", sortable: true, width: "0.8fr", render: (row) => row.folder ?? "general" },
     { key: "fileSize", header: "Size", sortable: true, width: "110px", render: (row) => formatBytes(row.fileSize) },
     { key: "usageCount", header: "Usage", sortable: true, width: "100px", render: (row) => <StatusBadge label={`${row.usageCount}`} variant={row.usageCount > 0 ? "info" : "neutral"} /> },
@@ -98,7 +98,7 @@ export default function AdminMediaPage() {
     <>
       <PageHeader title="Media Library" description="Manage images, folders, metadata, and file usage." breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Media" }]} />
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-md border border-[#2A2A2A] bg-[#141414] p-1">
+        <div className="inline-flex rounded-md border border-border-default bg-bg-secondary p-1">
           <IconButton active={view === "grid"} icon={Grid3X3} onClick={() => setView("grid")} />
           <IconButton active={view === "list"} icon={List} onClick={() => setView("list")} />
         </div>
@@ -110,7 +110,7 @@ export default function AdminMediaPage() {
             filters={[{ key: "folder", label: "Folder", value: folder, onChange: (value) => { setFolder(value); setPage(1); }, options: folders.map((item) => ({ label: item, value: item })) }]}
           />
         </div>
-        <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md bg-white px-4 text-sm font-medium text-black hover:bg-zinc-200">
+        <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md bg-accent-primary px-4 text-sm font-medium text-accent-primary-text hover:opacity-90">
           <Upload className="size-4" />
           {uploadMutation.isPending ? "Uploading..." : "Upload"}
           <input multiple accept="image/*" className="hidden" type="file" onChange={(event) => { const files = Array.from(event.target.files ?? []); if (files.length) uploadMutation.mutate(files); event.currentTarget.value = ""; }} />
@@ -118,9 +118,9 @@ export default function AdminMediaPage() {
       </div>
 
       {selectedIds.length > 0 ? (
-        <div className="mb-4 flex items-center justify-between rounded-md border border-[#2A2A2A] bg-[#141414] p-3 text-sm">
+        <div className="mb-4 flex items-center justify-between rounded-md border border-border-default bg-bg-secondary p-3 text-sm">
           <span>{selectedIds.length} selected</span>
-          <button className="inline-flex h-9 items-center gap-2 rounded-md bg-[#EF4444] px-3 text-white" type="button" onClick={() => setBulkDeleteOpen(true)}><Trash2 className="size-4" />Delete selected</button>
+          <button className="inline-flex h-9 items-center gap-2 rounded-md bg-status-danger px-3 text-text-primary" type="button" onClick={() => setBulkDeleteOpen(true)}><Trash2 className="size-4" />Delete selected</button>
         </div>
       ) : null}
 
@@ -143,15 +143,15 @@ export default function AdminMediaPage() {
           totalCount={mediaQuery.data?.totalCount ?? 0}
           onPageChange={setPage}
           onRowClick={(mediaFile) => setDetailId(mediaFile.id)}
-          actions={(row) => <button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#EF4444]" type="button" onClick={() => setDeleteTarget(row)}><Trash2 className="size-4" /></button>}
+          actions={(row) => <button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-status-danger" type="button" onClick={() => setDeleteTarget(row)}><Trash2 className="size-4" /></button>}
         />
       )}
 
       {view === "grid" && (mediaQuery.data?.totalCount ?? 0) > pageSize ? (
-        <div className="mt-4 flex items-center justify-end gap-2 text-sm text-[#A0A0A0]">
-          <button className="h-9 rounded-md border border-[#2A2A2A] px-3 disabled:opacity-40" disabled={page <= 1} type="button" onClick={() => setPage((current) => current - 1)}>Previous</button>
+        <div className="mt-4 flex items-center justify-end gap-2 text-sm text-text-secondary">
+          <button className="h-9 rounded-md border border-border-default px-3 disabled:opacity-40" disabled={page <= 1} type="button" onClick={() => setPage((current) => current - 1)}>Previous</button>
           <span>Page {page}</span>
-          <button className="h-9 rounded-md border border-[#2A2A2A] px-3 disabled:opacity-40" disabled={page * pageSize >= (mediaQuery.data?.totalCount ?? 0)} type="button" onClick={() => setPage((current) => current + 1)}>Next</button>
+          <button className="h-9 rounded-md border border-border-default px-3 disabled:opacity-40" disabled={page * pageSize >= (mediaQuery.data?.totalCount ?? 0)} type="button" onClick={() => setPage((current) => current + 1)}>Next</button>
         </div>
       ) : null}
 
@@ -168,24 +168,24 @@ function MediaGrid({ data, isLoading, onSelect, onToggle, selectedIds }: Readonl
   }
 
   if (data.length === 0) {
-    return <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-[#2A2A2A] text-[#A0A0A0]"><div className="text-center"><ImagePlus className="mx-auto mb-3 size-8" /><p>No media files found</p></div></div>;
+    return <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-border-default text-text-secondary"><div className="text-center"><ImagePlus className="mx-auto mb-3 size-8" /><p>No media files found</p></div></div>;
   }
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
       {data.map((media) => (
-        <article className="group overflow-hidden rounded-md border border-[#2A2A2A] bg-[#141414]" key={media.id}>
+        <article className="group overflow-hidden rounded-md border border-border-default bg-bg-secondary" key={media.id}>
           <div className="relative">
             <button className="block w-full" type="button" onClick={() => onSelect(media)}>
               <img alt={media.altText ?? media.fileName} className="aspect-square w-full object-cover" src={assetUrl(media.thumbnailPath ?? media.filePath)} />
             </button>
-            <button className={`absolute left-2 top-2 inline-flex size-7 items-center justify-center rounded-md border border-white/20 ${selectedIds.includes(media.id) ? "bg-white text-black" : "bg-black/70 text-white opacity-0 group-hover:opacity-100"}`} type="button" onClick={() => onToggle(media.id)}>
+            <button className={`absolute left-2 top-2 inline-flex size-7 items-center justify-center rounded-md border border-border-default ${selectedIds.includes(media.id) ? "bg-accent-primary text-accent-primary-text" : "bg-overlay text-text-primary opacity-0 group-hover:opacity-100"}`} type="button" onClick={() => onToggle(media.id)}>
               {selectedIds.includes(media.id) ? <Check className="size-4" /> : null}
             </button>
           </div>
           <div className="p-3">
-            <p className="truncate text-sm text-white">{media.fileName}</p>
-            <p className="mt-1 text-xs text-[#666666]">{media.folder ?? "general"} · {formatBytes(media.fileSize)}</p>
+            <p className="truncate text-sm text-text-primary">{media.fileName}</p>
+            <p className="mt-1 text-xs text-text-tertiary">{media.folder ?? "general"} · {formatBytes(media.fileSize)}</p>
           </div>
         </article>
       ))}
@@ -199,42 +199,42 @@ function MediaDetailPanel({ media, onClose, onDelete, onSave }: Readonly<{ media
   const [folder, setFolder] = useState(media.folder ?? "");
 
   return (
-    <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-[#2A2A2A] bg-[#141414] shadow-2xl">
-      <header className="flex items-center justify-between border-b border-[#2A2A2A] p-4">
+    <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-border-default bg-bg-secondary shadow-2xl">
+      <header className="flex items-center justify-between border-b border-border-default p-4">
         <h2 className="text-lg font-medium">Media details</h2>
-        <button className="inline-flex size-9 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-[#1E1E1E]" type="button" onClick={onClose}><X className="size-4" /></button>
+        <button className="inline-flex size-9 items-center justify-center rounded-md text-text-secondary hover:bg-bg-tertiary" type="button" onClick={onClose}><X className="size-4" /></button>
       </header>
       <div className="flex-1 overflow-y-auto p-4">
         <img alt={media.altText ?? media.fileName} className="mb-4 aspect-square w-full rounded-md object-cover" src={assetUrl(media.filePath)} />
-        <div className="mb-5 grid gap-2 text-sm text-[#A0A0A0]">
-          <p className="truncate text-white">{media.fileName}</p>
+        <div className="mb-5 grid gap-2 text-sm text-text-secondary">
+          <p className="truncate text-text-primary">{media.fileName}</p>
           <p>{media.mimeType}</p>
           <p>{formatBytes(media.fileSize)}</p>
           <p>{media.width && media.height ? `${media.width} x ${media.height}` : "Dimensions unavailable"}</p>
           <p>Uploaded by {media.uploadedByName}</p>
-          <button className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[#2A2A2A] text-white hover:bg-[#1E1E1E]" type="button" onClick={async () => { await navigator.clipboard.writeText(media.filePath); toast.success("URL copied"); }}><Copy className="size-4" />Copy URL</button>
+          <button className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border-default text-text-primary hover:bg-bg-tertiary" type="button" onClick={async () => { await navigator.clipboard.writeText(media.filePath); toast.success("URL copied"); }}><Copy className="size-4" />Copy URL</button>
         </div>
-        <FormField label="Alt text"><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={altText} onChange={(event) => setAltText(event.target.value)} /></FormField>
-        <FormField label="Folder"><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={folder} onChange={(event) => setFolder(event.target.value)} /></FormField>
-        <section className="mt-6 rounded-md border border-[#2A2A2A] p-4">
-          <h3 className="mb-3 text-sm font-medium text-white">Usage</h3>
+        <FormField label="Alt text"><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" value={altText} onChange={(event) => setAltText(event.target.value)} /></FormField>
+        <FormField label="Folder"><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" value={folder} onChange={(event) => setFolder(event.target.value)} /></FormField>
+        <section className="mt-6 rounded-md border border-border-default p-4">
+          <h3 className="mb-3 text-sm font-medium text-text-primary">Usage</h3>
           {media.usages && media.usages.length > 0 ? (
-            <div className="grid gap-2 text-xs text-[#A0A0A0]">
+            <div className="grid gap-2 text-xs text-text-secondary">
               {media.usages.map((usage) => <p key={usage.id}>{usage.entityType}: {usage.entityId} · {usage.fieldName}</p>)}
             </div>
-          ) : <p className="text-sm text-[#666666]">Not used yet</p>}
+          ) : <p className="text-sm text-text-tertiary">Not used yet</p>}
         </section>
       </div>
-      <footer className="flex justify-between border-t border-[#2A2A2A] p-4">
-        <button className="inline-flex h-10 items-center gap-2 rounded-md border border-[#2A2A2A] px-4 text-sm text-[#EF4444]" type="button" onClick={onDelete}><Trash2 className="size-4" />Delete</button>
-        <button className="inline-flex h-10 items-center gap-2 rounded-md bg-white px-4 text-sm font-medium text-black" type="button" onClick={() => onSave({ altText, folder })}><Pencil className="size-4" />Save</button>
+      <footer className="flex justify-between border-t border-border-default p-4">
+        <button className="inline-flex h-10 items-center gap-2 rounded-md border border-border-default px-4 text-sm text-status-danger" type="button" onClick={onDelete}><Trash2 className="size-4" />Delete</button>
+        <button className="inline-flex h-10 items-center gap-2 rounded-md bg-accent-primary px-4 text-sm font-medium text-accent-primary-text" type="button" onClick={() => onSave({ altText, folder })}><Pencil className="size-4" />Save</button>
       </footer>
     </aside>
   );
 }
 
 function IconButton({ active, icon: Icon, onClick }: Readonly<{ active: boolean; icon: typeof Grid3X3; onClick: () => void }>) {
-  return <button className={`inline-flex size-8 items-center justify-center rounded ${active ? "bg-white text-black" : "text-[#A0A0A0] hover:bg-[#1E1E1E]"}`} type="button" onClick={onClick}><Icon className="size-4" /></button>;
+  return <button className={`inline-flex size-8 items-center justify-center rounded ${active ? "bg-accent-primary text-accent-primary-text" : "text-text-secondary hover:bg-bg-tertiary"}`} type="button" onClick={onClick}><Icon className="size-4" /></button>;
 }
 
 function formatBytes(bytes: number) {

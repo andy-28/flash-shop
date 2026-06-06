@@ -14,9 +14,9 @@ interface MutationButtonProps {
 }
 
 const variantClass = {
-  primary: "bg-white text-black hover:bg-zinc-200",
-  danger: "bg-[#EF4444] text-white hover:bg-red-500",
-  ghost: "border border-[#2A2A2A] text-white hover:bg-[#1E1E1E]",
+  primary: "bg-accent-primary text-accent-primary-text hover:opacity-90",
+  danger: "bg-status-danger text-white hover:bg-red-500",
+  ghost: "border border-border-default text-text-primary hover:bg-bg-tertiary",
 };
 
 export function MutationButton({

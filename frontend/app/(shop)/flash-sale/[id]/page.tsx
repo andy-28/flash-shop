@@ -101,47 +101,47 @@ export default function FlashSaleDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <main className="mx-auto max-w-5xl px-4 py-8">
-        {isLoading ? <p className="text-sm text-zinc-400">Loading flash sale...</p> : null}
+        {isLoading ? <p className="text-sm text-text-secondary">Loading flash sale...</p> : null}
         {sale ? (
           <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-            <section className="rounded-md border border-white/10 bg-[#141414] p-6">
-              <div className="flex size-20 items-center justify-center rounded-full bg-[#EF4444]/15 text-[#EF4444]">
+            <section className="rounded-md border border-border-default bg-bg-secondary p-6">
+              <div className="flex size-20 items-center justify-center rounded-full bg-status-danger/15 text-status-danger">
                 <Flame className="size-9" />
               </div>
-              <p className="mt-6 text-sm text-zinc-400">{sale.productName} / {sale.specName}</p>
+              <p className="mt-6 text-sm text-text-secondary">{sale.productName} / {sale.specName}</p>
               <h1 className="mt-2 text-4xl font-semibold">{sale.title}</h1>
               <div className="mt-6 flex items-end gap-4">
-                {sale.originalPrice ? <span className="text-lg text-zinc-500 line-through">{money(sale.originalPrice)}</span> : null}
-                <span className="text-4xl font-semibold text-[#EF4444]">{money(sale.flashPrice)}</span>
+                {sale.originalPrice ? <span className="text-lg text-text-tertiary line-through">{money(sale.originalPrice)}</span> : null}
+                <span className="text-4xl font-semibold text-status-danger">{money(sale.flashPrice)}</span>
               </div>
             </section>
 
-            <aside className="h-fit rounded-md border border-white/10 bg-[#141414] p-5 lg:sticky lg:top-20">
+            <aside className="h-fit rounded-md border border-border-default bg-bg-secondary p-5 lg:sticky lg:top-20">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-zinc-400">Remaining stock</span>
+                <span className="text-sm text-text-secondary">Remaining stock</span>
                 <span className="font-semibold">{remainingStock ?? 0}/{sale.totalStock}</span>
               </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full bg-[#EF4444]" style={{ width: `${progress}%` }} />
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-bg-tertiary">
+                <div className="h-full bg-status-danger" style={{ width: `${progress}%` }} />
               </div>
 
-              <div className="mt-6 rounded-md border border-white/10 bg-black/30 p-4">
+              <div className="mt-6 rounded-md border border-border-default bg-bg-tertiary p-4">
                 {phase === "upcoming" ? (
                   <>
-                    <p className="text-sm text-zinc-400">Starts in</p>
-                    <p className="mt-1 animate-scaleIn text-2xl font-semibold" key={Math.floor(now / 1000)}>{formatRemaining(new Date(sale.startAt).getTime() - now)}</p>
+                    <p className="text-sm text-text-secondary">Starts in</p>
+                    <p className="mt-1 animate-scale-in text-2xl font-semibold" key={Math.floor(now / 1000)}>{formatRemaining(new Date(sale.startAt).getTime() - now)}</p>
                   </>
                 ) : null}
-                {phase === "live" ? <p className="text-sm text-[#22C55E]">Flash sale is live.</p> : null}
-                {phase === "sold-out" ? <p className="text-sm text-[#EF4444]">Sold out.</p> : null}
-                {phase === "ended" ? <p className="text-sm text-zinc-400">Flash sale ended.</p> : null}
+                {phase === "live" ? <p className="text-sm text-status-success">Flash sale is live.</p> : null}
+                {phase === "sold-out" ? <p className="text-sm text-status-danger">Sold out.</p> : null}
+                {phase === "ended" ? <p className="text-sm text-text-secondary">Flash sale ended.</p> : null}
               </div>
 
-              {error ? <p className="mt-4 text-sm text-[#EF4444]">{error}</p> : null}
-              {message ? <p className="mt-4 text-sm text-[#22C55E]">{message}</p> : null}
+              {error ? <p className="mt-4 text-sm text-status-danger">{error}</p> : null}
+              {message ? <p className="mt-4 text-sm text-status-success">{message}</p> : null}
 
               <LoadingButton
                 className="mt-5"

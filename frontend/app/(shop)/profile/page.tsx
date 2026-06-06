@@ -56,12 +56,12 @@ export default function ProfilePage() {
 
   if (hasHydrated && !isAuthenticated) {
     return (
-      <main className="min-h-screen bg-[#0A0A0A] text-white">
+      <main className="min-h-screen bg-bg-primary text-text-primary">
         <ShopNavbar />
         <section className="mx-auto max-w-2xl px-4 py-16 text-center">
           <h1 className="text-2xl font-semibold">Please log in</h1>
-          <p className="mt-2 text-sm text-zinc-400">You need an account to edit your profile.</p>
-          <Link className="mt-5 inline-flex rounded-md bg-white px-4 py-2 text-sm font-medium text-black" href="/login">Login</Link>
+          <p className="mt-2 text-sm text-text-secondary">You need an account to edit your profile.</p>
+          <Link className="mt-5 inline-flex rounded-md bg-accent-primary px-4 py-2 text-sm font-medium text-accent-primary-text" href="/login">Login</Link>
         </section>
       </main>
     );
@@ -70,16 +70,16 @@ export default function ProfilePage() {
   const name = displayName || profile?.name || "User";
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <section className="mx-auto max-w-4xl px-4 py-10">
-        <div className="rounded-xl border border-white/10 bg-[#141414] p-6">
+        <div className="rounded-xl border border-border-default bg-bg-secondary p-6">
           {isLoading ? <div className="h-72 shimmer rounded-lg" /> : null}
           {profile ? (
             <>
               <div className="flex flex-col gap-6 md:flex-row">
                 <div className="w-full md:w-44">
-                  <div className="group relative mx-auto size-32 overflow-hidden rounded-full border-2 border-[#2A2A2A]">
+                  <div className="group relative mx-auto size-32 overflow-hidden rounded-full border-2 border-border-default">
                     <UserAvatar avatarUrl={avatarUrl} name={name} size={128} />
                     <div className="absolute inset-0 grid place-items-center bg-black/0 opacity-0 transition group-hover:bg-black/55 group-hover:opacity-100">
                       <Camera className="size-6" />
@@ -91,17 +91,17 @@ export default function ProfilePage() {
                 </div>
                 <div className="min-w-0 flex-1 space-y-4">
                   <div>
-                    <label className="text-sm text-zinc-400">Display name</label>
-                    <input className="mt-2 h-11 w-full rounded-md border border-white/10 bg-black px-3 text-sm outline-none" maxLength={50} value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
+                    <label className="text-sm text-text-secondary">Display name</label>
+                    <input className="mt-2 h-11 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" maxLength={50} value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
                   </div>
                   <div>
-                    <label className="text-sm text-zinc-400">Bio</label>
-                    <textarea className="mt-2 min-h-28 w-full rounded-md border border-white/10 bg-black p-3 text-sm outline-none" maxLength={500} value={bio} onChange={(event) => setBio(event.target.value)} />
-                    <p className="mt-1 text-xs text-zinc-500">{bio.length}/500</p>
+                    <label className="text-sm text-text-secondary">Bio</label>
+                    <textarea className="mt-2 min-h-28 w-full rounded-md border border-border-default bg-bg-primary p-3 text-sm outline-none" maxLength={500} value={bio} onChange={(event) => setBio(event.target.value)} />
+                    <p className="mt-1 text-xs text-text-tertiary">{bio.length}/500</p>
                   </div>
-                  <div className="grid gap-2 text-sm text-zinc-400">
-                    <p>Email: <span className="text-zinc-300">{profile.email}</span></p>
-                    <p>Joined: <span className="text-zinc-300">{formatDate(profile.createdAt)}</span></p>
+                  <div className="grid gap-2 text-sm text-text-secondary">
+                    <p>Email: <span className="text-text-secondary">{profile.email}</span></p>
+                    <p>Joined: <span className="text-text-secondary">{formatDate(profile.createdAt)}</span></p>
                   </div>
                   <LoadingButton isLoading={mutation.isPending} loadingText="Saving..." onClick={() => mutation.mutate()}>
                     Save profile
@@ -124,17 +124,17 @@ export default function ProfilePage() {
         <section className="mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">My posts</h2>
-            <Link className="text-sm text-zinc-400 hover:text-white" href="/community/new">New post</Link>
+            <Link className="text-sm text-text-secondary hover:text-text-primary" href="/community/new">New post</Link>
           </div>
           <div className="mt-4 grid gap-3">
             {(posts?.items ?? []).map((post) => (
-              <Link className="rounded-md border border-white/10 bg-[#141414] p-4 hover:border-white/25" href={`/community/${post.id}`} key={post.id}>
-                <p className="text-sm text-zinc-500">{post.category} · {relativeTime(post.createdAt)}</p>
+              <Link className="rounded-md border border-border-default bg-bg-secondary p-4 hover:border-border-hover" href={`/community/${post.id}`} key={post.id}>
+                <p className="text-sm text-text-tertiary">{post.category} · {relativeTime(post.createdAt)}</p>
                 <h3 className="mt-2 font-medium">{post.title}</h3>
-                <p className="mt-2 text-sm text-zinc-400">{post.likeCount} likes · {post.commentCount} comments</p>
+                <p className="mt-2 text-sm text-text-secondary">{post.likeCount} likes · {post.commentCount} comments</p>
               </Link>
             ))}
-            {posts && posts.items.length === 0 ? <div className="rounded-md border border-dashed border-white/10 p-8 text-center text-sm text-zinc-500">No posts yet.</div> : null}
+            {posts && posts.items.length === 0 ? <div className="rounded-md border border-dashed border-border-default p-8 text-center text-sm text-text-tertiary">No posts yet.</div> : null}
           </div>
         </section>
       </section>
@@ -144,10 +144,10 @@ export default function ProfilePage() {
 
 function StatCard({ icon: Icon, label, value }: Readonly<{ icon: typeof ReceiptText; label: string; value: string }>) {
   return (
-    <div className="rounded-lg border border-white/10 bg-[#141414] p-4">
-      <Icon className="size-4 text-zinc-400" />
+    <div className="rounded-lg border border-border-default bg-bg-secondary p-4">
+      <Icon className="size-4 text-text-secondary" />
       <p className="mt-3 text-2xl font-semibold">{value}</p>
-      <p className="mt-1 text-sm text-zinc-500">{label}</p>
+      <p className="mt-1 text-sm text-text-tertiary">{label}</p>
     </div>
   );
 }

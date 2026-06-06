@@ -23,10 +23,10 @@ export default function ContentDetailPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-        <Link href="/contents" className="mb-8 inline-flex items-center gap-2 text-sm text-[#A0A0A0] hover:text-white">
+        <Link href="/contents" className="mb-8 inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
           <ArrowLeft className="size-4" />
           Back to Contents
         </Link>
@@ -38,28 +38,28 @@ export default function ContentDetailPage() {
             {content.videoUrl ? (
               <YouTubePlayer url={content.videoUrl} />
             ) : content.imageUrl ? (
-              <img src={assetUrl(content.imageUrl)} alt="" className="aspect-video w-full rounded-xl border border-[#2A2A2A] object-cover" />
+              <img src={assetUrl(content.imageUrl)} alt="" className="aspect-video w-full rounded-xl border border-border-default object-cover" />
             ) : null}
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-[#666666]">
+            <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-text-tertiary">
               <StatusBadge label={content.category ?? "News"} variant={getCategoryVariant(content.category)} />
               <span>{relativeTime(content.publishedAt ?? content.createdAt)}</span>
               <span>{content.viewCount.toLocaleString()} views</span>
             </div>
 
             <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight">{content.title}</h1>
-            {content.subtitle ? <p className="mt-4 text-lg leading-8 text-[#A0A0A0]">{content.subtitle}</p> : null}
-            {content.summary ? <p className="mt-4 rounded-xl border border-[#2A2A2A] bg-[#141414] p-4 text-sm leading-7 text-[#A0A0A0]">{content.summary}</p> : null}
+            {content.subtitle ? <p className="mt-4 text-lg leading-8 text-text-secondary">{content.subtitle}</p> : null}
+            {content.summary ? <p className="mt-4 rounded-xl border border-border-default bg-bg-secondary p-4 text-sm leading-7 text-text-secondary">{content.summary}</p> : null}
 
-            <div className="my-8 border-t border-[#2A2A2A]" />
+            <div className="my-8 border-t border-border-default" />
             {content.body ? <RichTextDisplay html={content.body} /> : null}
 
             {content.media.length > 0 ? (
               <>
-                <div className="my-8 border-t border-[#2A2A2A]" />
+                <div className="my-8 border-t border-border-default" />
                 <div className="grid gap-4 sm:grid-cols-2">
                   {content.media.map((media) => (
-                    <button type="button" key={media.id} onClick={() => setLightbox(media.mediaUrl)} className="overflow-hidden rounded-xl border border-[#2A2A2A] bg-[#141414]">
+                    <button type="button" key={media.id} onClick={() => setLightbox(media.mediaUrl)} className="overflow-hidden rounded-xl border border-border-default bg-bg-secondary">
                       <img src={assetUrl(media.mediaUrl)} alt="" className="aspect-[4/3] w-full object-cover transition hover:scale-[1.02]" />
                     </button>
                   ))}
@@ -69,7 +69,7 @@ export default function ContentDetailPage() {
 
             {content.relatedContents.length > 0 ? (
               <>
-                <div className="my-8 border-t border-[#2A2A2A]" />
+                <div className="my-8 border-t border-border-default" />
                 <section>
                   <h2 className="mb-4 text-xl font-semibold">Related Contents</h2>
                   <div className="grid gap-4 md:grid-cols-3">
@@ -85,8 +85,8 @@ export default function ContentDetailPage() {
       </article>
 
       {lightbox ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/90 p-4">
-          <button type="button" className="absolute right-5 top-5 text-white" onClick={() => setLightbox(null)} aria-label="Close image">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-overlay p-4">
+          <button type="button" className="absolute right-5 top-5 text-text-primary" onClick={() => setLightbox(null)} aria-label="Close image">
             <X className="size-6" />
           </button>
           <img src={assetUrl(lightbox)} alt="" className="max-h-[88vh] max-w-full rounded-xl object-contain" />

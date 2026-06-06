@@ -56,12 +56,12 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
   }, [editor]);
 
   if (!editor) {
-    return <div className="min-h-[260px] shimmer rounded-md border border-[#2A2A2A]" />;
+    return <div className="min-h-[260px] shimmer rounded-md border border-border-default" />;
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-[#2A2A2A] bg-[#1E1E1E]">
-      <div className="flex flex-wrap gap-1 border-b border-[#2A2A2A] bg-black/30 p-2">
+    <div className="overflow-hidden rounded-md border border-border-default bg-bg-tertiary">
+      <div className="flex flex-wrap gap-1 border-b border-border-default bg-bg-tertiary p-2">
         <ToolbarButton active={editor.isActive("bold")} icon={Bold} label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} />
         <ToolbarButton active={editor.isActive("italic")} icon={Italic} label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} />
         <ToolbarButton active={editor.isActive("strike")} icon={Strikethrough} label="Strike" onClick={() => editor.chain().focus().toggleStrike().run()} />
@@ -77,7 +77,7 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
         <ToolbarButton icon={Redo2} label="Redo" onClick={() => editor.chain().focus().redo().run()} />
       </div>
       {showImagePicker ? (
-        <div className="border-b border-[#2A2A2A] p-3">
+        <div className="border-b border-border-default p-3">
           <MediaPicker
             folder="content"
             onChange={(url) => {
@@ -87,7 +87,7 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
           />
         </div>
       ) : null}
-      <EditorContent className="rich-text-editor text-sm leading-7 text-white" editor={editor} />
+      <EditorContent className="rich-text-editor text-sm leading-7 text-text-primary" editor={editor} />
     </div>
   );
 }
@@ -104,7 +104,7 @@ function ToolbarButton({
       aria-label={label}
       title={label}
       className={`inline-flex size-8 items-center justify-center rounded-md transition ${
-        active ? "bg-white text-black" : "text-[#A0A0A0] hover:bg-white/10 hover:text-white"
+        active ? "bg-accent-primary text-accent-primary-text" : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
       }`}
       onClick={onClick}
     >

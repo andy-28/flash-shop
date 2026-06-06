@@ -57,11 +57,11 @@ export default function AdminCouponsPage() {
     <>
       <PageHeader title="Coupons" description="Create and manage promotional discounts." breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Coupons" }]} action={{ label: "New Coupon", icon: Plus, onClick: () => { setEditing(null); setForm(emptyForm); } }} />
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
-        <DataTable columns={columns} data={coupons} emptyMessage="No coupons found" isLoading={isLoading} actions={(row) => (<><button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A]" type="button" onClick={() => edit(row)}><Pencil className="size-4" /></button><button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#EF4444]" type="button" onClick={() => setDeleteTarget(row)}><Trash2 className="size-4" /></button></>)} />
-        <aside className="h-fit rounded-md border border-[#2A2A2A] bg-[#141414] p-5 xl:sticky xl:top-8">
+        <DataTable columns={columns} data={coupons} emptyMessage="No coupons found" isLoading={isLoading} actions={(row) => (<><button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default" type="button" onClick={() => edit(row)}><Pencil className="size-4" /></button><button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-status-danger" type="button" onClick={() => setDeleteTarget(row)}><Trash2 className="size-4" /></button></>)} />
+        <aside className="h-fit rounded-md border border-border-default bg-bg-secondary p-5 xl:sticky xl:top-8">
           <FormSection title={editing ? "Edit Coupon" : "Create Coupon"}>
-            <FormField label="Code" required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none disabled:opacity-60" disabled={!!editing} value={form.code} onChange={(event) => setForm({ ...form, code: event.target.value })} /></FormField>
-            <FormField label="Type" required><select className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none disabled:opacity-60" disabled={!!editing} value={form.discountType} onChange={(event) => setForm({ ...form, discountType: event.target.value as CouponPayload["discountType"] })}><option value="Fixed">Fixed</option><option value="Percentage">Percentage</option></select></FormField>
+            <FormField label="Code" required><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none disabled:opacity-60" disabled={!!editing} value={form.code} onChange={(event) => setForm({ ...form, code: event.target.value })} /></FormField>
+            <FormField label="Type" required><select className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none disabled:opacity-60" disabled={!!editing} value={form.discountType} onChange={(event) => setForm({ ...form, discountType: event.target.value as CouponPayload["discountType"] })}><option value="Fixed">Fixed</option><option value="Percentage">Percentage</option></select></FormField>
             <div className="grid gap-3 sm:grid-cols-2"><NumberField label="Discount" value={form.discountValue} onChange={(value) => setForm({ ...form, discountValue: value })} /><NumberField label="Min Order" value={form.minOrderAmount} onChange={(value) => setForm({ ...form, minOrderAmount: value })} /></div>
             <NumberField label="Usage Limit" value={form.usageLimit} onChange={(value) => setForm({ ...form, usageLimit: value })} />
             <div className="grid gap-3 sm:grid-cols-2"><DateField label="Valid From" value={form.validFrom} onChange={(value) => setForm({ ...form, validFrom: value })} /><DateField label="Valid Until" value={form.validUntil} onChange={(value) => setForm({ ...form, validUntil: value })} /></div>
@@ -79,9 +79,9 @@ function toLocalInput(value: string) {
 }
 
 function NumberField({ label, onChange, value }: Readonly<{ label: string; value: number; onChange: (value: number) => void }>) {
-  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" min="0" type="number" value={value} onChange={(event) => onChange(Number(event.target.value))} /></FormField>;
+  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" min="0" type="number" value={value} onChange={(event) => onChange(Number(event.target.value))} /></FormField>;
 }
 
 function DateField({ label, onChange, value }: Readonly<{ label: string; value: string; onChange: (value: string) => void }>) {
-  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" type="datetime-local" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
+  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" type="datetime-local" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
 }

@@ -11,7 +11,7 @@ export function OrderTimeline({ order }: Readonly<{ order: Order }>) {
   const steps = buildTimeline(order);
 
   return (
-    <div className="rounded-md border border-[#2A2A2A] bg-[#141414] p-5">
+    <div className="rounded-md border border-border-default bg-bg-secondary p-5">
       <h2 className="text-lg font-semibold">Order timeline</h2>
       <ol className="mt-5 space-y-0">
         {steps.map((step, index) => (
@@ -20,12 +20,12 @@ export function OrderTimeline({ order }: Readonly<{ order: Order }>) {
               <span className={`grid size-7 place-items-center rounded-full border ${stepClass(step.state)}`}>
                 {step.state === "failed" ? <X className="size-4" /> : step.state === "done" ? <Check className="size-4" /> : step.state === "current" ? <PackageCheck className="size-4" /> : <Circle className="size-3" />}
               </span>
-              {index < steps.length - 1 ? <span className={`h-14 w-px ${step.state === "done" ? "bg-white/50" : "bg-[#2A2A2A]"}`} /> : null}
+              {index < steps.length - 1 ? <span className={`h-14 w-px ${step.state === "done" ? "bg-border-hover" : "bg-border-default"}`} /> : null}
             </div>
             <div className="pb-6">
-              <p className="font-medium text-white">{step.label}</p>
-              {step.time ? <p className="mt-1 text-xs text-[#A0A0A0]">{formatDate(step.time)}</p> : null}
-              {step.description ? <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#A0A0A0]">{step.description}</p> : null}
+              <p className="font-medium text-text-primary">{step.label}</p>
+              {step.time ? <p className="mt-1 text-xs text-text-secondary">{formatDate(step.time)}</p> : null}
+              {step.description ? <p className="mt-2 whitespace-pre-line text-sm leading-6 text-text-secondary">{step.description}</p> : null}
             </div>
           </li>
         ))}
@@ -73,8 +73,8 @@ function buildTimeline(order: Order) {
 }
 
 function stepClass(state: "done" | "current" | "todo" | "failed") {
-  if (state === "done") return "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]";
-  if (state === "current") return "animate-pulse border-white bg-white/15 text-white";
-  if (state === "failed") return "border-[#EF4444] bg-[#EF4444]/15 text-[#EF4444]";
-  return "border-[#666666] bg-[#1E1E1E] text-[#666666]";
+  if (state === "done") return "border-status-success bg-status-success/15 text-status-success";
+  if (state === "current") return "animate-pulse border-accent-primary bg-bg-tertiary text-text-primary";
+  if (state === "failed") return "border-status-danger bg-status-danger/15 text-status-danger";
+  return "border-text-tertiary bg-bg-tertiary text-text-tertiary";
 }

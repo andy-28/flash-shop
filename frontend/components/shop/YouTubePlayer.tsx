@@ -11,7 +11,7 @@ export function YouTubePlayer({ url }: Readonly<YouTubePlayerProps>) {
   }
 
   return (
-    <div className="aspect-video overflow-hidden rounded-xl border border-[#2A2A2A] bg-[#141414]">
+    <div className="aspect-video overflow-hidden rounded-xl border border-border-default bg-bg-secondary">
       <iframe
         src={`https://www.youtube-nocookie.com/embed/${videoId}`}
         title="YouTube video player"

@@ -26,24 +26,24 @@ export function ConfirmDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid animate-fadeIn place-items-center bg-black/70 px-4">
-      <section className="w-full max-w-md animate-scaleIn rounded-xl border border-[#2A2A2A] bg-[#141414] p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 grid animate-fade-in place-items-end bg-overlay px-0 sm:place-items-center sm:px-4">
+      <section className="max-h-[85vh] w-full animate-slide-in-up overflow-y-auto rounded-t-2xl border border-border-default bg-bg-secondary p-5 shadow-2xl sm:max-w-md sm:animate-scale-in sm:rounded-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-white">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-[#A0A0A0]">{description}</p>
+            <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+            <p className="mt-2 text-sm leading-6 text-text-secondary">{description}</p>
           </div>
-          <button className="inline-flex size-8 items-center justify-center rounded-md text-[#A0A0A0] hover:bg-[#1E1E1E]" type="button" onClick={onClose}>
+          <button className="inline-flex size-11 items-center justify-center rounded-md text-text-secondary hover:bg-bg-tertiary sm:size-8" type="button" onClick={onClose}>
             <X className="size-4" />
           </button>
         </div>
         <div className="mt-6 flex justify-end gap-2">
-          <button className="h-9 rounded-md px-3 text-sm text-[#A0A0A0] hover:bg-[#1E1E1E]" type="button" onClick={onClose}>
+          <button className="h-11 rounded-md px-3 text-sm text-text-secondary hover:bg-bg-tertiary sm:h-9" type="button" onClick={onClose}>
             Cancel
           </button>
           <button
             className={`inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium disabled:opacity-50 ${
-              confirmVariant === "danger" ? "bg-[#EF4444] text-white" : "bg-white text-black"
+              confirmVariant === "danger" ? "bg-status-danger text-white" : "bg-accent-primary text-accent-primary-text"
             }`}
             disabled={isLoading}
             type="button"

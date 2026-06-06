@@ -101,8 +101,8 @@ export default function AdminContentPage() {
     onSuccess: async () => { toast.success("Content reordered"); await invalidate(); },
   });
   const columns: Column<ContentBlock>[] = [
-    { key: "title", header: "Content", sortable: true, width: "1.4fr", render: (row) => <div><p className="font-medium">{row.title}</p><p className="mt-1 text-xs text-[#666666]">{row.subtitle}</p></div> },
-    { key: "placement", header: "Placement", sortable: true, width: "0.8fr", render: (row) => <span className="text-[#A0A0A0]">{row.placement}</span> },
+    { key: "title", header: "Content", sortable: true, width: "1.4fr", render: (row) => <div><p className="font-medium">{row.title}</p><p className="mt-1 text-xs text-text-tertiary">{row.subtitle}</p></div> },
+    { key: "placement", header: "Placement", sortable: true, width: "0.8fr", render: (row) => <span className="text-text-secondary">{row.placement}</span> },
     { key: "position", header: "Position", sortable: true, width: "90px" },
     { key: "linkType", header: "Link", width: "120px" },
     { key: "status", header: "Status", width: "120px", render: (row) => <StatusBadge label={row.status} variant={row.status === "Published" ? "success" : row.status === "Draft" ? "info" : "neutral"} /> },
@@ -165,7 +165,7 @@ export default function AdminContentPage() {
             </>
           )} />
         </section>
-        <aside className="h-fit rounded-md border border-[#2A2A2A] bg-[#141414] p-5 xl:sticky xl:top-8">
+        <aside className="h-fit rounded-md border border-border-default bg-bg-secondary p-5 xl:sticky xl:top-8">
           <FormSection title={editing ? "Edit Content" : "Create Content"}>
             <TextField label="Title" value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
             <TextField label="Subtitle" value={form.subtitle ?? ""} onChange={(value) => setForm({ ...form, subtitle: value })} />
@@ -185,18 +185,18 @@ export default function AdminContentPage() {
             <MutationButton label="Save & publish" loadingLabel="Publishing..." onClick={saveAndPublish} disabled={saveMutation.isPending || publishMutation.isPending || (!!editing && !form.changeNote?.trim())} />
           </div>
           {editing ? (
-            <div className="mt-6 border-t border-[#2A2A2A] pt-5">
-              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-white"><History className="size-4" />Versions</div>
+            <div className="mt-6 border-t border-border-default pt-5">
+              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-text-primary"><History className="size-4" />Versions</div>
               <div className="grid gap-2">
                 {versions.map((version) => (
-                  <div key={version.id} className="rounded-md border border-[#2A2A2A] bg-black/30 p-3">
+                  <div key={version.id} className="rounded-md border border-border-default bg-bg-tertiary p-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm text-white">v{version.versionNumber} · {version.title}</p>
-                        <p className="mt-1 text-xs text-[#666666]">{version.modifiedByName} · {new Date(version.createdAt).toLocaleString()}</p>
-                        <p className="mt-1 text-xs text-[#A0A0A0]">{version.changeNote}</p>
+                        <p className="text-sm text-text-primary">v{version.versionNumber} · {version.title}</p>
+                        <p className="mt-1 text-xs text-text-tertiary">{version.modifiedByName} · {new Date(version.createdAt).toLocaleString()}</p>
+                        <p className="mt-1 text-xs text-text-secondary">{version.changeNote}</p>
                       </div>
-                      <button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-[#A0A0A0]" type="button" onClick={() => setRestoreTarget(version)}>
+                      <button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default text-text-secondary" type="button" onClick={() => setRestoreTarget(version)}>
                         <RotateCcw className="size-4" />
                       </button>
                     </div>
@@ -222,17 +222,17 @@ function toIsoOrNull(value: string) {
 }
 
 function IconButton({ danger = false, icon: Icon, onClick }: Readonly<{ danger?: boolean; icon: typeof Pencil; onClick: () => void }>) {
-  return <button className={`inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] ${danger ? "text-[#EF4444]" : ""}`} type="button" onClick={onClick}><Icon className="size-4" /></button>;
+  return <button className={`inline-flex size-8 items-center justify-center rounded-md border border-border-default ${danger ? "text-status-danger" : ""}`} type="button" onClick={onClick}><Icon className="size-4" /></button>;
 }
 
 function TextField({ label, onChange, value }: Readonly<{ label: string; value: string; onChange: (value: string) => void }>) {
-  return <FormField label={label}><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
+  return <FormField label={label}><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
 }
 
 function SelectField({ disabled = false, label, onChange, options, value }: Readonly<{ disabled?: boolean; label: string; value: string; options: string[]; onChange: (value: string) => void }>) {
-  return <FormField label={label}><select className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none disabled:opacity-60" disabled={disabled} value={value} onChange={(event) => onChange(event.target.value)}>{options.map((item) => <option key={item}>{item}</option>)}</select></FormField>;
+  return <FormField label={label}><select className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none disabled:opacity-60" disabled={disabled} value={value} onChange={(event) => onChange(event.target.value)}>{options.map((item) => <option key={item}>{item}</option>)}</select></FormField>;
 }
 
 function DateField({ label, onChange, value }: Readonly<{ label: string; value: string; onChange: (value: string) => void }>) {
-  return <FormField label={label}><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" type="datetime-local" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
+  return <FormField label={label}><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" type="datetime-local" value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
 }

@@ -56,8 +56,8 @@ export default function AdminOrdersPage() {
   });
   const totalRevenue = useMemo(() => orders.filter((order) => ["Paid", "Shipping", "Delivered"].includes(order.status)).reduce((sum, order) => sum + order.finalAmount, 0), [orders]);
   const columns: Column<Order>[] = [
-    { key: "orderNo", header: "Order", sortable: true, width: "1fr", render: (row) => <div><p className="font-medium">{row.orderNo}</p><p className="mt-1 text-xs text-[#666666]">{new Date(row.createdAt).toLocaleString()}</p></div> },
-    { key: "userName", header: "User", width: "1fr", render: (row) => <div><p>{row.userName ?? "Customer"}</p><p className="text-xs text-[#666666]">{row.userEmail}</p></div> },
+    { key: "orderNo", header: "Order", sortable: true, width: "1fr", render: (row) => <div><p className="font-medium">{row.orderNo}</p><p className="mt-1 text-xs text-text-tertiary">{new Date(row.createdAt).toLocaleString()}</p></div> },
+    { key: "userName", header: "User", width: "1fr", render: (row) => <div><p>{row.userName ?? "Customer"}</p><p className="text-xs text-text-tertiary">{row.userEmail}</p></div> },
     { key: "status", header: "Status", sortable: true, width: "0.7fr", render: (row) => <StatusBadge {...getStatusBadge(row.status)} /> },
     { key: "itemCount", header: "Items", width: "0.5fr" },
     { key: "finalAmount", header: "Total", sortable: true, width: "0.8fr", render: (row) => formatCurrency(row.finalAmount) },
@@ -76,7 +76,7 @@ export default function AdminOrdersPage() {
         }]}
       />
       {isError ? (
-        <div className="rounded-md border border-[#2A2A2A] bg-[#141414] p-4 text-sm text-[#EF4444]">
+        <div className="rounded-md border border-border-default bg-bg-secondary p-4 text-sm text-status-danger">
           Failed to load orders. <button className="underline" type="button" onClick={() => void refetch()}>Retry</button>
         </div>
       ) : (
@@ -126,19 +126,19 @@ function OrderActions({
   onTracking: () => void;
 }>) {
   if (order.status === "Paid") {
-    return <button className="h-8 rounded-md bg-white px-3 text-xs font-medium text-black hover:bg-zinc-200" type="button" onClick={onShip}>Ship</button>;
+    return <button className="h-8 rounded-md bg-accent-primary px-3 text-xs font-medium text-accent-primary-text hover:opacity-90" type="button" onClick={onShip}>Ship</button>;
   }
 
   if (order.status === "Shipping") {
     return (
       <div className="flex flex-wrap justify-end gap-2">
-        <button className="h-8 rounded-md border border-[#2A2A2A] px-3 text-xs text-white hover:bg-[#1E1E1E]" type="button" onClick={onTracking}>Tracking</button>
+        <button className="h-8 rounded-md border border-border-default px-3 text-xs text-text-primary hover:bg-bg-tertiary" type="button" onClick={onTracking}>Tracking</button>
         <LoadingButton isLoading={isDelivering} size="sm" onClick={onDeliver}>Deliver</LoadingButton>
       </div>
     );
   }
 
-  return <span className="text-xs text-[#666666]">No action</span>;
+  return <span className="text-xs text-text-tertiary">No action</span>;
 }
 
 function ShipDialog({ isLoading, onClose, onSubmit, order }: Readonly<{ order: Order | null; isLoading: boolean; onClose: () => void; onSubmit: (carrier: string, trackingNo?: string) => void }>) {
@@ -147,13 +147,13 @@ function ShipDialog({ isLoading, onClose, onSubmit, order }: Readonly<{ order: O
   if (!order) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-4">
-      <section className="w-full max-w-md rounded-xl border border-[#2A2A2A] bg-[#141414] p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-overlay px-4">
+      <section className="w-full max-w-md rounded-xl border border-border-default bg-bg-secondary p-5 shadow-2xl">
         <h2 className="text-lg font-semibold">Ship order {order.orderNo}</h2>
-        <label className="mt-5 grid gap-2 text-sm text-[#A0A0A0]">Carrier<input className="h-10 rounded-md border border-[#2A2A2A] bg-black px-3 text-white outline-none" value={carrier} onChange={(event) => setCarrier(event.target.value)} /></label>
-        <label className="mt-4 grid gap-2 text-sm text-[#A0A0A0]">Tracking no<input className="h-10 rounded-md border border-[#2A2A2A] bg-black px-3 text-white outline-none" value={trackingNo} onChange={(event) => setTrackingNo(event.target.value)} /></label>
+        <label className="mt-5 grid gap-2 text-sm text-text-secondary">Carrier<input className="h-10 rounded-md border border-border-default bg-bg-primary px-3 text-text-primary outline-none" value={carrier} onChange={(event) => setCarrier(event.target.value)} /></label>
+        <label className="mt-4 grid gap-2 text-sm text-text-secondary">Tracking no<input className="h-10 rounded-md border border-border-default bg-bg-primary px-3 text-text-primary outline-none" value={trackingNo} onChange={(event) => setTrackingNo(event.target.value)} /></label>
         <div className="mt-6 flex justify-end gap-2">
-          <button className="h-10 rounded-md px-4 text-sm text-[#A0A0A0] hover:bg-[#1E1E1E]" type="button" onClick={onClose}>Cancel</button>
+          <button className="h-10 rounded-md px-4 text-sm text-text-secondary hover:bg-bg-tertiary" type="button" onClick={onClose}>Cancel</button>
           <LoadingButton disabled={!carrier.trim()} isLoading={isLoading} onClick={() => onSubmit(carrier, trackingNo || undefined)}>Confirm shipment</LoadingButton>
         </div>
       </section>
@@ -170,12 +170,12 @@ function TrackingDialog({ isLoading, onClose, onSubmit, order }: Readonly<{ orde
   if (!order) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-4">
-      <section className="w-full max-w-md rounded-xl border border-[#2A2A2A] bg-[#141414] p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-overlay px-4">
+      <section className="w-full max-w-md rounded-xl border border-border-default bg-bg-secondary p-5 shadow-2xl">
         <h2 className="text-lg font-semibold">Update tracking</h2>
-        <label className="mt-5 grid gap-2 text-sm text-[#A0A0A0]">Tracking no<input className="h-10 rounded-md border border-[#2A2A2A] bg-black px-3 text-white outline-none" value={trackingNo} onChange={(event) => setTrackingNo(event.target.value)} /></label>
+        <label className="mt-5 grid gap-2 text-sm text-text-secondary">Tracking no<input className="h-10 rounded-md border border-border-default bg-bg-primary px-3 text-text-primary outline-none" value={trackingNo} onChange={(event) => setTrackingNo(event.target.value)} /></label>
         <div className="mt-6 flex justify-end gap-2">
-          <button className="h-10 rounded-md px-4 text-sm text-[#A0A0A0] hover:bg-[#1E1E1E]" type="button" onClick={onClose}>Cancel</button>
+          <button className="h-10 rounded-md px-4 text-sm text-text-secondary hover:bg-bg-tertiary" type="button" onClick={onClose}>Cancel</button>
           <LoadingButton isLoading={isLoading} onClick={() => onSubmit(trackingNo)}>Update</LoadingButton>
         </div>
       </section>

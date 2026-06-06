@@ -19,8 +19,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-Hant" className="dark">
-      <body className={`${geistMono.variable} min-h-screen bg-background text-foreground antialiased`}>
+    <html lang="zh-Hant" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme') || 'dark';
+                  var resolved = theme === 'system'
+                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : theme;
+                  if (resolved === 'dark') document.documentElement.classList.add('dark');
+                } catch (error) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className={`${geistMono.variable} min-h-screen bg-bg-primary text-text-primary antialiased transition-colors duration-300`}>
         <Providers>{children}</Providers>
       </body>
     </html>

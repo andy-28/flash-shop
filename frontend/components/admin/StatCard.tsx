@@ -10,17 +10,17 @@ export function StatCard({
   value,
 }: Readonly<{ icon?: LucideIcon; label: string; tone?: "default" | "danger" | "success" | "warning"; value: string }>) {
   const toneClass = {
-    default: "text-white",
-    danger: "text-[#EF4444]",
-    success: "text-[#22C55E]",
-    warning: "text-[#F59E0B]",
+    default: "text-text-primary",
+    danger: "text-status-danger",
+    success: "text-status-success",
+    warning: "text-status-warning",
   }[tone];
   const animatedValue = useAnimatedValue(value);
 
   return (
-    <section className="rounded-md border border-white/10 bg-[#141414] p-4">
+    <section className="rounded-md border border-border-default bg-bg-secondary p-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-400">{label}</p>
+        <p className="text-sm text-text-secondary">{label}</p>
         {Icon ? <Icon className={`size-5 ${toneClass}`} /> : null}
       </div>
       <p className={`mt-3 text-2xl font-semibold ${toneClass}`}>{animatedValue}</p>

@@ -20,11 +20,11 @@ export default function AuditLogsPage() {
     queryFn: () => getAuditLogs(entityType, page, pageSize),
   });
   const columns: Column<AuditLog>[] = [
-    { key: "createdAt", header: "Time", sortable: true, width: "170px", render: (row) => <span className="text-[#A0A0A0]">{new Date(row.createdAt).toLocaleString()}</span> },
+    { key: "createdAt", header: "Time", sortable: true, width: "170px", render: (row) => <span className="text-text-secondary">{new Date(row.createdAt).toLocaleString()}</span> },
     { key: "userName", header: "User", width: "140px" },
     { key: "action", header: "Action", sortable: true, width: "160px", render: (row) => <span className="font-medium">{row.action}</span> },
     { key: "entityType", header: "Entity", width: "130px", render: (row) => <StatusBadge label={row.entityType} variant="neutral" /> },
-    { key: "detail", header: "Detail", width: "1fr", render: (row) => <details><summary className="cursor-pointer text-[#A0A0A0]">View detail</summary><pre className="mt-2 max-h-40 overflow-auto rounded-md bg-black/40 p-3 text-xs text-[#A0A0A0]">{formatDetail(row.detail)}</pre></details> },
+    { key: "detail", header: "Detail", width: "1fr", render: (row) => <details><summary className="cursor-pointer text-text-secondary">View detail</summary><pre className="mt-2 max-h-40 overflow-auto rounded-md bg-black/40 p-3 text-xs text-text-secondary">{formatDetail(row.detail)}</pre></details> },
   ];
 
   return (

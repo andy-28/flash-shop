@@ -18,7 +18,7 @@ export function LikeButton({ count, isLiked, onToggle, size = "md" }: Readonly<L
     <button
       type="button"
       disabled={isLocked}
-      className={`inline-flex items-center gap-1.5 rounded-full transition active:scale-90 disabled:cursor-not-allowed disabled:opacity-70 ${isLiked ? "text-[#EF4444]" : "text-zinc-400 hover:text-white"}`}
+      className={`inline-flex items-center gap-1.5 rounded-full transition active:scale-90 disabled:cursor-not-allowed disabled:opacity-70 ${isLiked ? "text-status-danger" : "text-text-secondary hover:text-text-primary"}`}
       onClick={(event) => {
         event.preventDefault();
         if (isLocked) return;
@@ -32,7 +32,7 @@ export function LikeButton({ count, isLiked, onToggle, size = "md" }: Readonly<L
       }}
     >
       <Heart className={`${iconSize} transition-colors duration-200 ${isLiked ? "fill-current" : ""} ${isAnimating ? "animate-heartbeat" : ""}`} />
-      <span className={`text-sm ${isAnimating ? "animate-fadeInUp" : ""}`}>{count}</span>
+      <span className={`text-sm ${isAnimating ? "animate-fade-in-up" : ""}`}>{count}</span>
     </button>
   );
 }

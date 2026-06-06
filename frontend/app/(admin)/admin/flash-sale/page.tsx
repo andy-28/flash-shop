@@ -28,10 +28,10 @@ export default function AdminFlashSalePage() {
   const activateMutation = useMutation({ mutationFn: activateFlashSale, onSuccess: async () => { toast.success("Flash sale activated"); await refresh(); } });
   const endMutation = useMutation({ mutationFn: endFlashSale, onSuccess: async () => { toast.success("Flash sale ended"); await refresh(); } });
   const columns: Column<FlashSale>[] = [
-    { key: "title", header: "Sale", sortable: true, width: "1.3fr", render: (row) => <div><p className="font-medium">{row.title}</p><p className="mt-1 text-xs text-[#666666]">{row.productName} / {row.specName}</p></div> },
+    { key: "title", header: "Sale", sortable: true, width: "1.3fr", render: (row) => <div><p className="font-medium">{row.title}</p><p className="mt-1 text-xs text-text-tertiary">{row.productName} / {row.specName}</p></div> },
     { key: "flashPrice", header: "Price", sortable: true, width: "110px", render: (row) => formatCurrency(row.flashPrice) },
     { key: "soldCount", header: "Stock", width: "110px", render: (row) => `${row.soldCount}/${row.totalStock}` },
-    { key: "startAt", header: "Window", width: "180px", render: (row) => <span className="text-xs text-[#A0A0A0]">{new Date(row.startAt).toLocaleString()}<br />{new Date(row.endAt).toLocaleString()}</span> },
+    { key: "startAt", header: "Window", width: "180px", render: (row) => <span className="text-xs text-text-secondary">{new Date(row.startAt).toLocaleString()}<br />{new Date(row.endAt).toLocaleString()}</span> },
     { key: "status", header: "Status", sortable: true, width: "110px", render: (row) => <StatusBadge {...getStatusBadge(row.status)} /> },
   ];
 
@@ -49,11 +49,11 @@ export default function AdminFlashSalePage() {
           data={sales}
           emptyMessage="No flash sales found"
           isLoading={isLoading}
-          actions={(sale) => (<><button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] disabled:opacity-40" disabled={sale.status === "Active" || activateMutation.isPending} type="button" onClick={() => activateMutation.mutate(sale.id)}><Play className="size-4" /></button><button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] disabled:opacity-40" disabled={sale.status !== "Active" || endMutation.isPending} type="button" onClick={() => endMutation.mutate(sale.id)}><Square className="size-4" /></button></>)}
+          actions={(sale) => (<><button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default disabled:opacity-40" disabled={sale.status === "Active" || activateMutation.isPending} type="button" onClick={() => activateMutation.mutate(sale.id)}><Play className="size-4" /></button><button className="inline-flex size-8 items-center justify-center rounded-md border border-border-default disabled:opacity-40" disabled={sale.status !== "Active" || endMutation.isPending} type="button" onClick={() => endMutation.mutate(sale.id)}><Square className="size-4" /></button></>)}
         />
-        <aside className="h-fit rounded-md border border-[#2A2A2A] bg-[#141414] p-5 xl:sticky xl:top-8">
+        <aside className="h-fit rounded-md border border-border-default bg-bg-secondary p-5 xl:sticky xl:top-8">
           <FormSection title="Create Flash Sale" description="Choose a variant and load campaign stock into Redis on activation.">
-            <FormField label="Variant" required><select className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" value={form.variantId} onChange={(event) => setForm((value) => ({ ...value, variantId: event.target.value }))}><option value="">Select variant</option>{variants.map(({ product, variant }) => <option key={variant.id} value={variant.id}>{product.name} / {variant.specName} / {formatCurrency(variant.price)}</option>)}</select></FormField>
+            <FormField label="Variant" required><select className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" value={form.variantId} onChange={(event) => setForm((value) => ({ ...value, variantId: event.target.value }))}><option value="">Select variant</option>{variants.map(({ product, variant }) => <option key={variant.id} value={variant.id}>{product.name} / {variant.specName} / {formatCurrency(variant.price)}</option>)}</select></FormField>
             <TextField label="Title" value={form.title} onChange={(value) => setForm((current) => ({ ...current, title: value }))} />
             <div className="grid gap-3 sm:grid-cols-2"><TextField label="Flash Price" type="number" value={form.flashPrice} onChange={(value) => setForm((current) => ({ ...current, flashPrice: value }))} /><TextField label="Stock" type="number" value={form.totalStock} onChange={(value) => setForm((current) => ({ ...current, totalStock: value }))} /></div>
             <TextField label="Per User Limit" type="number" value={form.perUserLimit} onChange={(value) => setForm((current) => ({ ...current, perUserLimit: value }))} />
@@ -71,5 +71,5 @@ function toLocalInput(value: Date) {
 }
 
 function TextField({ label, onChange, type = "text", value }: Readonly<{ label: string; value: string; type?: string; onChange: (value: string) => void }>) {
-  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-[#2A2A2A] bg-black px-3 text-sm outline-none" type={type} value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
+  return <FormField label={label} required><input className="h-10 w-full rounded-md border border-border-default bg-bg-primary px-3 text-sm outline-none" type={type} value={value} onChange={(event) => onChange(event.target.value)} /></FormField>;
 }

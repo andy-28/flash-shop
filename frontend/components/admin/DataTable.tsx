@@ -23,6 +23,7 @@ interface DataTableProps<T> {
   onPageChange?: (page: number) => void;
   onRowClick?: (row: T) => void;
   actions?: (row: T) => React.ReactNode;
+  mobileCardRender?: (row: T) => React.ReactNode;
 }
 
 export function DataTable<T extends object>({
@@ -35,6 +36,7 @@ export function DataTable<T extends object>({
   onRowClick,
   page = 1,
   pageSize = data.length || 10,
+  mobileCardRender,
   totalCount = data.length,
 }: Readonly<DataTableProps<T>>) {
   const [sort, setSort] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
@@ -65,10 +67,31 @@ export function DataTable<T extends object>({
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-[#2A2A2A] bg-[#141414]">
-      <div className="overflow-x-auto">
+    <div className="overflow-hidden rounded-md border border-border-default bg-bg-secondary">
+      {mobileCardRender ? (
+        <div className="grid gap-3 p-3 md:hidden">
+          {isLoading ? (
+            Array.from({ length: Math.min(pageSize, 5) }).map((_, index) => <div className="h-28 shimmer rounded-md" key={index} />)
+          ) : sortedData.length === 0 ? (
+            <EmptyState title={emptyMessage} />
+          ) : (
+            sortedData.map((row, rowIndex) => (
+              <article
+                className={`rounded-md border border-border-default bg-bg-primary p-4 text-sm ${onRowClick ? "cursor-pointer" : ""}`}
+                key={String((row as Record<string, unknown>).id ?? rowIndex)}
+                onClick={() => onRowClick?.(row)}
+              >
+                {mobileCardRender(row)}
+                {actions ? <div className="mt-3 flex justify-end gap-2" onClick={(event) => event.stopPropagation()}>{actions(row)}</div> : null}
+              </article>
+            ))
+          )}
+        </div>
+      ) : null}
+
+      <div className={`${mobileCardRender ? "hidden md:block" : ""} overflow-x-auto`}>
         <div className="min-w-[760px]">
-          <div className="grid border-b border-[#2A2A2A] px-4 py-3 text-xs font-medium uppercase text-[#A0A0A0]" style={{ gridTemplateColumns }}>
+          <div className="grid border-b border-border-default px-4 py-3 text-xs font-medium uppercase text-text-secondary" style={{ gridTemplateColumns }}>
             {columns.map((column) => {
               const active = sort?.key === column.key;
               const SortIcon = active ? (sort.direction === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
@@ -76,7 +99,7 @@ export function DataTable<T extends object>({
                 <button
                   key={column.key}
                   type="button"
-                  className={`flex items-center gap-1 text-left ${column.sortable ? "hover:text-white" : "cursor-default"}`}
+                  className={`flex items-center gap-1 text-left ${column.sortable ? "hover:text-text-primary" : "cursor-default"}`}
                   disabled={!column.sortable}
                   onClick={() => column.sortable && toggleSort(column.key)}
                 >
@@ -89,7 +112,7 @@ export function DataTable<T extends object>({
           </div>
 
           {isLoading ? (
-            <div className="divide-y divide-[#2A2A2A]">
+            <div className="divide-y divide-border-default">
               {Array.from({ length: Math.min(pageSize, 5) }).map((_, index) => (
                 <div className="grid gap-4 px-4 py-4" key={index} style={{ gridTemplateColumns }}>
                   {columns.map((column) => (
@@ -102,16 +125,16 @@ export function DataTable<T extends object>({
           ) : sortedData.length === 0 ? (
             <EmptyState title={emptyMessage} />
           ) : (
-            <div className="divide-y divide-[#2A2A2A]">
+            <div className="divide-y divide-border-default">
               {sortedData.map((row, rowIndex) => (
                 <div
-                  className={`grid items-center gap-4 px-4 py-4 text-sm text-white hover:bg-[#1E1E1E] ${onRowClick ? "cursor-pointer" : ""}`}
+                  className={`grid items-center gap-4 px-4 py-4 text-sm text-text-primary hover:bg-bg-tertiary ${onRowClick ? "cursor-pointer" : ""}`}
                   key={String((row as Record<string, unknown>).id ?? rowIndex)}
                   onClick={() => onRowClick?.(row)}
                   style={{ gridTemplateColumns }}
                 >
                   {columns.map((column) => (
-                    <div className="min-w-0 text-[#FFFFFF]" key={column.key}>
+                    <div className="min-w-0 text-text-primary" key={column.key}>
                       {column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? "")}
                     </div>
                   ))}
@@ -124,12 +147,12 @@ export function DataTable<T extends object>({
       </div>
 
       {onPageChange ? (
-        <div className="flex items-center justify-between border-t border-[#2A2A2A] px-4 py-3 text-sm text-[#A0A0A0]">
+        <div className="flex items-center justify-between border-t border-border-default px-4 py-3 text-sm text-text-secondary">
           <span>{start}-{end} of {totalCount}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-white disabled:opacity-40"
+              className="inline-flex size-9 items-center justify-center rounded-md border border-border-default text-text-primary disabled:opacity-40"
               disabled={page <= 1}
               onClick={() => onPageChange(page - 1)}
             >
@@ -138,7 +161,7 @@ export function DataTable<T extends object>({
             <span className="text-xs">Page {page} / {totalPages}</span>
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] text-white disabled:opacity-40"
+              className="inline-flex size-9 items-center justify-center rounded-md border border-border-default text-text-primary disabled:opacity-40"
               disabled={page >= totalPages}
               onClick={() => onPageChange(page + 1)}
             >

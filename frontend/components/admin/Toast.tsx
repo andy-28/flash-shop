@@ -20,10 +20,10 @@ interface ToastApi {
 const ToastContext = createContext<ToastApi | null>(null);
 
 const typeConfig = {
-  success: { icon: CheckCircle2, bar: "bg-[#22C55E]" },
-  error: { icon: XCircle, bar: "bg-[#EF4444]" },
-  info: { icon: Info, bar: "bg-[#3B82F6]" },
-  warning: { icon: AlertTriangle, bar: "bg-[#F59E0B]" },
+  success: { icon: CheckCircle2, bar: "bg-status-success" },
+  error: { icon: XCircle, bar: "bg-status-danger" },
+  info: { icon: Info, bar: "bg-status-info" },
+  warning: { icon: AlertTriangle, bar: "bg-status-warning" },
 };
 
 export function ToastProvider({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -49,12 +49,12 @@ export function ToastProvider({ children }: Readonly<{ children: React.ReactNode
           const config = typeConfig[item.type];
           const Icon = config.icon;
           return (
-            <div className="overflow-hidden rounded-lg border border-[#2A2A2A] bg-[#1E1E1E] shadow-xl" key={item.id}>
+            <div className="overflow-hidden rounded-lg border border-border-default bg-bg-tertiary shadow-xl" key={item.id}>
               <div className="flex items-center gap-3 p-3">
                 <span className={`h-10 w-1 rounded-full ${config.bar}`} />
-                <Icon className="size-4 text-white" />
-                <p className="min-w-0 flex-1 text-sm text-white">{item.message}</p>
-                <button className="text-[#A0A0A0] hover:text-white" type="button" onClick={() => remove(item.id)}>
+                <Icon className="size-4 text-text-primary" />
+                <p className="min-w-0 flex-1 text-sm text-text-primary">{item.message}</p>
+                <button className="text-text-secondary hover:text-text-primary" type="button" onClick={() => remove(item.id)}>
                   <X className="size-4" />
                 </button>
               </div>

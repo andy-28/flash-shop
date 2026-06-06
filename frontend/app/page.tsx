@@ -62,7 +62,7 @@ export default function HomePage() {
   const latestContents = latestContentsQuery.data?.items ?? [];
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       {bannersQuery.isLoading ? <HeroSkeleton /> : banners.length > 0 ? <HeroBanner items={banners} /> : <FallbackHero />}
 
@@ -146,15 +146,15 @@ function FallbackHero() {
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.14),transparent_34%),linear-gradient(135deg,#0A0A0A,#1E1E1E)]">
       <div className="mx-auto flex aspect-[16/9] min-h-[460px] max-w-7xl flex-col justify-end px-4 pb-10 pt-28 sm:aspect-[21/9] sm:min-h-[620px] sm:px-6 sm:pb-14 lg:px-8">
         <div className="max-w-3xl">
-          <p className="inline-flex items-center gap-2 text-sm font-medium uppercase text-zinc-400">
+          <p className="inline-flex items-center gap-2 text-sm font-medium uppercase text-text-secondary">
             <Sparkles className="size-4" />
             Content commerce system
           </p>
           <h1 className="mt-4 text-5xl font-semibold leading-none sm:text-7xl">Flash drops, stories, and shop moments.</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
+          <p className="mt-5 max-w-2xl text-base leading-7 text-text-secondary">
             Build editorial storefronts from CMS placements, products, campaigns, and limited releases.
           </p>
-          <Link href="/products" className="mt-8 inline-flex h-10 items-center gap-2 rounded-md bg-white px-4 text-sm font-medium text-black">
+          <Link href="/products" className="mt-8 inline-flex h-10 items-center gap-2 rounded-md bg-accent-primary px-4 text-sm font-medium text-accent-primary-text">
             Browse products
             <ArrowRight className="size-4" />
           </Link>
@@ -185,7 +185,7 @@ function ProductGridSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
-        <div className="rounded-md border border-white/10 bg-[#141414] p-3" key={index}>
+        <div className="rounded-md border border-border-default bg-bg-secondary p-3" key={index}>
           <div className="aspect-[4/3] shimmer rounded" />
           <div className="mt-4 h-3 w-20 shimmer rounded" />
           <div className="mt-3 h-5 w-4/5 shimmer rounded" />
@@ -197,5 +197,5 @@ function ProductGridSkeleton() {
 }
 
 function BlockSkeleton() {
-  return <div className="h-72 shimmer rounded-xl border border-white/10" />;
+  return <div className="h-72 shimmer rounded-xl border border-border-default" />;
 }

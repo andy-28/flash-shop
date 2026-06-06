@@ -30,7 +30,7 @@ export function HeroBanner({ items }: Readonly<{ items: ContentBlock[] }>) {
   const goPrevious = () => setActiveIndex((current) => (current - 1 + items.length) % items.length);
   const goNext = () => setActiveIndex((current) => (current + 1) % items.length);
   const content = (
-    <section className="group relative overflow-hidden bg-black text-white">
+    <section className="group relative overflow-hidden bg-bg-primary text-white">
       <div className="relative aspect-[16/9] min-h-[460px] sm:aspect-[21/9] sm:min-h-[620px]">
       <Image
         src={assetUrl(active.imageUrl)}

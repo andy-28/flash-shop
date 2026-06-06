@@ -21,13 +21,13 @@ export default function ContentsPage() {
   const rest = items.slice(1);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main className="min-h-screen bg-bg-primary text-text-primary">
       <ShopNavbar />
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.2em] text-[#666666]">Official channel</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-text-tertiary">Official channel</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight">Contents</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#A0A0A0]">官方最新內容、幕後花絮、影片與活動公告。</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary">官方最新內容、幕後花絮、影片與活動公告。</p>
         </div>
 
         <div className="mb-8 flex gap-2 overflow-x-auto pb-2">
@@ -38,7 +38,7 @@ export default function ContentsPage() {
                 type="button"
                 key={item}
                 className={`h-9 shrink-0 rounded-full border px-4 text-sm transition ${
-                  active ? "border-white bg-white text-black" : "border-[#2A2A2A] text-white hover:border-[#404040]"
+                  active ? "border-accent-primary bg-accent-primary text-accent-primary-text" : "border-border-default text-text-primary hover:border-border-hover"
                 }`}
                 onClick={() => setCategory(item)}
               >
@@ -51,7 +51,7 @@ export default function ContentsPage() {
         {isLoading ? (
           <ContentsSkeleton />
         ) : items.length === 0 ? (
-          <div className="grid min-h-80 place-items-center rounded-xl border border-dashed border-[#2A2A2A] bg-[#141414] text-[#A0A0A0]">
+          <div className="grid min-h-80 place-items-center rounded-xl border border-dashed border-border-default bg-bg-secondary text-text-secondary">
             目前沒有內容
           </div>
         ) : (

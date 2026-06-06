@@ -33,20 +33,20 @@ export function ProductImageManager({ currentImageUrl, disabled = false, onRemov
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-md border border-[#2A2A2A] bg-black">
+      <div className="overflow-hidden rounded-md border border-border-default bg-bg-primary">
         {currentImageUrl ? (
           <>
             <div className="relative">
               <img alt="" className="h-52 w-full object-cover" src={assetUrl(currentImageUrl)} />
-              <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white backdrop-blur">
+              <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-overlay px-2.5 py-1 text-xs text-text-primary backdrop-blur">
                 <Star className="size-3.5 fill-white" />
                 Primary image
               </span>
             </div>
             <div className="flex items-center justify-between gap-3 p-3">
-              <p className="min-w-0 truncate text-xs text-[#A0A0A0]">{currentImageUrl}</p>
+              <p className="min-w-0 truncate text-xs text-text-secondary">{currentImageUrl}</p>
               <button
-                className="inline-flex h-8 items-center gap-2 rounded-md border border-[#2A2A2A] px-3 text-xs text-[#EF4444] hover:bg-[#1E1E1E] disabled:opacity-50"
+                className="inline-flex h-8 items-center gap-2 rounded-md border border-border-default px-3 text-xs text-status-danger hover:bg-bg-tertiary disabled:opacity-50"
                 disabled={disabled || isUploading}
                 type="button"
                 onClick={onRemove}
@@ -57,13 +57,13 @@ export function ProductImageManager({ currentImageUrl, disabled = false, onRemov
             </div>
           </>
         ) : (
-          <div className="grid h-36 place-items-center text-sm text-[#666666]">No product image selected</div>
+          <div className="grid h-36 place-items-center text-sm text-text-tertiary">No product image selected</div>
         )}
       </div>
 
       <DragDropImageUploader disabled={disabled} isUploading={isUploading} onUpload={handleUpload} />
-      {error ? <p className="text-xs text-[#EF4444]">{error}</p> : null}
-      <p className="text-xs text-[#666666]">FlashShop currently stores one primary product image. Uploading a new image replaces the current one.</p>
+      {error ? <p className="text-xs text-status-danger">{error}</p> : null}
+      <p className="text-xs text-text-tertiary">FlashShop currently stores one primary product image. Uploading a new image replaces the current one.</p>
     </div>
   );
 }

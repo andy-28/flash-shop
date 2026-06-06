@@ -11,16 +11,16 @@ export function CommunityPreview({ posts }: Readonly<{ posts: CommunityPost[] }>
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {posts.map((post) => (
-        <Link className="rounded-md border border-white/10 bg-[#141414] p-4 transition hover:border-white/25" href={`/community/${post.id}`} key={post.id}>
+        <Link className="rounded-md border border-border-default bg-bg-secondary p-4 transition hover:border-border-hover" href={`/community/${post.id}`} key={post.id}>
           <div className="flex items-center gap-3">
             <UserAvatar avatarUrl={post.authorAvatarUrl} name={post.authorDisplayName || post.authorName} />
             <div className="min-w-0">
-              <p className="truncate text-sm text-white">{post.authorDisplayName || post.authorName}</p>
-              <p className="text-xs text-zinc-500">{relativeTime(post.createdAt)}</p>
+              <p className="truncate text-sm text-text-primary">{post.authorDisplayName || post.authorName}</p>
+              <p className="text-xs text-text-tertiary">{relativeTime(post.createdAt)}</p>
             </div>
           </div>
-          <h3 className="mt-3 line-clamp-2 text-base font-medium text-white">{post.title}</h3>
-          <div className="mt-4 flex items-center gap-4 text-sm text-zinc-400">
+          <h3 className="mt-3 line-clamp-2 text-base font-medium text-text-primary">{post.title}</h3>
+          <div className="mt-4 flex items-center gap-4 text-sm text-text-secondary">
             <LikeButton count={post.likeCount} isLiked={post.isLikedByMe} onToggle={() => undefined} size="sm" />
             <span className="inline-flex items-center gap-1.5"><MessageCircle className="size-4" />{post.commentCount}</span>
           </div>

@@ -7,5 +7,5 @@ export function RichTextDisplay({ html }: Readonly<RichTextDisplayProps>) {
     return null;
   }
 
-  return <div className="rich-text-display text-sm leading-7 text-zinc-300" dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div className="rich-text-display text-sm leading-7 text-text-secondary" dangerouslySetInnerHTML={{ __html: html }} />;
 }

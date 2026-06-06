@@ -26,23 +26,23 @@ export function FilterBar({ filters = [], onSearchChange, searchPlaceholder = "S
   return (
     <div className="mb-5 flex flex-wrap items-center gap-3">
       {onSearchChange ? (
-        <label className="flex h-10 min-w-64 flex-1 items-center gap-2 rounded-md border border-[#2A2A2A] bg-[#141414] px-3">
-          <Search className="size-4 text-[#666666]" />
+        <label className="flex h-10 min-w-64 flex-1 items-center gap-2 rounded-md border border-border-default bg-bg-secondary px-3">
+          <Search className="size-4 text-text-tertiary" />
           <input
             value={searchValue}
             onChange={(event) => onSearchChange(event.target.value)}
-            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[#666666]"
+            className="w-full bg-transparent text-sm text-text-primary outline-none placeholder:text-text-tertiary"
             placeholder={searchPlaceholder}
           />
         </label>
       ) : null}
       {filters.map((filter) => (
-        <label className="grid gap-1 text-xs text-[#666666]" key={filter.key}>
+        <label className="grid gap-1 text-xs text-text-tertiary" key={filter.key}>
           {filter.label}
           <select
             value={filter.value}
             onChange={(event) => filter.onChange(event.target.value)}
-            className="h-10 min-w-36 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm text-white outline-none hover:border-[#404040]"
+            className="h-10 min-w-36 rounded-md border border-border-default bg-bg-secondary px-3 text-sm text-text-primary outline-none hover:border-border-hover"
           >
             {filter.options.map((option) => (
               <option key={option.value} value={option.value}>

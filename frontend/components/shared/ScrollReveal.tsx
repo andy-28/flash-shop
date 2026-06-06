@@ -11,11 +11,11 @@ interface ScrollRevealProps {
 }
 
 const animationClass = {
-  fadeIn: "animate-fadeIn",
-  fadeInUp: "animate-fadeInUp",
-  fadeInLeft: "animate-fadeInLeft",
-  fadeInRight: "animate-fadeInRight",
-  scaleIn: "animate-scaleIn",
+  fadeIn: "animate-fade-in",
+  fadeInUp: "animate-fade-in-up",
+  fadeInLeft: "animate-fade-in-left",
+  fadeInRight: "animate-fade-in-right",
+  scaleIn: "animate-scale-in",
 };
 
 export function ScrollReveal({ animation = "fadeInUp", children, className, delay }: Readonly<ScrollRevealProps>) {

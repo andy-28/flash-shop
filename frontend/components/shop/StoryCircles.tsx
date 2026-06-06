@@ -57,7 +57,7 @@ export function StoryCircles({ items }: Readonly<{ items: ContentBlock[] }>) {
                 >
                   <img alt={item.title} className="size-full rounded-full border-2 border-black object-cover" src={assetUrl(item.imageUrl)} />
                 </div>
-                <p className={`mt-2 line-clamp-2 text-xs leading-4 ${viewed ? "text-white/45" : "text-white"}`}>{item.title}</p>
+                <p className={`mt-2 line-clamp-2 text-xs leading-4 ${viewed ? "text-white/45" : "text-text-primary"}`}>{item.title}</p>
               </button>
             );
           })}

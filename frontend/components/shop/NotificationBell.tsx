@@ -55,38 +55,38 @@ export function NotificationBell() {
     <div className="relative">
       <button
         type="button"
-        className="btn-icon relative inline-flex size-9 items-center justify-center rounded-md text-zinc-300 hover:bg-white/10 hover:text-white"
+        className="btn-icon relative inline-flex size-9 items-center justify-center rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
         onClick={() => setOpen((value) => !value)}
         aria-label="Notifications"
       >
         <Bell className="size-4" />
-        {unreadCount > 0 ? <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-[#EF4444]" /> : null}
+        {unreadCount > 0 ? <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-status-danger" /> : null}
       </button>
       {open ? (
-        <div className="absolute right-0 top-11 z-30 w-80 animate-scaleIn overflow-hidden rounded-lg border border-white/10 bg-[#141414] shadow-xl">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-            <p className="text-sm font-medium text-white">通知</p>
-            <button type="button" className="text-xs text-zinc-400 hover:text-white" onClick={readAll}>
+        <div className="absolute right-0 top-11 z-30 w-80 animate-scale-in overflow-hidden rounded-lg border border-border-default bg-bg-secondary shadow-xl">
+          <div className="flex items-center justify-between border-b border-border-default px-4 py-3">
+            <p className="text-sm font-medium text-text-primary">通知</p>
+            <button type="button" className="text-xs text-text-secondary hover:text-text-primary" onClick={readAll}>
               全部已讀
             </button>
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {notificationsQuery.isLoading ? <p className="px-4 py-5 text-sm text-zinc-400">Loading...</p> : null}
-            {!notificationsQuery.isLoading && notifications.length === 0 ? <p className="px-4 py-5 text-sm text-zinc-400">目前沒有通知</p> : null}
+            {notificationsQuery.isLoading ? <p className="px-4 py-5 text-sm text-text-secondary">Loading...</p> : null}
+            {!notificationsQuery.isLoading && notifications.length === 0 ? <p className="px-4 py-5 text-sm text-text-secondary">目前沒有通知</p> : null}
             {notifications.map((notification) => (
               <button
                 key={notification.id}
                 type="button"
-                className={`block w-full border-b border-white/10 px-4 py-3 text-left text-sm hover:bg-white/10 ${notification.isRead ? "" : "border-l-2 border-l-[#8B5CF6]"}`}
+                className={`block w-full border-b border-border-default px-4 py-3 text-left text-sm hover:bg-bg-tertiary ${notification.isRead ? "" : "border-l-2 border-l-[#8B5CF6]"}`}
                 onClick={() => openNotification(notification.id, notification.linkUrl)}
               >
-                <p className="font-medium text-white">{notification.title}</p>
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-400">{notification.message}</p>
-                <p className="mt-2 text-xs text-zinc-500">{new Date(notification.createdAt).toLocaleString()}</p>
+                <p className="font-medium text-text-primary">{notification.title}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-5 text-text-secondary">{notification.message}</p>
+                <p className="mt-2 text-xs text-text-tertiary">{new Date(notification.createdAt).toLocaleString()}</p>
               </button>
             ))}
           </div>
-          <button type="button" className="block w-full px-4 py-3 text-left text-sm text-zinc-300 hover:bg-white/10 hover:text-white" onClick={() => router.push("/notifications")}>
+          <button type="button" className="block w-full px-4 py-3 text-left text-sm text-text-secondary hover:bg-bg-tertiary hover:text-text-primary" onClick={() => router.push("/notifications")}>
             查看全部 →
           </button>
         </div>
