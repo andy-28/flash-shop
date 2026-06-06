@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { ProductImageManager } from "@/components/admin/ProductImageManager";
 import { StatusBadge, getStatusBadge } from "@/components/admin/StatusBadge";
 import { useToast } from "@/components/admin/Toast";
-import { createProduct, getAdminProducts, updateInventory, updateProduct, uploadProductImage } from "@/lib/api/products";
+import { createProduct, getAdminProducts, markVariantArrival, updateInventory, updateProduct, uploadProductImage } from "@/lib/api/products";
 import { assetUrl } from "@/lib/utils/assetUrl";
 import type { CreateProductPayload, Product, UpdateProductPayload } from "@/types";
 
@@ -21,7 +21,10 @@ const emptyProduct: CreateProductPayload = {
   description: "",
   category: "",
   imageUrl: "",
-  variants: [{ sku: "", specName: "", price: 0, totalStock: 0 }, { sku: "", specName: "", price: 0, totalStock: 0 }],
+  variants: [
+    { sku: "", specName: "", price: 0, totalStock: 0, isPreOrder: false, estimatedArrivalDate: null },
+    { sku: "", specName: "", price: 0, totalStock: 0, isPreOrder: false, estimatedArrivalDate: null }
+  ],
 };
 
 export default function AdminProductsPage() {
@@ -32,6 +35,7 @@ export default function AdminProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editForm, setEditForm] = useState<UpdateProductPayload | null>(null);
   const [inventoryDrafts, setInventoryDrafts] = useState<Record<string, string>>({});
+  const [arrivalDrafts, setArrivalDrafts] = useState<Record<string, string>>({});
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin-products", search],
     queryFn: () => getAdminProducts({ search: search || undefined }),
@@ -66,10 +70,19 @@ export default function AdminProductsPage() {
     },
     onError: () => toast.error("Failed to update inventory"),
   });
+  const arrivalMutation = useMutation({
+    mutationFn: ({ variantId, arrivalStock }: { variantId: string; arrivalStock: number }) => markVariantArrival(variantId, arrivalStock),
+    onSuccess: async (result) => {
+      toast.success(`Marked arrival. ${result.notifiedOrders} preorder orders notified.`);
+      await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: () => toast.error("Failed to mark arrival"),
+  });
   const columns: Column<Product>[] = [
     { key: "name", header: "Product", sortable: true, width: "1.6fr", render: (row) => <div className="flex items-center gap-3">{row.imageUrl ? <img alt="" className="size-11 rounded object-cover" src={assetUrl(row.imageUrl)} /> : null}<div className="min-w-0"><p className="font-medium">{row.name}</p><p className="mt-1 truncate text-xs text-[#666666]">{row.description}</p></div></div> },
     { key: "category", header: "Category", sortable: true, width: "0.8fr", render: (row) => <span className="text-[#A0A0A0]">{row.category}</span> },
-    { key: "variants", header: "Variants", width: "1fr", render: (row) => <div className="space-y-1 text-[#A0A0A0]">{row.variants.map((variant) => <p key={variant.id}>{variant.specName}</p>)}</div> },
+    { key: "variants", header: "Variants", width: "1fr", render: (row) => <div className="space-y-1 text-[#A0A0A0]">{row.variants.map((variant) => <p key={variant.id}>{variant.specName}{variant.isPreOrder ? <span className="ml-2 text-[#C4B5FD]">PreOrder ({variant.preOrderCount})</span> : null}</p>)}</div> },
     { key: "availableStock", header: "Stock", sortable: true, width: "0.7fr", render: (row) => row.variants.reduce((sum, variant) => sum + variant.availableStock, 0) },
     { key: "status", header: "Status", width: "0.7fr", render: (row) => <StatusBadge {...getStatusBadge(row.status)} /> },
   ];
@@ -108,6 +121,14 @@ export default function AdminProductsPage() {
                     <button className="inline-flex size-8 items-center justify-center rounded-md border border-[#2A2A2A] hover:bg-[#1E1E1E]" type="button" onClick={() => inventoryMutation.mutate({ productId: product.id, variantId: variant.id, stock: Number(inventoryDrafts[variant.id] ?? variant.availableStock) })}>
                       <RotateCcw className="size-4" />
                     </button>
+                    {variant.isPreOrder ? (
+                      <>
+                        <input className="h-8 w-20 rounded-md border border-[#8B5CF6]/40 bg-black px-2 text-right text-sm outline-none" min="1" type="number" placeholder="Arrival" value={arrivalDrafts[variant.id] ?? ""} onChange={(event) => setArrivalDrafts((current) => ({ ...current, [variant.id]: event.target.value }))} />
+                        <button className="inline-flex h-8 items-center justify-center rounded-md border border-[#8B5CF6]/40 px-2 text-xs text-[#C4B5FD] hover:bg-[#8B5CF6]/10" type="button" onClick={() => arrivalMutation.mutate({ variantId: variant.id, arrivalStock: Number(arrivalDrafts[variant.id] ?? 0) })}>
+                          到貨
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -181,6 +202,20 @@ function CreateProductPanel({
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" placeholder="Spec" value={variant.specName} onChange={(event) => onVariantChange(index, "specName", event.target.value)} />
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" min="0" placeholder="Price" type="number" value={variant.price} onChange={(event) => onVariantChange(index, "price", event.target.value)} />
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" min="0" placeholder="Stock" type="number" value={variant.totalStock} onChange={(event) => onVariantChange(index, "totalStock", event.target.value)} />
+            <label className="flex h-9 items-center gap-2 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm text-[#C4B5FD]">
+              <input
+                type="checkbox"
+                checked={variant.isPreOrder ?? false}
+                onChange={(event) => onChange((current) => ({ ...current, variants: current.variants.map((item, i) => i === index ? { ...item, isPreOrder: event.target.checked } : item) }))}
+              />
+              預購模式
+            </label>
+            <input
+              className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none"
+              type="date"
+              value={variant.estimatedArrivalDate ? variant.estimatedArrivalDate.slice(0, 10) : ""}
+              onChange={(event) => onChange((current) => ({ ...current, variants: current.variants.map((item, i) => i === index ? { ...item, estimatedArrivalDate: event.target.value ? new Date(event.target.value).toISOString() : null } : item) }))}
+            />
           </div>
         ))}
       </FormSection>
@@ -229,6 +264,20 @@ function EditProductPanel({
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" placeholder="SKU" value={variant.sku} onChange={(event) => updateEditVariant(onChange, index, "sku", event.target.value)} />
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" placeholder="Spec" value={variant.specName} onChange={(event) => updateEditVariant(onChange, index, "specName", event.target.value)} />
             <input className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none" min="0" placeholder="Price" type="number" value={variant.price} onChange={(event) => updateEditVariant(onChange, index, "price", event.target.value)} />
+            <label className="flex h-9 items-center gap-2 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm text-[#C4B5FD]">
+              <input
+                type="checkbox"
+                checked={variant.isPreOrder ?? false}
+                onChange={(event) => updateEditVariantValue(onChange, index, { isPreOrder: event.target.checked })}
+              />
+              預購模式
+            </label>
+            <input
+              className="h-9 rounded-md border border-[#2A2A2A] bg-[#141414] px-3 text-sm outline-none"
+              type="date"
+              value={variant.estimatedArrivalDate ? variant.estimatedArrivalDate.slice(0, 10) : ""}
+              onChange={(event) => updateEditVariantValue(onChange, index, { estimatedArrivalDate: event.target.value ? new Date(event.target.value).toISOString() : null })}
+            />
           </div>
         ))}
       </FormSection>
@@ -257,6 +306,20 @@ function updateEditVariant(
   });
 }
 
+function updateEditVariantValue(
+  onChange: Dispatch<SetStateAction<UpdateProductPayload | null>>,
+  index: number,
+  patch: Partial<UpdateProductPayload["variants"][number]>,
+) {
+  onChange((current) => {
+    if (!current) return current;
+    return {
+      ...current,
+      variants: current.variants.map((variant, variantIndex) => variantIndex === index ? { ...variant, ...patch } : variant),
+    };
+  });
+}
+
 function toUpdateProductPayload(product: Product): UpdateProductPayload {
   return {
     name: product.name,
@@ -270,6 +333,8 @@ function toUpdateProductPayload(product: Product): UpdateProductPayload {
       specName: variant.specName,
       price: variant.price,
       status: "Active",
+      isPreOrder: variant.isPreOrder,
+      estimatedArrivalDate: variant.estimatedArrivalDate,
     })),
   };
 }

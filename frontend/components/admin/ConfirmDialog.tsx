@@ -26,8 +26,8 @@ export function ConfirmDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-4">
-      <section className="w-full max-w-md rounded-xl border border-[#2A2A2A] bg-[#141414] p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 grid animate-fadeIn place-items-center bg-black/70 px-4">
+      <section className="w-full max-w-md animate-scaleIn rounded-xl border border-[#2A2A2A] bg-[#141414] p-5 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-white">{title}</h2>

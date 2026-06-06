@@ -21,6 +21,8 @@ public sealed class CreateProductVariantCommand
     public string SpecName { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int TotalStock { get; set; }
+    public bool IsPreOrder { get; set; }
+    public DateTime? EstimatedArrivalDate { get; set; }
 }
 
 public sealed class CreateProductCommandHandler(
@@ -67,6 +69,9 @@ public sealed class CreateProductCommandHandler(
                     SpecName = variant.SpecName.Trim(),
                     Price = variant.Price,
                     Status = "Active",
+                    IsPreOrder = variant.IsPreOrder,
+                    EstimatedArrivalDate = variant.IsPreOrder ? variant.EstimatedArrivalDate : null,
+                    PreOrderCount = 0,
                     CreatedAt = now,
                     ProductId = productId,
                     Inventory = new Domain.Entities.Inventory

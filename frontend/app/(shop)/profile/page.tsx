@@ -74,7 +74,7 @@ export default function ProfilePage() {
       <ShopNavbar />
       <section className="mx-auto max-w-4xl px-4 py-10">
         <div className="rounded-xl border border-white/10 bg-[#141414] p-6">
-          {isLoading ? <div className="h-72 animate-pulse rounded-lg bg-[#1E1E1E]" /> : null}
+          {isLoading ? <div className="h-72 shimmer rounded-lg" /> : null}
           {profile ? (
             <>
               <div className="flex flex-col gap-6 md:flex-row">

@@ -47,7 +47,7 @@ export function LoadingButton({
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition disabled:cursor-not-allowed disabled:opacity-60",
+        "btn-primary inline-flex items-center justify-center gap-2 rounded-md font-medium disabled:cursor-not-allowed disabled:opacity-60",
         variantClass[variant],
         sizeClass[size],
         fullWidth && "w-full",

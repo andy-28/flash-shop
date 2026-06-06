@@ -2,19 +2,31 @@
 
 import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 
 export function CartDrawer() {
   const { closeCart, isLoading, isOpen, itemCount, items, removeItem, totalAmount, updateQuantity } = useCartStore();
+  const [shouldRender, setShouldRender] = useState(isOpen);
 
-  if (!isOpen) {
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShouldRender(false), 240);
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
+
+  if (!shouldRender) {
     return null;
   }
 
   return (
     <div className="fixed inset-0 z-50">
-      <button type="button" className="absolute inset-0 bg-black/60" aria-label="Close cart" onClick={closeCart} />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[#2A2A2A] bg-[#141414] text-white shadow-2xl">
+      <button type="button" className={`absolute inset-0 bg-black/60 ${isOpen ? "animate-fadeIn" : "opacity-0 transition-opacity duration-200"}`} aria-label="Close cart" onClick={closeCart} />
+      <aside className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[#2A2A2A] bg-[#141414] text-white shadow-2xl ${isOpen ? "animate-slideInRight" : "animate-slideOutRight"}`}>
         <header className="flex h-16 items-center justify-between border-b border-[#2A2A2A] px-5">
           <div>
             <h2 className="text-lg font-semibold">購物車</h2>
@@ -40,8 +52,8 @@ export function CartDrawer() {
         ) : (
           <div className="flex-1 overflow-y-auto px-5 py-4">
             <div className="space-y-4">
-              {items.map((item) => (
-                <article key={item.cartItemId} className="rounded-md border border-[#2A2A2A] bg-[#1E1E1E] p-3">
+              {items.map((item, index) => (
+                <article key={item.cartItemId} className="animate-fadeInUp rounded-md border border-[#2A2A2A] bg-[#1E1E1E] p-3" style={{ animationDelay: `${Math.min(index, 6) * 50}ms` }}>
                   <div className="flex gap-3">
                     <div className="size-16 rounded-md bg-[#252525]" />
                     <div className="min-w-0 flex-1">

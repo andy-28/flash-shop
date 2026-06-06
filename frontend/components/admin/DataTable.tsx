@@ -93,9 +93,9 @@ export function DataTable<T extends object>({
               {Array.from({ length: Math.min(pageSize, 5) }).map((_, index) => (
                 <div className="grid gap-4 px-4 py-4" key={index} style={{ gridTemplateColumns }}>
                   {columns.map((column) => (
-                    <span className="h-4 animate-pulse rounded bg-[#252525]" key={column.key} />
+                    <span className="h-4 shimmer rounded" key={column.key} />
                   ))}
-                  {actions ? <span className="h-4 w-16 animate-pulse rounded bg-[#252525]" /> : null}
+                  {actions ? <span className="h-4 w-16 shimmer rounded" /> : null}
                 </div>
               ))}
             </div>

@@ -45,6 +45,12 @@ function buildTimeline(order: Order) {
     return steps;
   }
 
+  if (order.status === "PreOrdered") {
+    steps.push({ label: "Pre-ordered", time: order.createdAt, state: "current", description: "Waiting for arrival notification." });
+    steps.push({ label: "Payment opens", time: null, state: "todo" });
+    return steps;
+  }
+
   const paidDone = ["Paid", "Shipping", "Delivered"].includes(order.status);
   steps.push({ label: "Paid", time: order.paidAt, state: paidDone ? "done" : "todo" });
 

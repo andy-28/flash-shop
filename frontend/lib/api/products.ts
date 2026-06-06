@@ -53,6 +53,11 @@ export async function updateInventory(productId: string, payload: UpdateInventor
   return response.data;
 }
 
+export async function markVariantArrival(variantId: string, arrivalStock: number) {
+  const response = await apiClient.post<{ notifiedOrders: number }>(`/admin/products/variants/${variantId}/mark-arrival`, { arrivalStock });
+  return response.data;
+}
+
 function toUpdateProductPayload(product: Product, imageUrl: string | null): UpdateProductPayload {
   return {
     name: product.name,
@@ -66,6 +71,8 @@ function toUpdateProductPayload(product: Product, imageUrl: string | null): Upda
       specName: variant.specName,
       price: variant.price,
       status: "Active",
+      isPreOrder: variant.isPreOrder,
+      estimatedArrivalDate: variant.estimatedArrivalDate,
     })),
   };
 }

@@ -8,8 +8,10 @@ export function FeaturedProducts({ products }: Readonly<{ products: Product[] }>
 
   return (
     <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {products.map((product, index) => (
+        <div className="animate-fadeInUp" key={product.id} style={{ animationDelay: `${Math.min(index, 7) * 50}ms` }}>
+          <ProductCard product={product} />
+        </div>
       ))}
     </div>
   );

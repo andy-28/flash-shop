@@ -9,6 +9,7 @@ import { ShopNavbar } from "@/components/shop/ShopNavbar";
 import { useToast } from "@/components/admin/Toast";
 import { LoadingButton } from "@/components/shared/LoadingButton";
 import { cancelOrder, getOrder, payOrder } from "@/lib/api/orders";
+import { cancelPreOrder } from "@/lib/api/preorders";
 import { useAuthStore } from "@/stores/authStore";
 import type { Order } from "@/types";
 
@@ -27,7 +28,7 @@ export default function OrderDetailPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [mutatingAction, setMutatingAction] = useState<"pay" | "cancel" | null>(null);
+  const [mutatingAction, setMutatingAction] = useState<"pay" | "cancel" | "cancelPreOrder" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -70,6 +71,25 @@ export default function OrderDetailPage() {
     } catch (exception) {
       const axiosError = exception as AxiosError<{ message?: string }>;
       const message = axiosError.response?.data?.message ?? "Unable to update order.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setMutatingAction(null);
+    }
+  }
+
+  async function mutatePreOrderCancel() {
+    if (!order || mutatingAction) return;
+
+    setMutatingAction("cancelPreOrder");
+    setError(null);
+    try {
+      const nextOrder = await cancelPreOrder(order.id);
+      setOrder(nextOrder);
+      toast.success("預購已取消。");
+    } catch (exception) {
+      const axiosError = exception as AxiosError<{ message?: string }>;
+      const message = axiosError.response?.data?.message ?? "Unable to cancel preorder.";
       setError(message);
       toast.error(message);
     } finally {
@@ -186,6 +206,16 @@ export default function OrderDetailPage() {
                   </LoadingButton>
                 </div>
               ) : null}
+              {order.status === "PreOrdered" ? (
+                <div className="mt-5 space-y-3">
+                  <p className="rounded-md border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 p-3 text-sm text-[#C4B5FD]">
+                    商品到貨後會通知您付款，付款期限會從到貨通知後開始計算。
+                  </p>
+                  <LoadingButton fullWidth size="lg" variant="ghost" isLoading={mutatingAction === "cancelPreOrder"} loadingText="取消中..." disabled={!!mutatingAction} onClick={mutatePreOrderCancel}>
+                    取消預購
+                  </LoadingButton>
+                </div>
+              ) : null}
               {order.status === "Expired" ? (
                 <p className="mt-5 rounded-md border border-zinc-700 bg-zinc-900 p-3 text-sm text-zinc-300">
                   訂單已過期，凍結庫存會由系統自動釋放。
@@ -202,6 +232,10 @@ export default function OrderDetailPage() {
 function OrderStateNotice({ order }: Readonly<{ order: Order }>) {
   if (order.status === "Paid") {
     return <p className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-3 text-sm text-[#93C5FD]">Payment received. Your order is waiting for shipment.</p>;
+  }
+
+  if (order.status === "PreOrdered") {
+    return <p className="rounded-md border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 p-3 text-sm text-[#C4B5FD]">預購等待中。商品到貨後將通知您付款。</p>;
   }
 
   if (order.status === "Shipping") {

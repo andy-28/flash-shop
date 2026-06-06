@@ -54,12 +54,24 @@ public sealed class ProcessPaymentCommandHandler(
             var variant = await productRepository.GetVariantAsync(item.VariantId, cancellationToken)
                 ?? throw new NotFoundException("Product variant was not found.");
             var inventory = variant.Inventory ?? throw new NotFoundException("Inventory was not found.");
-            if (inventory.FrozenStock < item.Quantity)
+            if (order.OrderType == "PreOrder")
+            {
+                if (inventory.AvailableStock < item.Quantity)
+                {
+                    throw new BusinessException("Stock is not enough to complete preorder payment.");
+                }
+
+                inventory.AvailableStock -= item.Quantity;
+            }
+            else if (inventory.FrozenStock < item.Quantity)
             {
                 throw new BusinessException("Frozen stock is not enough to complete payment.");
             }
+            else
+            {
+                inventory.FrozenStock -= item.Quantity;
+            }
 
-            inventory.FrozenStock -= item.Quantity;
             inventory.SoldCount += item.Quantity;
             inventory.Version += 1;
             await inventoryLogRepository.AddAsync(new InventoryLog

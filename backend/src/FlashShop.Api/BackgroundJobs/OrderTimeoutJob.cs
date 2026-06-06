@@ -103,6 +103,12 @@ public sealed class OrderTimeoutJob(
             order.Payment.Status = PaymentStatus.Failed;
         }
 
+        if (order.OrderType == "PreOrder")
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
         foreach (var item in order.Items)
         {
             var inventory = await dbContext.Inventories

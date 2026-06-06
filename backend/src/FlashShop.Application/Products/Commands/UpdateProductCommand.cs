@@ -25,6 +25,8 @@ public sealed class UpdateProductVariantCommand
     public decimal Price { get; set; }
     public string Status { get; set; } = "Active";
     public int? TotalStock { get; set; }
+    public bool IsPreOrder { get; set; }
+    public DateTime? EstimatedArrivalDate { get; set; }
 }
 
 public sealed class UpdateProductCommandHandler(
@@ -77,6 +79,9 @@ public sealed class UpdateProductCommandHandler(
                     SpecName = variantRequest.SpecName.Trim(),
                     Price = variantRequest.Price,
                     Status = variantRequest.Status.Trim(),
+                    IsPreOrder = variantRequest.IsPreOrder,
+                    EstimatedArrivalDate = variantRequest.IsPreOrder ? variantRequest.EstimatedArrivalDate : null,
+                    PreOrderCount = 0,
                     CreatedAt = now,
                     Inventory = new Domain.Entities.Inventory
                     {
@@ -96,6 +101,8 @@ public sealed class UpdateProductCommandHandler(
             variant.SpecName = variantRequest.SpecName.Trim();
             variant.Price = variantRequest.Price;
             variant.Status = variantRequest.Status.Trim();
+            variant.IsPreOrder = variantRequest.IsPreOrder;
+            variant.EstimatedArrivalDate = variantRequest.IsPreOrder ? variantRequest.EstimatedArrivalDate : null;
 
             if (variantRequest.TotalStock.HasValue && variant.Inventory is not null)
             {

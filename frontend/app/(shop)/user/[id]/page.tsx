@@ -22,7 +22,7 @@ export default function PublicUserProfilePage() {
     <main className="min-h-screen bg-[#0A0A0A] text-white">
       <ShopNavbar />
       <section className="mx-auto max-w-4xl px-4 py-10">
-        {isLoading ? <div className="h-64 animate-pulse rounded-xl bg-[#141414]" /> : null}
+        {isLoading ? <div className="h-64 shimmer rounded-xl" /> : null}
         {profile ? (
           <>
             <header className="rounded-xl border border-white/10 bg-[#141414] p-6 text-center">

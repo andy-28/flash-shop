@@ -8,6 +8,7 @@ public sealed class Order
     public Guid UserId { get; set; }
     public User? User { get; set; }
     public string OrderNo { get; set; } = string.Empty;
+    public string OrderType { get; set; } = "Normal";
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public decimal TotalAmount { get; set; }
     public decimal DiscountAmount { get; set; }

@@ -9,8 +9,10 @@ interface CartState {
   itemCount: number;
   isLoading: boolean;
   isOpen: boolean;
+  cartBounce: boolean;
   openCart: () => void;
   closeCart: () => void;
+  triggerCartBounce: () => void;
   fetchCart: () => Promise<void>;
   addToCart: (variantId: string, quantity: number) => Promise<void>;
   updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
@@ -24,8 +26,13 @@ export const useCartStore = create<CartState>((set, get) => ({
   itemCount: 0,
   isLoading: false,
   isOpen: false,
+  cartBounce: false,
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
+  triggerCartBounce: () => {
+    set({ cartBounce: true });
+    window.setTimeout(() => set({ cartBounce: false }), 650);
+  },
   fetchCart: async () => {
     if (get().isLoading) return;
     set({ isLoading: true });
@@ -49,6 +56,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       const cart = await addCartItem({ variantId, quantity });
       set({ items: cart.items, totalAmount: cart.totalAmount, itemCount: cart.itemCount, isOpen: true });
+      get().triggerCartBounce();
     } catch (error) {
       console.error("Failed to add cart item", error);
       throw error;

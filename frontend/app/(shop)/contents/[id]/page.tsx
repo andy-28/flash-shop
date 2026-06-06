@@ -32,7 +32,7 @@ export default function ContentDetailPage() {
         </Link>
 
         {isLoading || !content ? (
-          <div className="h-[640px] animate-pulse rounded-xl bg-[#141414]" />
+          <div className="h-[640px] shimmer rounded-xl" />
         ) : (
           <>
             {content.videoUrl ? (

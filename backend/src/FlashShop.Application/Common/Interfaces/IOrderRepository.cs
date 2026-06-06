@@ -15,5 +15,7 @@ public interface IOrderRepository
         int pageSize,
         CancellationToken cancellationToken = default);
     Task<string?> GetLastOrderNoForDateAsync(DateTime dateUtc, CancellationToken cancellationToken = default);
+    Task<bool> HasActivePreOrderAsync(Guid userId, Guid variantId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<Order>> ListPreOrdersForVariantAsync(Guid variantId, CancellationToken cancellationToken = default);
     Task AddAsync(Order order, CancellationToken cancellationToken = default);
 }

@@ -74,10 +74,10 @@ export default function ContentsPage() {
 function ContentsSkeleton() {
   return (
     <div className="grid gap-5">
-      <div className="h-[420px] animate-pulse rounded-xl bg-[#141414]" />
+      <div className="h-[420px] shimmer rounded-xl" />
       <div className="grid gap-5 md:grid-cols-2">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="h-80 animate-pulse rounded-xl bg-[#141414]" />
+          <div key={index} className="h-80 shimmer rounded-xl" />
         ))}
       </div>
     </div>

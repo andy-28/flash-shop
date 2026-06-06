@@ -13,6 +13,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Id).HasColumnName("id");
         builder.Property(x => x.UserId).HasColumnName("user_id");
         builder.Property(x => x.OrderNo).HasColumnName("order_no").HasMaxLength(30).IsRequired();
+        builder.Property(x => x.OrderType).HasColumnName("order_type").HasMaxLength(20).HasDefaultValue("Normal").IsRequired();
         builder.Property(x => x.Status).HasColumnName("status").HasConversion<string>().IsRequired();
         builder.Property(x => x.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
         builder.Property(x => x.DiscountAmount).HasColumnName("discount_amount").HasPrecision(18, 2);

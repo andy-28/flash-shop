@@ -132,7 +132,7 @@ export default function FlashSaleDetailPage() {
                 {phase === "upcoming" ? (
                   <>
                     <p className="text-sm text-zinc-400">Starts in</p>
-                    <p className="mt-1 text-2xl font-semibold">{formatRemaining(new Date(sale.startAt).getTime() - now)}</p>
+                    <p className="mt-1 animate-scaleIn text-2xl font-semibold" key={Math.floor(now / 1000)}>{formatRemaining(new Date(sale.startAt).getTime() - now)}</p>
                   </>
                 ) : null}
                 {phase === "live" ? <p className="text-sm text-[#22C55E]">Flash sale is live.</p> : null}

@@ -16,6 +16,9 @@ public sealed class ProductVariantConfiguration : IEntityTypeConfiguration<Produ
         builder.Property(x => x.SpecName).HasColumnName("spec_name").HasMaxLength(200).IsRequired();
         builder.Property(x => x.Price).HasColumnName("price").HasPrecision(18, 2);
         builder.Property(x => x.Status).HasColumnName("status").HasMaxLength(50).IsRequired();
+        builder.Property(x => x.IsPreOrder).HasColumnName("is_pre_order").HasDefaultValue(false);
+        builder.Property(x => x.EstimatedArrivalDate).HasColumnName("estimated_arrival_date");
+        builder.Property(x => x.PreOrderCount).HasColumnName("pre_order_count").HasDefaultValue(0);
         builder.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.HasIndex(x => x.Sku).IsUnique();
     }

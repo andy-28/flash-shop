@@ -26,6 +26,11 @@ public sealed class UpdateCartItemCommandHandler(ICartRepository cartRepository,
             ?? throw new NotFoundException("Cart item was not found.");
 
         var availableStock = item.Variant?.Inventory?.AvailableStock ?? 0;
+        if (item.Variant?.IsPreOrder == true)
+        {
+            throw new BusinessException("預購商品請使用預購功能。");
+        }
+
         if (request.Quantity > availableStock)
         {
             throw new BusinessException("Insufficient stock.");

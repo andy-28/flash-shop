@@ -71,6 +71,23 @@ public sealed class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<bool> HasActivePreOrderAsync(Guid userId, Guid variantId, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Orders
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && x.OrderType == "PreOrder" && x.Status == OrderStatus.PreOrdered)
+            .AnyAsync(x => x.Items.Any(item => item.VariantId == variantId), cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<Order>> ListPreOrdersForVariantAsync(Guid variantId, CancellationToken cancellationToken = default)
+    {
+        return await IncludeDetails(dbContext.Orders)
+            .Where(x => x.OrderType == "PreOrder" && x.Status == OrderStatus.PreOrdered)
+            .Where(x => x.Items.Any(item => item.VariantId == variantId))
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task AddAsync(Order order, CancellationToken cancellationToken = default)
     {
         return dbContext.Orders.AddAsync(order, cancellationToken).AsTask();

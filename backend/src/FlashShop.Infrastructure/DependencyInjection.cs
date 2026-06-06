@@ -53,6 +53,7 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IMediaRepository, MediaRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddSingleton<IOrderSettings, OrderSettings>();

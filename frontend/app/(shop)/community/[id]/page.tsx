@@ -89,7 +89,7 @@ export default function CommunityPostDetailPage() {
     <main className="min-h-screen bg-[#0A0A0A] text-white">
       <ShopNavbar />
       <section className="mx-auto max-w-3xl px-4 py-10">
-        {isLoading ? <div className="h-96 animate-pulse rounded-xl bg-[#141414]" /> : null}
+        {isLoading ? <div className="h-96 shimmer rounded-xl" /> : null}
         {post ? (
           <>
             <article className="rounded-xl border border-white/10 bg-[#141414] p-5">

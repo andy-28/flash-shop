@@ -7,6 +7,7 @@ public sealed class OrderDto
 {
     public Guid Id { get; set; }
     public string OrderNo { get; set; } = string.Empty;
+    public string OrderType { get; set; } = "Normal";
     public OrderStatus Status { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal DiscountAmount { get; set; }
@@ -26,6 +27,7 @@ public sealed class OrderDto
 
 public sealed class OrderItemDto
 {
+    public Guid VariantId { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public string SpecName { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }

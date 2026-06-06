@@ -33,6 +33,11 @@ public sealed class AddToCartCommandHandler(
             throw new BusinessException("Product variant is not available.");
         }
 
+        if (variant.IsPreOrder)
+        {
+            throw new BusinessException("預購商品請使用預購功能。");
+        }
+
         var inventory = variant.Inventory ?? throw new NotFoundException("Inventory was not found.");
         var cart = await cartRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (cart is null)

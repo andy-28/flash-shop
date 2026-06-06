@@ -56,7 +56,7 @@ export function RichTextEditor({ value, onChange, placeholder = "Write content..
   }, [editor]);
 
   if (!editor) {
-    return <div className="min-h-[260px] animate-pulse rounded-md border border-[#2A2A2A] bg-[#1E1E1E]" />;
+    return <div className="min-h-[260px] shimmer rounded-md border border-[#2A2A2A]" />;
   }
 
   return (

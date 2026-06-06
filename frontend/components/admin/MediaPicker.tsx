@@ -85,7 +85,7 @@ function MediaPickerDialog({ folder, onClose, onSelect }: Readonly<{ folder?: st
         <div className="overflow-y-auto p-4">
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, index) => <span className="aspect-square animate-pulse rounded-md bg-[#252525]" key={index} />)}
+              {Array.from({ length: 8 }).map((_, index) => <span className="aspect-square shimmer rounded-md" key={index} />)}
             </div>
           ) : items.length === 0 ? (
             <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-[#2A2A2A] text-sm text-[#A0A0A0]">No media found</div>

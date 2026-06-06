@@ -18,4 +18,7 @@ public sealed class ProductVariantDto
     public string SpecName { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int AvailableStock { get; set; }
+    public bool IsPreOrder { get; set; }
+    public DateTime? EstimatedArrivalDate { get; set; }
+    public int PreOrderCount { get; set; }
 }

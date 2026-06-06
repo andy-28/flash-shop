@@ -11,6 +11,7 @@ public static class OrderMapper
         {
             Id = order.Id,
             OrderNo = order.OrderNo,
+            OrderType = order.OrderType,
             Status = order.Status,
             TotalAmount = order.TotalAmount,
             DiscountAmount = order.DiscountAmount,
@@ -27,6 +28,7 @@ public static class OrderMapper
                 .OrderBy(x => x.ProductName)
                 .Select(x => new OrderItemDto
                 {
+                    VariantId = x.VariantId,
                     ProductName = x.ProductName,
                     SpecName = x.SpecName,
                     UnitPrice = x.UnitPrice,

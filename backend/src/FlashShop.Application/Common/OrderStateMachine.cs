@@ -8,6 +8,7 @@ public static class OrderStateMachine
     private static readonly Dictionary<OrderStatus, HashSet<OrderStatus>> Transitions = new()
     {
         [OrderStatus.Pending] = [OrderStatus.Paid, OrderStatus.Cancelled, OrderStatus.Expired],
+        [OrderStatus.PreOrdered] = [OrderStatus.Pending, OrderStatus.Cancelled],
         [OrderStatus.Paid] = [OrderStatus.Shipping],
         [OrderStatus.Shipping] = [OrderStatus.Delivered],
         [OrderStatus.Delivered] = [],

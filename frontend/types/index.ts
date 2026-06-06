@@ -1,4 +1,4 @@
-export type OrderStatus = "Pending" | "Paid" | "Shipping" | "Delivered" | "Cancelled" | "Expired";
+export type OrderStatus = "Pending" | "PreOrdered" | "Paid" | "Shipping" | "Delivered" | "Cancelled" | "Expired";
 
 export interface Product {
   id: string;
@@ -18,6 +18,9 @@ export interface ProductVariant {
   specName: string;
   price: number;
   availableStock: number;
+  isPreOrder: boolean;
+  estimatedArrivalDate: string | null;
+  preOrderCount: number;
 }
 
 export interface CreateProductPayload {
@@ -30,6 +33,8 @@ export interface CreateProductPayload {
     specName: string;
     price: number;
     totalStock: number;
+    isPreOrder?: boolean;
+    estimatedArrivalDate?: string | null;
   }>;
 }
 
@@ -46,6 +51,8 @@ export interface UpdateProductPayload {
     price: number;
     status?: string;
     totalStock?: number;
+    isPreOrder?: boolean;
+    estimatedArrivalDate?: string | null;
   }>;
 }
 
@@ -95,6 +102,7 @@ export interface LoginResponse {
 export interface Order {
   id: string;
   orderNo: string;
+  orderType: "Normal" | "PreOrder" | string;
   status: OrderStatus;
   totalAmount: number;
   discountAmount: number;
@@ -113,6 +121,7 @@ export interface Order {
 }
 
 export interface OrderItem {
+  variantId: string;
   productName: string;
   specName: string;
   unitPrice: number;
@@ -452,5 +461,15 @@ export interface AdminCommunityPost {
   commentCount: number;
   isPinned: boolean;
   isHidden: boolean;
+  createdAt: string;
+}
+
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  linkUrl: string | null;
+  isRead: boolean;
   createdAt: string;
 }

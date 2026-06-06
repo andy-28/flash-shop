@@ -12,7 +12,7 @@ import { deliverOrder, getAdminOrders, shipOrder, updateTracking } from "@/lib/a
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import type { Order, OrderStatus } from "@/types";
 
-const statuses: Array<OrderStatus | "All"> = ["All", "Pending", "Paid", "Shipping", "Delivered", "Cancelled", "Expired"];
+const statuses: Array<OrderStatus | "All"> = ["All", "Pending", "PreOrdered", "Paid", "Shipping", "Delivered", "Cancelled", "Expired"];
 
 export default function AdminOrdersPage() {
   const queryClient = useQueryClient();

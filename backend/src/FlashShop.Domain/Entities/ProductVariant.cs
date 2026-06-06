@@ -9,6 +9,9 @@ public sealed class ProductVariant
     public string SpecName { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public string Status { get; set; } = "Active";
+    public bool IsPreOrder { get; set; }
+    public DateTime? EstimatedArrivalDate { get; set; }
+    public int PreOrderCount { get; set; }
     public DateTime CreatedAt { get; set; }
     public Inventory? Inventory { get; set; }
     public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();

@@ -38,8 +38,10 @@ export default function ProductsPage() {
           <p className="py-10 text-zinc-400">Loading products...</p>
         ) : (
           <div className="grid gap-4 py-8 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product, index) => (
+              <div className="animate-fadeInUp" key={product.id} style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         )}

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useScrollReveal } from "@/lib/hooks/useScrollReveal";
 
 interface SectionProps {
   title?: string;
@@ -10,8 +13,10 @@ interface SectionProps {
 }
 
 export function Section({ action, children, className = "", subtitle, title }: Readonly<SectionProps>) {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
-    <section className={`mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`}>
+    <section ref={ref} className={`mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8 ${isVisible ? "animate-fadeInUp" : "opacity-0"} ${className}`}>
       {title || subtitle || action ? (
         <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>

@@ -3,6 +3,7 @@ using FlashShop.Application.Common.Interfaces;
 using FlashShop.Application.Media.Commands;
 using FlashShop.Application.Products.Commands;
 using FlashShop.Application.Products.Queries;
+using FlashShop.Application.PreOrders.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -80,4 +81,21 @@ public sealed class AdminProductController(IMediator mediator, ICurrentUserServi
 
         return Ok(new { url = media.FilePath, media });
     }
+
+    [HttpPost("variants/{variantId:guid}/mark-arrival")]
+    public async Task<IActionResult> MarkArrival(
+        Guid variantId,
+        [FromBody] MarkArrivalRequest request,
+        CancellationToken cancellationToken)
+    {
+        var notifiedOrders = await mediator.Send(new MarkArrivalCommand
+        {
+            VariantId = variantId,
+            ArrivalStock = request.ArrivalStock
+        }, cancellationToken);
+
+        return Ok(new { notifiedOrders });
+    }
 }
+
+public sealed record MarkArrivalRequest(int ArrivalStock);

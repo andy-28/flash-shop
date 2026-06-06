@@ -44,7 +44,10 @@ public sealed class GetProductDetailQueryHandler(
                 Sku = variant.Sku,
                 SpecName = variant.SpecName,
                 Price = variant.Price,
-                AvailableStock = variant.Inventory?.AvailableStock ?? 0
+                AvailableStock = variant.Inventory?.AvailableStock ?? 0,
+                IsPreOrder = variant.IsPreOrder,
+                EstimatedArrivalDate = variant.EstimatedArrivalDate,
+                PreOrderCount = variant.PreOrderCount
             }).ToList()
         };
 

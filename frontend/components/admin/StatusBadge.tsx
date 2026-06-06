@@ -7,6 +7,7 @@ interface StatusBadgeProps {
 
 const statusVariantMap: Record<string, BadgeVariant> = {
   Pending: "warning",
+  PreOrdered: "info",
   Paid: "success",
   Shipping: "info",
   Delivered: "success",

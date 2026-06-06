@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -99,7 +99,7 @@ export default function HomePage() {
 
         {promosQuery.isLoading ? (
           <section className="mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="aspect-[16/7] animate-pulse rounded-xl bg-[#141414] sm:aspect-[21/9]" />
+            <div className="aspect-[16/7] shimmer rounded-xl sm:aspect-[21/9]" />
           </section>
         ) : (
           <PromoBanner item={promos[0] ?? null} />
@@ -165,7 +165,7 @@ function FallbackHero() {
 }
 
 function HeroSkeleton() {
-  return <div className="aspect-[16/9] min-h-[460px] animate-pulse bg-[#141414] sm:aspect-[21/9] sm:min-h-[620px]" />;
+  return <div className="aspect-[16/9] min-h-[460px] shimmer sm:aspect-[21/9] sm:min-h-[620px]" />;
 }
 
 function StorySkeleton() {
@@ -173,8 +173,8 @@ function StorySkeleton() {
     <div className="flex gap-4 overflow-hidden">
       {Array.from({ length: 8 }).map((_, index) => (
         <div className="w-20 shrink-0 sm:w-24" key={index}>
-          <div className="mx-auto size-16 animate-pulse rounded-full bg-[#252525] sm:size-[72px]" />
-          <div className="mx-auto mt-3 h-3 w-14 animate-pulse rounded bg-[#252525]" />
+          <div className="mx-auto size-16 shimmer rounded-full sm:size-[72px]" />
+          <div className="mx-auto mt-3 h-3 w-14 shimmer rounded" />
         </div>
       ))}
     </div>
@@ -186,10 +186,10 @@ function ProductGridSkeleton() {
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
         <div className="rounded-md border border-white/10 bg-[#141414] p-3" key={index}>
-          <div className="aspect-[4/3] animate-pulse rounded bg-[#252525]" />
-          <div className="mt-4 h-3 w-20 animate-pulse rounded bg-[#252525]" />
-          <div className="mt-3 h-5 w-4/5 animate-pulse rounded bg-[#252525]" />
-          <div className="mt-2 h-3 w-full animate-pulse rounded bg-[#252525]" />
+          <div className="aspect-[4/3] shimmer rounded" />
+          <div className="mt-4 h-3 w-20 shimmer rounded" />
+          <div className="mt-3 h-5 w-4/5 shimmer rounded" />
+          <div className="mt-2 h-3 w-full shimmer rounded" />
         </div>
       ))}
     </div>
@@ -197,5 +197,5 @@ function ProductGridSkeleton() {
 }
 
 function BlockSkeleton() {
-  return <div className="h-72 animate-pulse rounded-xl border border-white/10 bg-[#141414]" />;
+  return <div className="h-72 shimmer rounded-xl border border-white/10" />;
 }

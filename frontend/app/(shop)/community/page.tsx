@@ -123,7 +123,7 @@ function PostCard({ onLike, post }: Readonly<{ post: CommunityPost; onLike: () =
 }
 
 function CommunitySkeleton() {
-  return Array.from({ length: 3 }).map((_, index) => <div className="h-48 animate-pulse rounded-xl border border-white/10 bg-[#141414]" key={index} />);
+  return Array.from({ length: 3 }).map((_, index) => <div className="h-48 shimmer rounded-xl border border-white/10" key={index} />);
 }
 
 function stripHtml(value: string) {

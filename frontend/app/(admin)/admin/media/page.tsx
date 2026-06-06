@@ -164,7 +164,7 @@ export default function AdminMediaPage() {
 
 function MediaGrid({ data, isLoading, onSelect, onToggle, selectedIds }: Readonly<{ data: MediaFile[]; isLoading: boolean; selectedIds: string[]; onSelect: (media: MediaFile) => void; onToggle: (id: string) => void }>) {
   if (isLoading) {
-    return <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }).map((_, index) => <span className="aspect-square animate-pulse rounded-md bg-[#252525]" key={index} />)}</div>;
+    return <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }).map((_, index) => <span className="aspect-square shimmer rounded-md" key={index} />)}</div>;
   }
 
   if (data.length === 0) {

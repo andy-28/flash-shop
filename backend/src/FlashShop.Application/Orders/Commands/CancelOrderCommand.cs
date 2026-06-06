@@ -40,6 +40,16 @@ public sealed class CancelOrderCommandHandler(
             order.Payment.Status = PaymentStatus.Failed;
         }
 
+        if (order.OrderType == "PreOrder")
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await dashboardNotifier.NotifyOrderCancelled(order.OrderNo, cancellationToken);
+
+            var cancelledPreOrder = await orderRepository.GetByIdAsync(order.Id, cancellationToken)
+                ?? throw new NotFoundException("Order was not found.");
+            return OrderMapper.ToDto(cancelledPreOrder);
+        }
+
         foreach (var item in order.Items)
         {
             var variant = await productRepository.GetVariantAsync(item.VariantId, cancellationToken)
