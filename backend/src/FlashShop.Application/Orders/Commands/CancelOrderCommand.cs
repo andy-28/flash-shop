@@ -60,8 +60,7 @@ public sealed class CancelOrderCommandHandler(
                 throw new BusinessException("Frozen stock is not enough to cancel this order.");
             }
 
-            inventory.FrozenStock -= item.Quantity;
-            inventory.AvailableStock += item.Quantity;
+            inventory.Release(item.Quantity);
             inventory.Version += 1;
             await inventoryLogRepository.AddAsync(new InventoryLog
             {

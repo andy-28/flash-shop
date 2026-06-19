@@ -79,8 +79,7 @@ public sealed class FlashSaleOrderWorker(
         });
 
         sale.SoldCount += message.Quantity;
-        inventory.AvailableStock -= message.Quantity;
-        inventory.FrozenStock += message.Quantity;
+        inventory.Freeze(message.Quantity);
         inventory.Version += 1;
 
         dbContext.Orders.Add(order);

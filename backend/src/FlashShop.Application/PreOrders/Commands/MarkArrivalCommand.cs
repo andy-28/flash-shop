@@ -17,6 +17,7 @@ public sealed class MarkArrivalCommandHandler(
     IProductRepository productRepository,
     IOrderRepository orderRepository,
     INotificationRepository notificationRepository,
+    IInventoryLogRepository inventoryLogRepository,
     ICacheService cacheService,
     IUnitOfWork unitOfWork)
     : IRequestHandler<MarkArrivalCommand, int>
@@ -36,9 +37,18 @@ public sealed class MarkArrivalCommandHandler(
 
         variant.IsPreOrder = false;
         variant.EstimatedArrivalDate = null;
-        inventory.TotalStock += request.ArrivalStock;
-        inventory.AvailableStock += request.ArrivalStock;
+        var availableStockBefore = inventory.AvailableStock;
+        inventory.Restock(request.ArrivalStock);
         inventory.Version += 1;
+        await inventoryLogRepository.AddAsync(new InventoryLog
+        {
+            Id = Guid.NewGuid(),
+            InventoryId = inventory.Id,
+            ChangeType = "Restock",
+            Quantity = request.ArrivalStock,
+            Reason = $"PreOrder arrival (available {availableStockBefore} → {inventory.AvailableStock})",
+            CreatedAt = now
+        }, cancellationToken);
 
         var preOrders = await orderRepository.ListPreOrdersForVariantAsync(request.VariantId, cancellationToken);
         foreach (var order in preOrders)

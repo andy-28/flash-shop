@@ -81,8 +81,7 @@ public sealed class CreateOrderCommandHandler(
                 Subtotal = subtotal
             });
 
-            inventory.AvailableStock -= cartItem.Quantity;
-            inventory.FrozenStock += cartItem.Quantity;
+            inventory.Freeze(cartItem.Quantity);
             inventory.Version += 1;
             await inventoryLogRepository.AddAsync(new InventoryLog
             {

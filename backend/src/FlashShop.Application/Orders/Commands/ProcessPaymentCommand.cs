@@ -61,7 +61,18 @@ public sealed class ProcessPaymentCommandHandler(
                     throw new BusinessException("Stock is not enough to complete preorder payment.");
                 }
 
-                inventory.AvailableStock -= item.Quantity;
+                inventory.Freeze(item.Quantity);
+                await inventoryLogRepository.AddAsync(new InventoryLog
+                {
+                    Id = Guid.NewGuid(),
+                    InventoryId = inventory.Id,
+                    ChangeType = "Freeze",
+                    Quantity = -item.Quantity,
+                    Reason = $"PreOrder {order.OrderNo} stock allocated for payment",
+                    OrderId = order.Id,
+                    CreatedAt = now
+                }, cancellationToken);
+                inventory.Commit(item.Quantity);
             }
             else if (inventory.FrozenStock < item.Quantity)
             {
@@ -69,10 +80,9 @@ public sealed class ProcessPaymentCommandHandler(
             }
             else
             {
-                inventory.FrozenStock -= item.Quantity;
+                inventory.Commit(item.Quantity);
             }
 
-            inventory.SoldCount += item.Quantity;
             inventory.Version += 1;
             await inventoryLogRepository.AddAsync(new InventoryLog
             {

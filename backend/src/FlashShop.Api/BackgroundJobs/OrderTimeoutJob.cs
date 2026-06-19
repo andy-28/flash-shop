@@ -129,8 +129,7 @@ public sealed class OrderTimeoutJob(
                     $"Inventory {inventory.Id} frozen stock is not enough to expire order {order.OrderNo}.");
             }
 
-            inventory.FrozenStock -= item.Quantity;
-            inventory.AvailableStock += item.Quantity;
+            inventory.Release(item.Quantity);
             inventory.Version += 1;
 
             dbContext.InventoryLogs.Add(new InventoryLog
