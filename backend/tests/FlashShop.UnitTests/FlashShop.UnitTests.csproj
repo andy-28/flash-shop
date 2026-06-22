@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="FluentAssertions" Version="8.10.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
@@ -21,8 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FlashShop.Api\FlashShop.Api.csproj" />
     <ProjectReference Include="..\..\src\FlashShop.Domain\FlashShop.Domain.csproj" />
     <ProjectReference Include="..\..\src\FlashShop.Application\FlashShop.Application.csproj" />
+    <ProjectReference Include="..\..\src\FlashShop.Infrastructure\FlashShop.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

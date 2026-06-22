@@ -4,8 +4,12 @@ using FlashShop.Domain.Entities;
 
 namespace FlashShop.Api.Services;
 
-public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<LocalMediaService> logger) : IMediaService
+public sealed class LocalMediaService : IMediaService
 {
+    private readonly ILogger<LocalMediaService> _logger;
+    private readonly string _basePath;
+    private readonly string _requestPath;
+
     private static readonly HashSet<string> AllowedMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
@@ -21,6 +25,21 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
     };
 
     private const long MaxFileSize = 5 * 1024 * 1024;
+
+    public LocalMediaService(
+        IConfiguration configuration,
+        IWebHostEnvironment environment,
+        ILogger<LocalMediaService> logger)
+    {
+        var configuredBasePath = configuration["MediaStorage:BasePath"];
+        _basePath = string.IsNullOrWhiteSpace(configuredBasePath)
+            ? Path.Combine(environment.WebRootPath ?? Path.Combine(environment.ContentRootPath, "wwwroot"), "uploads")
+            : Path.GetFullPath(configuredBasePath, environment.ContentRootPath);
+        _requestPath = NormalizeRequestPath(configuration["MediaStorage:RequestPath"]);
+        _logger = logger;
+
+        Directory.CreateDirectory(_basePath);
+    }
 
     public async Task<MediaFile> UploadAsync(
         Stream fileStream,
@@ -66,8 +85,7 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
         var now = DateTime.UtcNow;
         var storedFileName = $"{Guid.NewGuid():N}{extension}";
         var datePath = Path.Combine(now.ToString("yyyy"), now.ToString("MM"));
-        var webRoot = environment.WebRootPath ?? Path.Combine(environment.ContentRootPath, "wwwroot");
-        var absoluteDir = Path.Combine(webRoot, "uploads", "media", datePath);
+        var absoluteDir = Path.Combine(_basePath, "media", datePath);
         Directory.CreateDirectory(absoluteDir);
 
         var absolutePath = Path.Combine(absoluteDir, storedFileName);
@@ -77,7 +95,7 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
         }
 
         var thumbnailPath = await TryCreateThumbnailAsync(absolutePath, absoluteDir, storedFileName, now, cancellationToken);
-        var relativePath = $"/uploads/media/{now:yyyy}/{now:MM}";
+        var relativePath = $"{_requestPath}/media/{now:yyyy}/{now:MM}";
 
         return new MediaFile
         {
@@ -96,12 +114,11 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
 
     public Task DeleteFileAsync(string filePath, string? thumbnailPath, CancellationToken cancellationToken = default)
     {
-        var webRoot = environment.WebRootPath ?? Path.Combine(environment.ContentRootPath, "wwwroot");
-        DeleteIfInsideWebRoot(webRoot, filePath);
+        DeleteIfInsideStorage(filePath);
 
         if (!string.IsNullOrWhiteSpace(thumbnailPath))
         {
-            DeleteIfInsideWebRoot(webRoot, thumbnailPath);
+            DeleteIfInsideStorage(thumbnailPath);
         }
 
         return Task.CompletedTask;
@@ -116,20 +133,28 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
             await using var source = File.OpenRead(absolutePath);
             await using var target = File.Create(thumbAbsolutePath);
             await source.CopyToAsync(target, cancellationToken);
-            return $"/uploads/media/{now:yyyy}/{now:MM}/{thumbFileName}";
+            return $"{_requestPath}/media/{now:yyyy}/{now:MM}/{thumbFileName}";
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to create thumbnail for {FileName}", storedFileName);
+            _logger.LogWarning(ex, "Failed to create thumbnail for {FileName}", storedFileName);
             return null;
         }
     }
 
-    private static void DeleteIfInsideWebRoot(string webRoot, string relativePath)
+    private void DeleteIfInsideStorage(string requestPath)
     {
-        var absolutePath = Path.GetFullPath(Path.Combine(webRoot, relativePath.TrimStart('/', '\\')));
-        var absoluteRoot = Path.GetFullPath(webRoot);
-        if (!absolutePath.StartsWith(absoluteRoot, StringComparison.OrdinalIgnoreCase))
+        var relativePath = requestPath;
+        if (relativePath.StartsWith(_requestPath, StringComparison.OrdinalIgnoreCase))
+        {
+            relativePath = relativePath[_requestPath.Length..];
+        }
+
+        var absolutePath = Path.GetFullPath(Path.Combine(_basePath, relativePath.TrimStart('/', '\\')));
+        var absoluteRoot = Path.GetFullPath(_basePath);
+        var rootPrefix = absoluteRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
+        if (!absolutePath.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -138,5 +163,11 @@ public sealed class LocalMediaService(IWebHostEnvironment environment, ILogger<L
         {
             File.Delete(absolutePath);
         }
+    }
+
+    private static string NormalizeRequestPath(string? requestPath)
+    {
+        var normalized = string.IsNullOrWhiteSpace(requestPath) ? "/uploads" : requestPath.Trim();
+        return $"/{normalized.Trim('/', '\\')}";
     }
 }

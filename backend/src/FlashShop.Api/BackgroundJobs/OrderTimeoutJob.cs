@@ -1,10 +1,3 @@
-using FlashShop.Application.Common.Interfaces;
-using FlashShop.Application.Common;
-using FlashShop.Domain.Entities;
-using FlashShop.Domain.Enums;
-using FlashShop.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-
 namespace FlashShop.Api.BackgroundJobs;
 
 public sealed class OrderTimeoutJob(
@@ -22,7 +15,9 @@ public sealed class OrderTimeoutJob(
         {
             try
             {
-                await ProcessExpiredOrdersAsync(stoppingToken);
+                using var scope = scopeFactory.CreateScope();
+                var processor = scope.ServiceProvider.GetRequiredService<IOrderTimeoutProcessor>();
+                await processor.ProcessExpiredOrders(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -44,107 +39,6 @@ public sealed class OrderTimeoutJob(
         }
 
         logger.LogInformation("OrderTimeoutJob stopped");
-    }
-
-    private async Task ProcessExpiredOrdersAsync(CancellationToken cancellationToken)
-    {
-        using var scope = scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var dashboardNotifier = scope.ServiceProvider.GetRequiredService<IDashboardNotifier>();
-        var now = DateTime.UtcNow;
-
-        var expiredOrders = await dbContext.Orders
-            .Include(order => order.Items)
-            .Include(order => order.Payment)
-            .Where(order => order.Status == OrderStatus.Pending && order.ExpiredAt < now)
-            .OrderBy(order => order.ExpiredAt)
-            .ToListAsync(cancellationToken);
-
-        if (expiredOrders.Count == 0)
-        {
-            logger.LogDebug("OrderTimeoutJob found no expired pending orders at {CheckedAt}", now);
-            return;
-        }
-
-        logger.LogInformation("Found {Count} expired orders to cancel at {CheckedAt}", expiredOrders.Count, now);
-
-        foreach (var order in expiredOrders)
-        {
-            try
-            {
-                await CancelExpiredOrderAsync(dbContext, order, cancellationToken);
-                await dashboardNotifier.NotifyOrderExpired(order.OrderNo, cancellationToken);
-                logger.LogInformation(
-                    "Auto-cancelled expired order {OrderNo} (created {CreatedAt}, expired {ExpiredAt})",
-                    order.OrderNo,
-                    order.CreatedAt,
-                    order.ExpiredAt);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Failed to cancel expired order {OrderNo}", order.OrderNo);
-            }
-        }
-    }
-
-    private async Task CancelExpiredOrderAsync(AppDbContext dbContext, Order order, CancellationToken cancellationToken)
-    {
-        if (!OrderStateMachine.CanTransition(order.Status, OrderStatus.Expired))
-        {
-            logger.LogDebug("Skipped order {OrderNo} because status is {Status}", order.OrderNo, order.Status);
-            return;
-        }
-
-        var now = DateTime.UtcNow;
-        order.Status = OrderStatus.Expired;
-
-        if (order.Payment is not null)
-        {
-            order.Payment.Status = PaymentStatus.Failed;
-        }
-
-        if (order.OrderType == "PreOrder")
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-            return;
-        }
-
-        foreach (var item in order.Items)
-        {
-            var inventory = await dbContext.Inventories
-                .FirstOrDefaultAsync(candidate => candidate.VariantId == item.VariantId, cancellationToken);
-
-            if (inventory is null)
-            {
-                logger.LogWarning(
-                    "Inventory was not found while expiring order {OrderNo}, variant {VariantId}",
-                    order.OrderNo,
-                    item.VariantId);
-                continue;
-            }
-
-            if (inventory.FrozenStock < item.Quantity)
-            {
-                throw new InvalidOperationException(
-                    $"Inventory {inventory.Id} frozen stock is not enough to expire order {order.OrderNo}.");
-            }
-
-            inventory.Release(item.Quantity);
-            inventory.Version += 1;
-
-            dbContext.InventoryLogs.Add(new InventoryLog
-            {
-                Id = Guid.NewGuid(),
-                InventoryId = inventory.Id,
-                ChangeType = "Release",
-                Quantity = item.Quantity,
-                Reason = $"Order {order.OrderNo} expired (auto-cancelled)",
-                OrderId = order.Id,
-                CreatedAt = now
-            });
-        }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static int GetConfiguredIntervalSeconds(IConfiguration configuration)

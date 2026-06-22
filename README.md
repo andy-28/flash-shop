@@ -51,6 +51,22 @@ Default local endpoints:
 - Swagger: http://localhost:5000/swagger
 - Admin: `admin@flashshop.dev / Admin123!`
 
+### Image Upload Path
+
+By default, uploaded images are stored in `backend/src/FlashShop.Api/wwwroot/uploads/` and are not committed to Git.
+To keep development uploads outside the repository so they survive a fresh clone, configure
+`backend/src/FlashShop.Api/appsettings.Development.json`:
+
+```json
+"MediaStorage": {
+  "BasePath": "D:/flashshop-data/uploads",
+  "RequestPath": "/uploads"
+}
+```
+
+Leave `BasePath` empty to use the default `wwwroot/uploads/` directory. When an external path is configured,
+the backend serves that directory at the configured `RequestPath`.
+
 ## Production Deployment
 
 Production uses five containers:

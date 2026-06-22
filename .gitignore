@@ -18,7 +18,8 @@ coverage/
 .build/
 *.tsbuildinfo
 backend/.build-check/
-backend/src/FlashShop.Api/wwwroot/uploads/
+backend/src/FlashShop.Api/wwwroot/uploads/*
+!backend/src/FlashShop.Api/wwwroot/uploads/.gitkeep
 upload-test.png
 .env
 .env.production

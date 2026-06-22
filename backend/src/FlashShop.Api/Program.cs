@@ -15,6 +15,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,6 +68,7 @@ builder.Services.AddScoped<IMediaService, LocalMediaService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<FlashSaleOrderChannel>();
+builder.Services.AddScoped<IOrderTimeoutProcessor, OrderTimeoutProcessor>();
 builder.Services.AddHostedService<OrderTimeoutJob>();
 builder.Services.AddHostedService<MockDeliveryJob>();
 builder.Services.AddHostedService<FlashSaleOrderWorker>();
@@ -123,6 +125,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("DefaultCors");
 app.UseStaticFiles();
+
+var mediaBasePath = builder.Configuration["MediaStorage:BasePath"];
+if (!string.IsNullOrWhiteSpace(mediaBasePath))
+{
+    var absoluteMediaBasePath = Path.GetFullPath(mediaBasePath, builder.Environment.ContentRootPath);
+    var mediaRequestPath = builder.Configuration["MediaStorage:RequestPath"];
+    mediaRequestPath = string.IsNullOrWhiteSpace(mediaRequestPath)
+        ? "/uploads"
+        : $"/{mediaRequestPath.Trim().Trim('/', '\\')}";
+    Directory.CreateDirectory(absoluteMediaBasePath);
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(absoluteMediaBasePath),
+        RequestPath = mediaRequestPath
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
